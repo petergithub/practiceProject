@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN"
+    "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingDirectoryLocations">
+			<list>
+				<value>classpath:com/order/model/hbm/</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					${hibernate.dialect}
+				</prop>
+				<prop key="hibernate.show_sql">
+					${hibernate.show_sql}
+				</prop>
+				<prop key="hibernate.format_sql">
+					${hibernate.format_sql}
+				</prop>
+				<prop key="hibernate.cache.provider_class">
+					org.hibernate.cache.EhCacheProvider
+				</prop>
+				<prop key="hibernate.cache.use_query_cache">
+					${hibernate.cache.use_query_cache}
+				</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="txProxyTemplate" abstract="true"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="update*">PROPAGATION_REQUIRED</prop>
+				<prop key="*"></prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
+		lazy-init="false">
+		<property name="locations">
+			<list>
+				<value>classpath*:system.properties</value>
+			</list>
+		</property>
+	</bean>
+
+
+	<!-- service layer -->
+	<bean id="userService"
+		class="com.order.service.impl.UserServiceImpl">
+		<property name="userDao">
+			<ref bean="userDao" />
+		</property>
+	</bean>
+
+	<!-- dao layer -->
+	<bean id="userDao" parent="txProxyTemplate">
+		<property name="target">
+			<bean class="com.order.dao.impl.UserDaoImpl">
+				<property name="sessionFactory">
+					<ref bean="sessionFactory" />
+				</property>
+			</bean>
+		</property>
+	</bean>
+
+	<!--Spring Mail Sender-->
+
+	<bean id="mailService"
+		class="com.order.service.impl.MailServiceImpl">
+		<property name="emailOfSupporter"
+			value="${email.smtp.username}" />
+		<property name="mailSubject" value="${email.mailSubject}" />
+		<property name="systemUrl" value="${email.content.systemUrl}" />
+		<property name="templateFile" value="${email.templateFile1}" />
+		<property name="systemMailSender">
+			<ref bean="systemMailSender" />
+		</property>
+		<property name="emailContentGenerator">
+			<ref bean="emailContentGenerator" />
+		</property>
+	</bean>
+
+	<bean id="javaMailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="${email.smtp.host}" />
+		<property name="username" value="${email.smtp.username}" />
+		<property name="password" value="${email.smtp.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="systemMailSender"
+		class="com.db.util.SystemMailSender">
+		<property name="encode">
+			<value>${email.encode}</value>
+		</property>
+		<property name="javaMailSender">
+			<ref bean="javaMailSender" />
+		</property>
+	</bean>
+
+	<bean id="emailContentGenerator"
+		class="com.db.util.EmailContentGenerator">
+		<property name="encode" value="${email.encode}" />
+		<property name="templateDir" value="/emailskin" />
+		<property name="previewHtmlFileDir" value="preview" />
+	</bean>
+</beans>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+     "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="helloworld.hibernate.hsqldb.contacts.Folder" table="FOLDERS" discriminator-value="Normal">
+
+        <id name="id" column="PK" type="long" unsaved-value="0">
+            <generator class="increment"/>
+        </id>
+
+        <discriminator column="TYPE" type="string" />
+
+        <property name="folderName" column="FOLDER_NAME" length="30"/>
+
+        <set name="folders" cascade="all" inverse="true" lazy="true">
+            <key column="PARENTFOLDER_PK"/>
+            <one-to-many class="helloworld.hibernate.hsqldb.contacts.Folder"/>
+        </set>
+
+        <set name="contacts" cascade="save-update" table="CONTACTS_FOLDER_REL" lazy="true">
+            <key column="PARENTFOLDER_PK"/>
+            <many-to-many class="helloworld.hibernate.hsqldb.contacts.ContactInfo" column="CONTACT_PK"/>
+        </set>
+
+        <subclass name="helloworld.hibernate.hsqldb.contacts.OwnedFolder" discriminator-value="Owned">
+            <property name="owner" type="java.lang.String" column="OWNER" length="30"/>
+        </subclass>
+
+    </class>
+</hibernate-mapping>

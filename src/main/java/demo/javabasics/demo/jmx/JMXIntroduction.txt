@@ -1,0 +1,273 @@
+refer to CentralHeaterAgent class
+一、 JMX 简单介绍
+
+Tomcat 从 5.0 版本开始引入 JMX ，力图使 JMX 成为 Tomcat 未来版本的管理工具和平台。首先，让我们来对 JMX 做一个简单了解。 JMX 是 Java Management Extension 的缩写，可译为 Java 管理工具扩展，扩展的意思就是 JMX 不包含在标准的 J2SE 中，我们必须要另外下载 JMX RI 的实现。不过，这种把 JMX 排除在 J2SE 之外的情况已经成为历史了， J2SE5.0 和 J2SE6.0 都已经包含了 JMX 的标准实现。这说明， JMX 已经成为 J2SE 不可分割的一部分，另外一方面， JMX 已经成为 Java 平台上管理工具的事实标准，在业界广泛使用。例如， JBOSS 就是以 JMX 为微内核， Web 应用模块和其它功能模块都可热插拨到这个微内核，将 JMX 的管理功能发挥得淋漓尽致。从当前业界使用情况看， JMX 中的 X(Extension ，扩展 ) 应该去掉，改名为 Java Management Standard Platform (JMSP ， Java 管理标准平台 ) 更加合适。为了向下兼容，我们姑且还是称之为 JMX 吧。
+
+JMX 要管理的对象是什么呢，是资源。什么是资源，资源是指企业中的的各种应用软件和平台，举例来说，一个公司内部可能有许多应用服务器、若干 Web 服务器、一台至多台的数据库服务器及文件服务器等等，那么，如果我们想监视数据库服务器的内存使用情况，或者我们想更改应用服务器上 JDBC 最大连接池的数目，但我们又不想重启数据库和应用服务器，这就是典型意义上的资源管理，即对我们的资源进行监视 (Monitoring ，查看 ) 和管理 (Management ，更改 ) ，这种监视和更改不妨碍当前资源的正常运行。对资源进行适当的监测和管理，可以让我们的 IT 资源尽可能的平稳运行，可以为我们的客户提供真正意思上的 24 × 7 服务。在资源耗尽或者在硬件出故障之前，我们就可以通过管理工具监测到，并通过管理工具进行热调整和插拔。独孤九剑，料敌机先，适当的资源管理就是我们料敌机先的工具，可以让我们立于 IT 服务的不败之地。在 Sun 公司提出 JMX(JSR174) 以前，人们通常都是使用 SNMP 对网络上的资源进行管理。 SNMP 的主要问题是入门门槛太高，不容易使用。所以 Sun 提出了 JSR174 倡议并且提供了一套 JMX 的参考实现。
+
+从技术上说， JMX 整体架构可分为三层，即资源植入层 (Instrumentation Level ，可能有更好的译法？ ) 、代理层 (Agent Level) 和管理层 (Manager Level) ，简述如下：
+
+资源植入层 (Instrumentation Level) ：该层包含 MBeans 及这些 MBeans 所管理的资源， MBeans 是一个 Java 对象，它必须实现 JMX 规范中规定的接口。按照 JMX 规范，在 MBeans 对象的接口中，我们可以指定管理层可以访问资源的哪些属性，可以调用资源的哪些方法，并且，在资源的属性发生变化是，我们的 MBeans 可以发出消息，通知对这些属性变化感兴趣的其它对象。 JMX 规范定义了四种 MBeans ，它们分别是标准 MBeans(Standard MBeans) 、动态 MBeans(Dynamic MBeans) 、开放 MBeans(Open MBeans) 和模态 MBeans(Model MBeans) 。
+
+代理层 (Agent Level) ：代理层的目的就是要把 MBeans 中实现的接口暴露给管理层，该层通常由 MBean Server 和 Agent Services 构成， MBean Server 就是一个 MBeans 对象注册器，所有的资源 MBeans 都注册到这个 MBean Server ，对象管理器或者其它的管理层应用程序可以通过访问 MBean Server ，从而可以访问 MBean Server 中注册的 MBeans ，当然也就可以监视和管理和这些 MBeans 绑定的资源。
+
+管理层 (Manager Level) ：又称之为分布式服务层 (Distributed Services) ，顾名思义，该层主要包含一些管理应用程序，这些程序可以访问和操作 JMX 代理层 (Agent Level) 。这些管理应用程序可以是一个 Web 应用，也可能是一个 Java SWT 应用程序。
+
+
+
+下面，我们举一个简单的例子，理解一下 JMX 中中的各个概念。我们家有一个中央热水系统 (Central Heater System) ，它是我们家的一个资源，现在我们想通过 JMI 进行管理。现有的代码如下所示，当然，为简单起见，我们略去了一些 JNI 调用代码，因为厂家提供的 API 是用 C 语言写的。
+
+a) 热水器接口 ( CentralHeaterInf .java ) 的现有代码：
+
+package carl.test.jmx;
+
+/**
+* The interface of Central Heater
+* @author carlwu
+*
+*/
+public interface CentralHeaterInf {
+
+/**
+* The heater is provided by British Gas Company
+*/
+public final static String HEATER_PROVIDER = "British Gas Company" ;
+
+/**
+* Get current temperature of heater
+* @return the temperature of the heater
+*/
+public int getCurrentTemperature();
+
+
+/**
+* Set the new temperature
+* @param newTemperature
+*/
+public void setCurrentTemperature( int newTemperature);
+
+
+/**
+* Turn on the heater
+*/
+public void turnOn();
+
+
+/**
+* Turn off the heater
+*/
+public void turnOff();
+
+}
+
+
+b) 热水器实现代码的现有代码 (CentralHeaterImpl .java )
+
+/**
+* The implemenation of Central Heater
+* @author carlwu
+*
+*/
+package carl.test.jmx;
+
+public class CentralHeaterImpl implements CentralHeaterInf {
+
+int currentTemperature ;
+public int getCurrentTemperature() {
+  return currentTemperature ;
+}
+
+public void setCurrentTemperature( int newTemperature) {
+  currentTemperature =newTemperature;
+}
+
+public void turnOff() {
+  System. out .println( "The heater is off. " );
+}
+
+public void turnOn() {
+  System. out .println( "The heater is on. " );
+}
+
+}
+
+
+1.1 资源植入层 (Instrumentation Level) 代码示例
+
+我们如何让 JMX 对我们的中央热水器进行管理呢 ? 首先，我们并不想让远程管理者能够关闭我们的中央热水器，因为热水器一旦关上，我们再也无法访问厂家提供的 API 。既然不能关闭它，我们的 MBeans 中也就不需要打开 (turnOn) 方法。所以，我们简单定义的 MBeans 接口如下：
+
+package carl.test.jmx;
+
+/**
+* @author carlwu
+*
+*/
+
+public interface CentralHeaterImplMBean {
+
+/**
+* return the heater provider
+* @return
+*/
+public String getHeaterProvider();
+
+/**
+* Get current temperature of heater
+* @return the temperature of the heater
+*/
+public int getCurrentTemperature();
+
+
+/**
+* Set the new temperature
+* @param newTemperature
+*/
+public void setCurrentTemperature( int newTemperature);
+
+/**
+* Print the current temperature of the heater
+* @return the string of current temperature
+*/
+public String printCurrentTemperature();
+
+}
+
+上面的 MBean 接口及其简单，意义也非常明显，我们只向管理程序公开热水器的生产厂家 ( 该属性为只读，管理程序不能更改热水器的生产厂家 ) ，但管理程序可以获取并更改当前热水器的温度，并且可以打印出热水器的当前温度。
+
+接下来，我们要做的，就是更改我们已有的 CentralHeaterImpl.java 代码，让它实现 CentralHeaterImplMBean 接口，同时实现 CentralHeaterImplMBean MBean 中规定的所有方法。 CentralHeaterImpl.java 更改后的源代码如下：
+
+/**
+* The implemenation of Central Heater
+* @author carlwu
+*
+*/
+package carl.test.jmx;
+
+
+public class CentralHeaterImpl implements CentralHeaterInf,CentralHeaterImplMBean {
+
+int currentTemperature ;
+
+public int getCurrentTemperature() {
+  return currentTemperature ;
+}
+
+public void setCurrentTemperature( int newTemperature) {
+  currentTemperature =newTemperature;
+}
+
+public void turnOff() {
+  System. out .println( "The heater is off. " );
+}
+
+public void turnOn() {
+  System. out .println( "The heater is on. " );
+
+}
+
+
+
+public String getHeaterProvider() {
+  // TODO Auto-generated method stub
+  return HEATER_PROVIDER ;
+
+}
+
+
+
+public String printCurrentTemperature() {
+
+  String printMsg= "Current temperature is:" + currentTemperature ;
+  System. out .println(printMsg);
+  return printMsg;
+}
+
+}
+
+到此为止，我们的资源植入层 (Instrumentation Level) 的代码全部完成，它主要由一个 MBean(CentralHeaterImplBean) 及其实现类 CentralHeaterImpl 组成，在 CentralHeaterImplBean 这个 MBean 接口中，我们说明了要向管理程序暴露的属性和方法，在本例中，我们的管理程序可以访问热水器的生产厂家信息，同时还可以获取和设置并打印热水器的温度。在 MBean 的实现类中，我们实现了 MBean 接口中规定的所有方法。
+
+然而，在上面的实现中，我们更改已有的 CentralHeaterImpl.java 代码。但从代码编写的角度看，这种做法违反了软件设计的基本原则 — 开闭原则。我们已有的 CentralHeaterImpl.java 类已经经过多次测试，消除了所有的 Bug ，现在为了支持 JMX ，我又增加方法，又修改代码，这会让原本运行得很好的系统重新产生 Bug 。您不妨思考一下，如何不修改 CentralHeaterImpl 类的代码，但又让使 JMX 能够管理我们家的热水器呢？请参考本文的附录，看看您的想法是否比我提供的参考实现高明些？
+
+1.2 代理层 (Agent Level) 示例代码
+
+import java.lang.management.ManagementFactory;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
+/**
+* @author carlwu
+*
+*/
+public class CentralHeaterAgent {
+private static MBeanServer mBeanServer ;
+/**
+* @param args
+*/
+
+public static void main(String[] args) throws Exception {
+
+  ObjectName oname;
+  // get the default MBeanServer from Management Factory
+
+  mBeanServer = ManagementFactory.getPlatformMBeanServer ();
+  // try {
+  // create a instance of CentralHeaterImpl class
+  CentralHeaterInf centralHeater = new CentralHeaterImpl();
+
+  // assign a Object name to above instance
+  oname = new ObjectName( "MyHome:name=centralheater" );
+
+  // register the instance of CentralHeaterImpl to MBeanServer
+  mBeanServer .registerMBean(centralHeater, oname);
+
+  System. out .println( "Press any key to end our JMX agent..." );
+  System. in .read();
+
+}
+
+}
+
+
+您可以看到，上面的代理层代码异常简单。前面讲过，代理层中最重要的对象就是 MBeanServer ，我们可以把 MBeanServer 理解为一个全局的 HashMap ，所有的 MBeans 都通过唯一的名字注册到这个 HashMap ，这个 HashMap 可以跨越 JVM 访问，甚至可以通过 RMI 、 Http 及其它手段跨越网络传输到其它机器，让其它机器也能访问这个 MBeanServer 中注册的对象。下面我们稍微理解一下代理层代码，在 main() 方法中，
+
+a)   首先我们从 ManagementFactory 的工厂方法中获得 MBeanServer 对象；
+
+b)   然后实例化我们的热水器对象，注意这个对象声明为 CentralHeaterInf ，而不是 CentralHeaterImplMBean 。 JMX 规范并没有规定对象声明，只要这个对象实现了一个以 SomethingMBean 命名的接口或父类即可；
+
+c)   接下来通过 new ObjectName(String) 构造函数给我们的 MBean 一个全局的名字，这个名字一般的格式是： ” 域名 : 属性 1=*, 属性 2=*,…” 构成；
+
+d)   第四步，我们调用 MBeanServer 的 regiesterBean 方法，通过第三步声明的全局名字把我们的 MBean 实例注册到 MBeanServer 。
+
+这几步都非常简单明了。下面我们在 Eclipse 中运行代理层代码，运行时，请加上下面几个 JVM 运行时参数：
+
+-Dcom.sun.management.jmxremote
+-Dcom.sun.management.jmxremote.port=9999
+-Dcom.sun.management.jmxremote.ssl="false"
+-Dcom.sun.management.jmxremote.authenticate="false"
+
+这四个 JVM 运行时参数的意义是， MBeanServer 允许其它管理程序通过 RMI 方式访问， RMI 端口是 9999 ， RMI 不使用 SSL 协议，也不需要验证。 Eclipse 的 Run 窗口如下：
+
+
+然后，请在上面的窗口中点击 Run( 运行 ) 按钮，运行代理层程序。
+
+1.3 管理层代码
+
+管理层代码编写起来其实也比较简单，但如果您要求界面比较完美，并且您也不想卷入到 AWT 加 Swing 的面条代码中，您最好直接使用 JDK 自带的 JConsole.exe 程序，这个程序位于 JDK\bin 目录下，可直接运行。下面我们观察管理程序在远程和本地运行情况。
+
+a)   远程运行 JConsole 管理程序
+
+请双击 JConsole.exe 或者通过命令行在本机上启动 JConsole.exe ，在 JConsole 的连接界面，选择远程连接，然后输入 RMI 地址和端口号，本例为 localhost:9999 ，注意确保我们上面编写的 CentralHeaterAgent 代理处于运行状态，远程连接界面如下图所示：
+连接成功后，请点击 MBean 标签，并展开 MyHome 节点，我们可以观察到 CentralHeaterImplMBean 中暴露给管理程序所有的属性和方法，如下图所示：
+
+我们在 CentralHeaterImplMBean 接口中规定， CurrentTemperature 属性是可以更改的，所以上图中 CurrentTemperature 的值显示为绿色，表示远程管理者可以调节；但 HeaterProvider( 生产厂家 ) 的属性是不能更改的，所以其值显示为灰色。现在，我们以远程管理用户的身份，把 CurrentTemperature 属性的值改为 25 ，并按回车或者点击刷新按钮，接下来您可以在上面的界面中，调用操作方法 printCurrentTemperature() ，您会在弹出的对话框中看到“ Current temperature is:25 ”的字样，这说明我们的温度更改成功。请注意这是通过远程 RMI 完成的。
+
+b)   本地运行 JConsole 管理程序
+
+请关闭上步中打开的 JConsole ，然后重新运行 JConsole.exe 程序，选择本地进程中的 carl.test.jmx.CentralHeaterAgent 程序，并单击“连接”按钮，图示如下。
+您在本地的管理程序中可以观察到， MyHome 节点下的 centralheater 的 CurrentTemperature 的值已经改为 25 ，这个更改时通过远程方式完成的。
+
+到此为止， JMX 的小例子就结束了，您可能有些疑惑。 a) 首先， JMX 从表现形式上看似 RMI 或者 EJB ，是一种分布式计算，对吗？ b) 其次，我们在注册 MBean 时，开始声明了一个 MBean 对象，然后把这个对象注册到 MBeanServer ，那么，所有的操作都只能操纵这个对象，对吧？假设我们在程序的其它地方，又新创建了这个 MBean 的另一个实例，这时，我们如何管理这个新创建的实例呢？
+
+我们先来思考一下 JMX 和 RMI/EJB 的区别， RMI/EJB 是分布式计算的一种，它们通过 Stub 和 Skeleon 的方式，在服务器和客户端之间传输 Bean 实例，所以客户端必须知道服务器端 Bean 的接口；客户端可以获得服务器端的实例对象，并能调用这个实例对象的方法，被调用的方法其实是在客户端运行的，方法的运行需要占用客户端资源。但 JMX 不同， JMX 管理程序 ( 类似于 EJB/RMI 的客户端 ) 不需要了解服务器中 Bean 的任何接口的信息，更不需要从服务器上获取正在运行的实例，所有方法的调用均在服务器端完成，管理程序只是用来监视或者管理服务器中注册的 MBeans 。
+
+再说说 JMX 如何管理新实例的问题，我们知道， JMX 管理的是资源。何谓资源，资源一般代表真实存在的事物。比如说上面例子中的热水器，我们家只有一个热水器，所以一个 MBean 的实例足矣，不必使用 new 来创建另一个实例。但是，您可能会问，我们家假如有两个热水器怎么办？在这种情况下，我们需要两个 MBean 的实例，把它们分别命名为 "MyHome:name=centralheater_1" 和 "MyHome:name=centralheater_2" ，并注册到 MBeanServer ，这两个热水器之间没有任何关系，就和 Java 中同一个类的两个实例类似。当然，同一个类的两个实例之间可以通过 static 属性共享资源。一般说来， JMX 中的 MBean 对应的是真实世界里存在的事物，或者服务器中独一无二的对象，这些对象往往长期驻留在内存中，所以需要管理。如果您新建一个实例，等您的方法退出之后，垃圾回收器马上将这个对象清理掉，您也没有必要使用 JMX 来管理这种昙花一现的对象，对吗？

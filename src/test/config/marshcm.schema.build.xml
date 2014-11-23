@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="dot-Hibernate-Mapping-Generation" default="schemaexport" basedir="../">
+    <property file="config/marshcm.properties" />
+
+    <property name="hibernate.config.dir" value="${config.dir}" />
+    <property name="spring.config.dir" value="${config.dir}" />
+	<property name="log4j.config.dir" value="${config.dir}" />
+    <property name="model.src.dir"   value="${src.dir}" />
+    <property name="model.build.dir" value="${build.dir}" />
+	<property name="webinf.dir" value="${webinf.dir}" />
+    <property name="hibernate-mapping.gen.dir" value="${build.dir}" />
+
+    
+
+	<path id="schemaexport.class.path">
+		<fileset dir="${hibernate.lib.dir}">
+			<include name="**/*.jar"/>
+			<include name="**/*.zip"/>
+		</fileset>
+		<pathelement path="${model.build.dir}" />
+	</path>
+
+	<target name="schemaexport">
+    	<taskdef name="schemaexport"
+        	classname="net.sf.hibernate.tool.hbm2ddl.SchemaExportTask"
+        	classpathref="schemaexport.class.path"
+        />
+
+	    <schemaexport
+	    	properties="config/hibernate.properties"
+	        quiet="no"
+	        text="yes"
+	        drop="no"
+	        delimiter=";"
+	        output="${marshcm.home.dir}/schema-export.sql"
+	    >
+
+	        <fileset dir="${hibernate-mapping.gen.dir}">
+	            <include name="**/*.hbm.xml"/>
+	        </fileset>
+	    </schemaexport>
+	</target>
+</project>

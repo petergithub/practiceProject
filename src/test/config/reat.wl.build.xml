@@ -1,0 +1,295 @@
+<project name="grs ear" default="build">
+
+  <property environment="env" />
+
+  <!-- define property file for grs -->	
+  <property file="./grs.properties"/>
+
+  <!-- compiler name -->
+  <property name="build.compiler" value="${compiler}" />
+
+  <!-- path of hibernate.cfg.xml and log4j.property -->
+  <property name="grs.config.dir" value="${grs.home.dir}/configure" />
+  <property name="hibernate.config.dir" value="${grs.config.dir}/hibernate" />
+  <property name="log4j.config.dir" value="${grs.config.dir}/log4j" />
+  
+  <!-- grsWebApp path name -->
+  <property name="grsWebApp" value="webApp"/>
+  <property name="ws_war_file" value="webservice"/>
+  <property name="endpoint" value="http://localhost:7001"/>
+
+  <!-- this is the src directory out of which when combined
+       with the build directory is a wls formatted ear -->
+  <property name="grs.ear.src.dir" value="${src.dir}/grsEar" />
+
+  <!-- generated ear file path after build -->	
+  <property name="dest.dir" value="${grs.ear.wlcompile.build.dir}" />
+  <property name="web.dest.dir" value="${dest.dir}/${grsWebApp}" />
+  <property name="web-inf.dir" value="${web.dest.dir}/WEB-INF" />
+   
+  <!-- This is an archived J2EE formatted ear, combining
+       the build and src elements of the grs ear -->
+  <property name="ear.file" value="${grs.ear.file}" />
+
+  <!-- This is an exploded J2EE formatted ear, combining
+       the build and src elements of the grs ear -->
+  <property name="ear.exploded.dir" value="${grs.ear.exploded.dir}" />
+
+  <!-- these all apply to the src and build directory for wls formatted ear -->
+  <property name="app-inf.dest.classes" value="${dest.dir}/APP-INF/classes"/>
+  <property name="app-inf.dest.lib" value="${dest.dir}/APP-INF/lib"/>
+  <property name="app-inf.src.classes" value="${grs.ear.src.dir}/APP-INF/classes"/>
+  <property name="app-inf.src.lib" value="${grs.ear.src.dir}/APP-INF/lib"/>
+  <property name="namespace"  value="http://www.pfizer.com/grs/codetable/webservices"/>
+  
+  <target name="banner">
+    <echo>+---------------------------------------+</echo>
+    <echo>+        Building GRS Ear               +</echo>
+    <echo>+---------------------------------------+</echo>
+  </target>
+
+  <!-- build and deploy application -->
+  <target name="all" depends="clean,  compile" />
+  <target name="stage" depends="clean, compile, exploded.ear" />
+
+  <target name="prepare">
+    <!--Setup the directories for the ear level -->
+    <mkdir dir="${app-inf.dest.classes}"/>
+    <mkdir dir="${app-inf.dest.lib}"/>
+    <mkdir dir="${web.dest.dir}"/>
+    <mkdir dir="${dest.dir}/META-INF" />
+    <mkdir dir="${dist.dir}" />
+    
+    <!-- 3rd-party jars -->
+    <copy todir="${app-inf.dest.lib}">
+      <fileset dir="${lib.root.dir}" includes="*.jar" excludes="j2ee.jar"/>
+      <fileset dir="${lib.root.dir}/crystal" includes="*.jar" />
+      <fileset dir="${lib.root.dir}/hibernate3.1.3" includes="*.jar,*.txt" />
+      <fileset dir="${lib.root.dir}/ldap" includes="*.jar" />
+      <fileset dir="${lib.root.dir}/oracle_driver" includes="*.jar" />
+      <fileset dir="${lib.root.dir}/struts1.2.9" includes="*.jar" />
+      <fileset dir="${lib.root.dir}/dfc" includes="*.jar" />
+    </copy>  
+
+    <!-- put the hibernate configuration file into the classpath -->
+    <copy file="${hibernate.config.dir}/hibernate.cfg.xml" todir="${app-inf.dest.classes}" />  
+    <copy todir="${app-inf.dest.classes}">
+      <fileset dir="${grs.config.dir}" includes="*.xml" />
+      <fileset dir="${hibernate.config.dir}" includes="*.xml" />
+    </copy>  
+    <copy file="${log4j.config.dir}/log4j.properties" todir="${app-inf.dest.classes}"/> 
+    
+    <copy todir="${web-inf.dir}/classes">
+      <fileset dir="${grs.ear.src.dir}/webApp" includes="rptfiles/**" excludes="**/CVS/**" />
+    </copy>
+<!--    
+	<copy todir="${web.dest.dir}">
+	  <fileset dir="${grs.ear.src.dir}/webApp" excludes="**/*.bak, **/CVS/**, ${web-inf.dir}/classes/**"/>
+	</copy>
+-->
+
+    <copy todir="${dest.dir}/META-INF">
+      <fileset dir="${grs.ear.src.dir}/META-INF">
+        <include name="*.xml"/>
+        <exclude name="appl*.xml" />
+      </fileset>
+    </copy>
+
+  </target>
+
+  <path id="grs-classpath">
+		<fileset dir="${app-inf.dest.lib}">
+			<include name="*.jar"/>
+		</fileset>		
+  </path>
+
+  <!-- builds entire application -->
+  <target name="compile" depends="banner, prepare">
+    <!-- Build value components first -->
+    <!-- Should conform to the dependency relation -->
+		<javac destdir="${app-inf.dest.classes}" >
+			<src path="${grs.ear.src.dir}/web"/>
+			<src path="${grs.ear.src.dir}/exception"/>
+			<src path="${grs.ear.src.dir}/util"/>
+			<src path="${grs.ear.src.dir}/model"/>
+			<src path="${grs.ear.src.dir}/transfer"/>
+			<src path="${grs.ear.src.dir}/dao"/>
+			<src path="${grs.ear.src.dir}/messaging"/>
+			<src path="${grs.ear.src.dir}/domain"/>
+			<src path="${grs.ear.src.dir}/service"/>
+			<src path="${grs.ear.src.dir}/webservice"/>
+			<src path="${grs.ear.src.dir}/ejb"/>
+			<src path="${grs.ear.src.dir}/documentum"/>
+			<classpath refid="grs-classpath"/>
+		</javac>
+
+		<copy todir="${app-inf.dest.classes}" preservelastmodified="true">
+			<fileset dir="${grs.ear.src.dir}/dao">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
+
+
+		<javac destdir="${app-inf.dest.classes}" >
+			<src path="${grs.ear.src.dir}/web"/>
+			<classpath refid="grs-classpath"/>
+		</javac>
+		
+		<copy todir="${app-inf.dest.classes}" preservelastmodified="true">
+			<fileset dir="${grs.ear.src.dir}/resources">
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+  </target>
+  
+                   
+  <!-- build split-dir components -->
+  <target name="build" depends="build.split.dir, appc.split.dir"/>
+  
+  <target name="build.split.dir" depends="banner,prepare, compile">
+
+    <wlcompile srcdir="${grs.ear.src.dir}" destdir="${dest.dir}"
+               includes="webApp"/> 
+      
+    <wlcompile srcdir="${grs.ear.src.dir}" destdir="${dest.dir}"
+               includes="ejb"/> 
+  </target>
+
+  <!-- build grs webapp
+       classpath is required due to session ejbs ejbgen nature -->
+  <target name="build.grs.webapp" description="build grs webapp" depends="prepare, compile">
+    <wlcompile srcdir="${grs.ear.src.dir}" destdir="${dest.dir}" includes="webApp" />
+  </target>
+
+  <!-- Update ejb jar file or create it if it doesn't exist, including XML 
+    deployment descriptors -->
+  <target name="jar.ejb">
+    <jar jarfile="${dest.dir}/grs_ejb.jar"
+      basedir="${app-inf.dest.classes}"
+      update="yes">
+    </jar>
+  </target>
+
+  <target name="appc.split.dir">
+    <wlappc source="${dest.dir}" keepgenerated="true"/>
+  </target>
+
+  <!-- call the servicegen element within the ear task to generate and build
+       the ear into the ${apps.dir} directory.  It will be automatically
+       deployed from there -->
+  <target name="grs.webservice">
+    <servicegen
+       destEar="${grs.ear.src.dir}"
+       warName="${ws_war_file}"
+       contextURI="webservice" >
+       <service
+         javaClassComponents="com.dbrg.grs.webservice.CodeSyncWSImpl"
+         targetNamespace="${namespace}"
+         serviceName="CodeService"
+         serviceURI="/codeService"
+	 	 generateTypes="True"
+         expandMethods="True">
+       </service>
+      <classpath>
+        <path refid="grs-classpath"/>
+        <pathelement path="${app-inf.dest.classes}"/>
+      </classpath>
+     </servicegen>
+ 	  <wsdlgen ear="${grs.ear.src.dir}"
+ 	           warName="${ws_war_file}"
+ 	           serviceName="CodeService"
+ 	           defaultEndpoint="${endpoint}"
+ 	           wsdlFile="${grs.ear.src.dir}/${grsWebApp}/wsdls/codeService.wsdl">    
+      <classpath>
+        <path refid="grs-classpath"/>
+        <pathelement path="${app-inf.dest.classes}"/>
+      </classpath>
+      </wsdlgen>
+  </target>
+
+  <!-- generate the client jar and build the client calling class -->
+  <target name="ws.client" depends="build">
+    <clientgen
+      ear="${dest.dir}"
+      warName="${ws_war_file}"
+      packageName="com.dbrg.grs.webservice.client"
+      clientJar="${dest.dir}/codeServiceClient.jar">
+      <classpath>
+        <path refid="grs-classpath"/>
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="${app-inf.dest.classes}"/>
+      </classpath>
+    </clientgen>
+<!--
+    <javac srcdir="${source}"
+      destdir="${client}"
+      includes="Client.java">
+      <classpath>
+        <pathelement path="${client}/${client_jar_file}"/>
+      </classpath>
+    </javac>
+-->
+  </target>
+
+  <!-- deploys entire application -->
+  <target name="deploy.grs.ear" description="Deploy build/grsEar to WebLogic on localhost:${port} .">
+    <!-- "url" is not required, but the default url is iiop://localhost:${port} -->
+    <wldeploy user="${wls.username}" password="${wls.password}" adminurl="t3://localhost:${port}"
+      action="deploy" name="${grs.ear.display.name}" source="${dest.dir}" />
+  </target>
+
+  <target name="deploy">
+    <wldeploy action="deploy" adminurl="t3://localhost:${port}" user="${wls.username}" password="${wls.password}" >
+     <files dir="${build}" includes="${ear_file}"/>
+    </wldeploy>
+  </target>
+
+  <target name="redeploy.grs.ear" description="Redeploy build/grsEar to WebLogic on localhost:${port}.">
+    <!-- "url" is not required, but the default url is iiop://localhost:${port} -->
+    <wldeploy user="${wls.username}" password="${wls.password}" adminurl="t3://localhost:${port}"
+      action="redeploy" name="${grs.ear.display.name}" />
+  </target>
+ 
+  <target name="redeploy.grs.webapp" description="Redeploy webApp to WebLogic on localhost:${port}.">
+    <!-- "url" is not required, but the default url is iiop://localhost:${port} -->
+    <wldeploy user="${wls.username}" password="${wls.password}" adminurl="t3://localhost:${port}"
+      action="redeploy" name="${grs.ear.display.name}" targets="grs@myserver"/>
+  </target>
+
+      
+  <!-- package the application as J2EE formatted archived .ear -->
+  <target name="ear">
+    <wlpackage srcdir="${grs.ear.src.dir}" destdir="${dest.dir}"
+      toFile="${ear.file}" />
+  </target>
+
+  <!-- package the application a J2EE formatted exploded ear -->
+  <target name="exploded.ear">
+    <wlpackage srcdir="${grs.ear.src.dir}" destdir="${dest.dir}"
+      toDir="${ear.exploded.dir}" />
+  </target>
+
+  <target name="undeploy.grs.ear" description="undeploy build/grsEar to WebLogic on localhost:${port}.">
+    <!-- "url" is not required, but the default url is iiop://localhost:${port} -->
+    <wldeploy user="${wls.username}" password="${wls.password}" adminurl="t3://localhost:${port}"
+      action="undeploy" name="${grs.ear.display.name}" />
+  </target>
+
+  <target name="clean" depends="clean.ear,clean.exploded.ear">
+    <delete dir="${dest.dir}" />
+  </target>
+      
+  <target name="clean.ear">
+    <delete file="${ear.file}"/>
+  </target>
+
+  <target name="clean.exploded.ear">
+    <delete dir="${ear.exploded.dir}"/>
+  </target>
+
+  <target name="clean.prepare">
+    <delete dir="${app-inf.dest.classes}"/>
+    <delete dir="${app-inf.dest.lib}"/>
+  </target>
+  
+</project>

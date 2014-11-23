@@ -1,0 +1,59 @@
+package demo.javabasics.gc;
+
+// Demonstration of the garbage collector and finalization
+public class GarbageCollection {
+	@SuppressWarnings("deprecation")
+	public static void main(String[] arg) {
+		// if (args.length == 0) {
+		// System.err.println("Usage: \n" + "java Garbage before\n or:\n"
+		// + "java Garbage after");
+		// return;
+		// }
+//		String[] args = { "before" };
+		 String [] args = {"after"};
+		while (!Chair.stopCreation) {
+			new Chair();
+			new String("To take up space");
+		}
+		System.out.println("After all Chairs have been created:\n"
+				+ "total created = " + Chair.created + ", total finalized = "
+				+ Chair.finalized);
+		if (args[0].equals("before")) {
+			System.out.println("gc():");
+			System.gc();
+			System.out.println("runFinalization():");
+			System.runFinalization();
+		}
+		System.out.println("bye!");
+		if (args[0].equals("after")) System.runFinalizersOnExit(true);
+	}
+}
+
+class Chair {
+	static boolean gcrun = false;
+	static boolean stopCreation = false;
+	static int created = 0;
+	static int finalized = 0;
+	int index;
+
+	Chair() {
+		index = ++created;
+		if (created == 47) System.out.println("Created 47");
+	}
+
+	protected void finalize() {
+		if (!gcrun) {
+			gcrun = true;
+			System.out.println("Beginning to finalize after " + created
+					+ " Chairs have been created");
+		}
+		if (index == 47) {
+			System.out
+					.println("Finalizing Chair #47, Setting flag to stop Chair creation");
+			stopCreation = true;
+		}
+		finalized++;
+		if (finalized >= created)
+			System.out.println("All " + finalized + " finalized");
+	}
+}

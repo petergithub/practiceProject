@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="zh-CN" lang="zh-CN"><head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Java 开发 2.0: 保护用于云计算的 Java 应用程序数据</title>
+</head><body><div id="ibm-pcon">
+<!-- RIGHT_COLUMN_CONTENT_BEGIN --> 
+<div class="ibm-container"><h2>内容</h2><div class="ibm-container-body"><img alt="" src="index_files/c_002.gif" height="1" width="1"><ul class="ibm-bullet-list"><li><a class="ibm-feature-link" href="#N1009B">保护云数据</a></li><li><a class="ibm-feature-link" href="#N100CB">私钥加密</a></li><li><a class="ibm-feature-link" href="#N100F8">加密 Java 应用程序</a></li><li><a class="ibm-feature-link" href="#N10144">Java 密钥库</a></li><li><a class="ibm-feature-link" href="#N101B9">云加密</a></li><li><a class="ibm-feature-link" href="#N1023E">结束语</a></li><li><a class="ibm-feature-link" href="#resources">参考资料 </a></li><li><a class="ibm-feature-link" href="#author">关于作者</a></li><li><a class="ibm-feature-link" href="#icomments">评论</a></li></ul></div></div>
+</div>
+<!-- CONTENT_BEGIN -->
+<div id="ibm-content">
+
+<!-- Navigation_Trail_BEGIN -->
+<!-- &nbsp; -->
+      <div id="ibm-content-head"><ul id="ibm-navigation-trail"><li class="ibm-first"><a href="http://www.ibm.com/developerworks/cn/">developerWorks</a></li><li><a href="http://www.ibm.com/developerworks/cn/topics/">技术主题</a></li><li><a href="http://www.ibm.com/developerworks/cn/java/">Java technology</a></li><li><a href="http://www.ibm.com/developerworks/cn/views/java/libraryview.jsp">文档库</a></li></ul></div>
+<!-- Navigation_Trail_END -->
+
+<!-- dW_Summary Area_START -->
+<div id="dw-summary-article">
+
+<div class="dw-content-head">
+<h1>Java 开发 2.0: 保护用于云计算的 Java 应用程序数据</h1><p><em>使用私钥加密来保护云数据</em></p>
+</div>
+
+<div class="ibm-container-body ibm-two-column">
+
+<div class="ibm-column ibm-first">
+<div class="author"><a class="dwauthor" rel="#authortip1" href="#author1">Andrew Glover</a>, CTO, App47</div><div style="display: none;" id="authortip1" class="dwauthor-onload-state ibm-no-print"><div class="position"><img src="index_files/p-anglover.jpg" alt="/developerworks/i/p-anglover.jpg" height="80" width="64"></div>Andrew Glover 是一位具有行为驱动开发、持续集成和敏捷软件开发激情的开发人员、作家、演说家和企业家。他是 <a href="http://www.easyb.org/">easyb</a> 行为驱动开发 (Behavior-Driven Development, BDD) 框架的创建者和以下三本书的合著者：<a href="http://www.amazon.com/gp/product/0321336380?ie=UTF8&amp;tag=thdibl-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0321336380">持续集成</a>、<a href="http://www.manning.com/koenig/">Groovy 在行动</a> 和 <a href="http://www.wiley.com/WileyCDA/WileyTitle/productCd-047144846X.html">Java 测试模式</a>。</div>
+<p></p>
+  <p><strong>简介：</strong>&nbsp;数据安全是考虑采用云计算的组织面临的一个严峻问题，但在许多情况下，无需对它过于担忧。在本期 <em>Java 开发 2.0</em> 中，将学习如何使用私钥加密和高级加密标准来保护用于云的敏感的应用程序数据。您还将快速了解加密策略，这对最大限度地提高针对分布式云数据存储的条件式搜索效率至关重要。</p>
+<p class="ibm-no-print"><a href="http://www.ibm.com/developerworks/cn/java/j-javadev2/">查看本系列更多内容</a></p>
+  <!-- <p class="ibm-no-print"><div id="dw-tag-this" class="ibm-no-print"></div><div id="interestShow" class="ibm-no-print"></div></p> -->
+<div id="dw-tag-content" class="ibm-no-print"></div><div id="dw-moretags-access" class="ibm-access"></div>
+<p class="ibm-no-print"></p><div id="dw-tag-this" class="ibm-no-print"><a class="ibm-external-link" onclick="jQuery.launchTagThisWindow(); return false;" href="#">标记本文！</a></div><div id="interestShow" class="ibm-no-print"></div>
+</div>
+
+</div>
+<!-- dW_Summary_Area_END -->
+
+<!-- CONTENT_BODY -->
+<div id="ibm-content-body">
+
+<!-- MAIN_COLUMN_BEGIN -->
+<div id="ibm-content-main">
+
+<!-- Related_Searches_Area_And_Overlays_Begin -->
+
+<!-- MAIN_COLUMN_CONTAINER_BEGIN -->
+<div class="ibm-container">
+
+<!-- MAIN_COLUMN_CONTENT_BEGIN -->
+<div class="ibm-container ibm-alt-header dw-container-sidebar"><h2>关于本系列</h2><div class="ibm-container-body">
+				
+				<p>自 Java 技术首次诞生以来，Java 开发格局已发生了翻天覆地的变化。得益于成熟的开源框架和可靠的租赁部署基础架构，现在可以迅速而经济地组装、测试、运行和维护 Java 应用程序。在本 <a href="http://www.ibm.com/developerworks/cn/java/j-javadev2/">系列</a> 文章中，Andrew Glover 将探索使得新的 Java 开发风格成为可能的各种技术和工具。</p>
+			</div></div>
+			<p>短短几年，云计算平台和服务就大大改变了 Java™ 应用程序开发领域。它们降低了与系统维护和配置关联的门槛，同时降低了将软件推向市场的<em>成本</em> 并提高了<em>上市速度</em>。从概念上讲，云计算具有重大意义：业务经理喜欢它的投资回报，开发人员喜欢摆脱基础架构代码的自由感。但是，许多商店仍然在纠结是否迁移到云平台。</p>
+			<p>数据安全是考虑将其软件迁移到云基础架构的组织面临的主要问题之一。数据越敏感，担忧的理由就越多。作为软件开发人员，我们一定要理解云计算的真实安全风险和解决至少部分问题的真实方法。</p>
+			<p>在本期 <em>Java 开发 2.0</em> 
+中，我将解释将数据存储在云中与将它存储在集中化的机器中有何不同。我然后将介绍如何使用 Java 
+平台内置的私钥加密标准和实用程序，合理地保护您的数据，即使这些数据存储在分布式云数据存储中。最后，我将演示一种战略性的加密方法，使用查询条件作为
+是否加密您的数据的判断标准。</p>
+			<p><a name="N1009B"><span class="atitle">保护云数据</span></a></p>
+			<p>云计算实际上并没有引入新的数据安全问题；在某些情形下，它只是放大了这些问题。将数据放在云中可能会将这些数据暴露给更大的群体，这通常是
+一件好事。但是，如果暴露的数据本应是私有的，或者只能有条件地访问，那么结果可能是灾难性的。云计算的基本问题是，它使委托的数据不再受开发人员或系统
+管理员直接掌控。没有在本地存储和管理，云中的数据存储在分布式设备上，这些设备可能位于任何地方，任何人都可以访问它们。</p>
+			<div class="ibm-container ibm-alt-header dw-container-sidebar"><h2>欧盟中的数据隐私</h2><div class="ibm-container-body">
+				
+				<p>欧盟的云平台数据隐私政策比美国的政策严格得多：属于欧盟居民的个人数据（比如一位法国居民的医疗记录）必须位于存在于欧盟内部的服务器上。</p>
+			</div></div>
+			<p>即使您的公司能够适应分散化、遥远的数据存储的事实，您可能仍然希望您放置在云中的应用程序存在一点点的数据安全性。当您开始考虑数据安全时，就会出现两个重要的问题： </p>
+			<ul>
+				<li>数据在传输期间是否安全？</li>
+				<li>数据在静止时是否安全？</li>
+			</ul>
+			<p><em>传输中的数据</em> 关系到数据如何从一个位置传输到另一个位置；也就是说，您使用了何种通信技术和基础架构。<em>静止的数据</em> 关系到如何（和多好地）存储数据。例如，如果您在数据库中存储用户名和密码，而不加密它们，那么您的静止数据就会不安全。</p>
+			<p>要保护在网络中传输的数据，通常需要使用 HTTPS。这是 HTTP 与浏览器与客户端之间的数据加密的结合。HTTPS 的另一项优势是流行性：大部分开发人员都已将 Apache、Tomcat 或 Jetty 配置为使用 HTTPS。</p>
+			<p>加密也是保护静止数据的一种常见机制，云计算没有改变这一事实。尽管加密的原理可能很复杂，但您只需要知道一些有关它的基本知识，就可以合理地保护您的应用程序数据。而且，一旦您的数据是安全的，那么您是在本地提供它还是通过云平台或数据库提供它就变得不那么重要。</p>
+			<div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="N100CB"><span class="atitle">私钥加密</span></a></p>
+			<p>加密是将人类可读的明文转换为不可读的文本的过程。您可以使用一个加密算法（也称为一个<em>密码</em>）来实现加密。加密的文本会通过一个密钥将文本解密成可读的文本，这个密钥实际上是一个密码。加密通过使信息无法供任何没有密钥的人读取来保护信息。</p>
+			<p>计算机领域中使用了两种类型的密钥加密：公钥加密和私钥加密。<em>公钥加密</em> 是保护传输中的数据的最常见技术；事实上，它是 HTTPS 事务安全性的底层架构。这种形式的加密需要一个公私钥<em>集合</em> 中的两个密钥。公钥用于加密数据，而私钥用于解密相应的数据。在公钥加密中，公钥可安全地分发，而私钥必须由管理员控制。公钥加密简化了已加密信息的共享。</p>
+			<div class="ibm-container ibm-alt-header dw-container-sidebar"><h2>私钥和隐私</h2><div class="ibm-container-body">
+				
+				<p>无论您使用何种加密算法，您必须确保私钥是安全的。您的密码应该满足高安全标准，绝不应以明文形式存储 — 尤其是不要存储在云中。幸运的是，Java 平台的安全基础架构创造适当复杂的密钥，允许您在 Java 平台密钥库中保护它们。</p>
+			</div></div>
+			<p>在<em>私钥加密</em> 中，数据使用一个私钥加密和解密。这种加密类型使得与第三方共享加密的数据变得很困难，因为发送方和接收方都必须使用相同的密钥。如果密钥被破坏，那么所有加密的信息就会被破坏。如果加密的数据无需与其他方共享，密钥可以始终受到严格控制，那么私钥加密非常有效。</p>
+			<p>私钥加密是保护将通过云基础架构存储和传输的应用程序数据的一种有效方式。因为加密密钥保持在管理员或应用程序创建者的控制之下，云提供者和其他潜在的窃听者无法不受控制地访问该数据。</p>
+			<div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="N100F8"><span class="atitle">加密 Java 应用程序</span></a></p>
+			<p>您可以选择各种选项来保护 Java 应用程序，包括标准 Java 平台库。您也可以从众多加密标准和包中进行选择。对于下面的示例，我将使用核心 Java 库和 AES（高级加密标准）。我将使用一个私钥来加密明文和解密<em>密文</em>，也就是加密之后的明文。我喜欢 AES，因为它是经过美国国家安全署批准的，还经过了美国政府的标准化。</p>
+			<p>为了实现最高的灵活性和测试的简单性，我将创建一些密码接口以及一些只是包装核心 Java 
+类的相关联的实现类。我然后将介绍如何使用这些类来实现安全的持久保存，以及如何查询云数据存储（比如 Amazon 的 SimpleDB 或者甚至 
+MongoHQ 的 MongoDB）中的数据。</p>
+			<p>在清单 1 中，我定义了一个简单的通用加密接口，它为加密和解密数据定义了两种方法。该接口将用作各种算法的前端，也就是说，我的实现类将使用一种特定的密码算法，比如 AES。</p>
+			<br><a name="listing1"><strong>清单 1. 一种加密接口</strong></a><br><table summary="这一表格包含代码清单。" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td class="code-outline"><pre class="displaycode">				
+package com.b50.crypto;
+
+public interface Cryptographical {
+ String encrypt(String plaintext);
+ String decrypt(String ciphertext);
+}
+</pre></td></tr></tbody></table><br>
+			<p>使用我的 <code>Cryptographical</code> 接口，我可以加密文本或解密已加密的文本。接下来，在清单 2 中，我将使用 Java 安全性 API 来创建另一个表示密钥的接口：</p>
+			<br><a name="listing2"><strong>清单 2. 一种密钥接口</strong></a><br><table summary="这一表格包含代码清单。" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td class="code-outline"><pre class="displaycode">				
+package com.b50.crypto;
+
+import java.security.Key;
+
+public interface CryptoKeyable {
+  Key getKey();
+} 
+</pre></td></tr></tbody></table><br>
+			<p>从上述代码中可以看到，我的 <code>CryptoKeyable</code> 接口仅仅用作 Java 平台的核心 <code>Key</code> 类型的包装器。</p>
+			<p>如果您使用 AES 加密，那么在加密明文时生成的二进制字符时，会需要使用 base-64 编码，至少在您希望在 Web 
+请求（例如，使用 SimpleDB 域）中使用它们时需要使用 base-64 编码。因此，我将编码所有加密的字符串，解码任何已加密的字符串。</p>
+			<p>用于 AES 的 <code>Cryptographical</code> 实现类（如清单 3 所示）不仅要处理 AES 加密，还要处理 base-64 编码和解码：</p>
+			<br><a name="listing3"><strong>清单 3. 我的 Cryptographical 接口的一种 AES 实现</strong></a><br><table summary="这一表格包含代码清单。" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td class="code-outline"><pre class="displaycode">				
+package com.b50.crypto;
+
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+
+public class AESCryptoImpl implements Cryptographical {
+
+ private Key key;
+ private Cipher ecipher;
+ private Cipher dcipher;
+
+ private AESCryptoImpl(Key key) throws NoSuchAlgorithmException,
+   NoSuchPaddingException, InvalidKeyException {
+  this.key = key;
+  this.ecipher = Cipher.getInstance("AES");
+  this.dcipher = Cipher.getInstance("AES");
+  this.ecipher.init(Cipher.ENCRYPT_MODE, key);
+  this.dcipher.init(Cipher.DECRYPT_MODE, key);
+ }
+
+ public static Cryptographical initialize(CryptoKeyable key) throws CryptoException {
+  try {
+   return new AESCryptoImpl(key.getKey());
+  } catch (NoSuchAlgorithmException e) {
+   throw new CryptoException(e);
+  } catch (NoSuchPaddingException e) {
+   throw new CryptoException(e);
+  } catch (InvalidKeyException e) {
+   throw new CryptoException(e);
+  }
+ }
+
+ public String encrypt(String plaintext) {
+  try {
+   return new BASE64Encoder().encode(ecipher.doFinal(plaintext.getBytes("UTF8")));
+  } catch (Exception e) {
+   throw new RuntimeException(e);
+  }
+ }
+
+ public String decrypt(String ciphertext) {
+  try {
+   return new String(dcipher.doFinal(new BASE64Decoder().decodeBuffer(ciphertext)), 
+     "UTF8");
+  } catch (Exception e) {
+   throw new RuntimeException(e);
+  }
+ }
+}
+ </pre></td></tr></tbody></table><br>
+			<div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="N10144"><span class="atitle">Java 密钥库</span></a></p>
+			<p>接下来，让我们想想加密密钥。Java 平台的核心库可用于创建强加密密钥；但是，这些方法总是会得到一个随机生成的新密钥。所以，如果您使用 Java <code>KeyGenerator</code> 类创建密钥，则需要存储该密钥，以供将来使用（也就是说，在您决定使用该密钥解密已加密的文本之前使用）。为此，您可以使用 Java 平台 <code>KeyStore</code> 实用程序和相应的类。</p>
+			<p><code>KeyStore</code> 包含一组类，这些类使您能够将密钥保存到采用密码保护的二进制文件（名为 <em>keystore</em>）中。我可以使用一些测试案例来测试 Java 中的密钥。首先，我创建一个 <code>Key</code> 的两个实例，显示每个实例对应的加密的 <code>String</code> 是不同的，如清单 4 所示：</p>
+			<br><a name="listing4"><strong>清单 4. 使用两个不同密钥的简单加密</strong></a><br><table summary="这一表格包含代码清单。" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td class="code-outline"><pre class="displaycode">				
+@Test
+public void testEncryptRandomKey() throws Exception {
+ SecretKey key = KeyGenerator.getInstance("AES").generateKey();
+ Cryptographical crypto = AESCryptoImpl.initialize(new AESCryptoKey(key));
+ String enc = crypto.encrypt("Andy");
+ Assert.assertEquals("Andy", crypto.decrypt(enc));
+
+ SecretKey anotherKey = KeyGenerator.getInstance("AES").generateKey();
+ Cryptographical anotherInst = AESCryptoImpl.initialize(new AESCryptoKey(anotherKey));
+ String anotherEncrypt = anotherInst.encrypt("Andy");
+ Assert.assertEquals("Andy", anotherInst.decrypt(anotherEncrypt));
+
+ Assert.assertFalse(anotherEncrypt.equals(enc));
+}
+</pre></td></tr></tbody></table><br>
+			<p>接下来，在清单 5 中，我证明了一个给定的密钥实例始终会得到相应 <code>String</code> 的相同加密文本：</p>
+			<br><a name="listing5"><strong>清单 5. 对应于一个字符串的一个私钥</strong></a><br><table summary="这一表格包含代码清单。" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td class="code-outline"><pre class="displaycode">				
+@Test
+public void testEncrypt() throws Exception {
+ SecretKey key = KeyGenerator.getInstance("AES").generateKey();
+
+ KeyStore ks = KeyStore.getInstance("JCEKS");
+ ks.load(null, null);
+ KeyStore.SecretKeyEntry skEntry = new KeyStore.SecretKeyEntry(key);
+ ks.setEntry("mykey", skEntry, 
+   new KeyStore.PasswordProtection("mykeypassword".toCharArray()));
+ FileOutputStream fos = new FileOutputStream("agb50.keystore");
+ ks.store(fos, "somepassword".toCharArray());
+ fos.close();
+
+ Cryptographical crypto = AESCryptoImpl.initialize(new AESCryptoKey(key));
+ String enc = crypto.encrypt("Andy");
+ Assert.assertEquals("Andy", crypto.decrypt(enc));
+
+ //alternatively, read the keystore file itself to obtain the key
+
+ Cryptographical anotherInst = AESCryptoImpl.initialize(new AESCryptoKey(key));
+ String anotherEncrypt = anotherInst.encrypt("Andy");
+ Assert.assertEquals("Andy", anotherInst.decrypt(anotherEncrypt));
+
+ Assert.assertTrue(anotherEncrypt.equals(enc));
+}
+</pre></td></tr></tbody></table><br>
+			<p>我使用了特定密钥加密的内容，因此需要使用相同密钥来解密。使用 Java <code>KeyStore</code> 是一种既方便又安全的密钥存储方法。</p>
+			<p><a name="N10188"><span class="smalltitle">密钥库相关说明</span></a></p>
+			<p>清单 <a href="#listing4">4</a> 和清单 <a href="#listing5">5</a> 中是样例代码，但它可以演示许多事情：</p>
+			<ul>
+				<li>密钥库有一个名称。 </li>
+				<li>存储的文件受密码保护。 </li>
+				<li>密钥库可存储多于一个密钥。</li>
+				<li>密钥库中的每个密钥都有一个关联的密码。</li>
+			</ul>
+			<p>对于这个测试案例，我决定在每次运行测试时创建一个新密钥库。我可以轻松地为每个新测试打开一个现有密钥库。如果我希望使用一个现有的密钥库，则需要知道它的密码，以及访问特定密钥的密码。</p>
+			<p>对于加密，密钥就是<em>一切</em>。底层密码有多强并不重要；如果我的密钥被破坏，那么我的数据就会暴露。这也意味着需要确保密钥库及其关联的密码始终都是安全的。（例如，在生产环境的应用程序中，我不会像清单 <a href="#listing4">4</a> 和清单 <a href="#listing5">5</a> 中演示的那样硬编码密码。）</p>
+			<div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="N101B9"><span class="atitle">云加密</span></a></p>
+			<p>当您加密数据时，您会更改它的属性。基本上，这意味着一个加密的整数不会很好地响应整数对比。因此，可以思考一下您最终会如何、为什么和在何
+种情形下查询存储在云中的数据，这很重要。好消息是，在许多情形下，您希望保持私有的数据将与您希望操作的数据具有不同的业务价值：加密一个帐户的名称或
+与帐户所有者相关的某些个人信息是合理的，但加密帐户余额可能没有意义（因为没有人会关心无法关联到一个人的帐户余额）。</p>
+			<p><a name="N101C2"><span class="smalltitle">查询加密数据</span></a></p>
+			<p>在执行<em>准确</em> 匹配时，加密的数据很容易搜索，比如：“为我找到所有名为 ‘foo’ 的帐户（其中 ‘foo’ 是加密的）。”但是这对于如下所示的条件查询没有效：“为我找到其到期余额大于 450 美元（其中 450 美元是加密的）的所有帐户。” </p>
+			<p>例如，让我们想象一下，我使用一个简单的密码，它将一个字符串的字符倒序排列并在其末尾添加一个字符 <em>i</em>。在此情况下，字符串 <em>foo</em> 将变成 <em>oofi</em>，<em>450</em> 将变成 <em>054i</em>。如果表中的名称值是使用这个简单密码加密的，我可以按准确匹配来轻松地查询，比如 “<code>select * from table where name = 'oofi'</code>”。但相比而言，450 的加密值完全不同：“<code>select * from table where amount  &gt; 054i</code>” 与 “<code>select * from table where amount &gt; 450</code>” 不太一样。</p>
+			<p>为了在此情形下进行数据比较，我可能必须在应用程序中执行某种解密，也就是说，我需要选择表中所包含的某个数据来解密 <code>amount</code> 字段，然后执行比较。对于此行为，无法依赖于底层数据存储意味着，我的过滤操作可能不会像在数据存储中那么快。假设我希望最大化效率，我应该考虑我希望加密何种数据，以及我希望如何加密它。加密时考虑未来的查询是一种改善程序总体效率的不错方式。</p>
+			<p>您可以轻松地加密 MongoDB 中的一个帐户名，并按它加密的名称进行搜索，如清单 6 所示：</p>
+			<br><a name="listing6"><strong>清单 6. 加密 MongoDB 中的数据</strong></a><br><table summary="这一表格包含代码清单。" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td class="code-outline"><pre class="displaycode">				
+@Test
+public void encryptMongoDBRecords() throws Exception {
+ KeyStore.SecretKeyEntry pkEntry = getKeyStoreEntry();
+ Cryptographical crypto = 
+   AESCryptoImpl.initialize(new AESCryptoKey(pkEntry.getSecretKey()));
+
+ DB db = getMongoConnection();
+ DBCollection coll = db.getCollection("accounts");
+
+ BasicDBObject encryptedDoc = new BasicDBObject();
+ encryptedDoc.put("name", crypto.encrypt("Acme Life, LLC"));
+ coll.insert(encryptedDoc);
+
+
+ BasicDBObject encryptedQuery = new BasicDBObject();
+ encryptedQuery.put("name", crypto.encrypt("Acme Life, LLC"));
+
+ DBObject result = coll.findOne(encryptedQuery);
+ String value = result.get("name").toString();
+ Assert.assertEquals("Acme Life, LLC", crypto.decrypt(value));
+}
+</pre></td></tr></tbody></table><br>
+			<p>我在 <a href="#listing6">清单 6</a> 中所做的第一步是，使用 <code>getKeyStoreEntry</code> 方法读取一个现有的密钥库。接下来获取一个 MongoDB 实例的连接，在本例中，它恰好位于 MongoHQ 上的云中。然后我会获取帐户集合（RDBMS 程序员会称之为<em>帐户表</em>）的链接，继续插入一个新帐户记录，其相应的名称已加密。最后，我会通过加密我的搜索字符串，搜索相同的记录（其中 <code>name</code> 等于加密的 “Acme Life, LLC”）。 </p>
+			<p>MongoDB 中的记录看起来将类似清单 7 中所示的内容。（请注意，您加密的 “Acme Life, LLC” 字符串将与我的不同，因为您将使用不同的密钥。）</p>
+			<br><a name="listing7"><strong>清单 7. 一个 MongoDB 加密测试案例</strong></a><br><table summary="这一表格包含代码清单。" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td class="code-outline"><pre class="displaycode">				
+{
+ _id : "4ee0c541300484530bf9c6fa",
+ name : "f0wJxYyVhfH0UkkTLKGZng=="
+}
+</pre></td></tr></tbody></table><br>
+			<p>我在文档中保持实际密钥 (<code>name</code>) 不加密，但我也可以加密它。如果我这么做，我相应的查询将需要反映这一变化。我也会加密集合名称。直接 <code>String</code> 对比将生效，无论它们是否加密。</p>
+			<p>这种策略不受限于 MongoDB 实现。例如，我可以对 SimpleDB 执行大体相同的测试案例，如清单 8 所示：</p>
+			<br><a name="listing8"><strong>清单 8. 一个 SimpleDB 加密测试案例</strong></a><br><table summary="这一表格包含代码清单。" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td class="code-outline"><pre class="displaycode">				
+@Test
+public void testSimpleDBEncryptInsert() throws Exception {
+
+ KeyStore.SecretKeyEntry pkEntry = getKeyStoreEntry();
+ Cryptographical crypto = 
+   AESCryptoImpl.initialize(new AESCryptoKey(pkEntry.getSecretKey()));
+
+ AmazonSimpleDB sdb = getSimpleDB();
+ String domain = "accounts";
+ sdb.createDomain(new CreateDomainRequest(domain));
+
+ List&lt;ReplaceableItem&gt; data = new ArrayList&lt;ReplaceableItem&gt;();
+
+ String encryptedName = crypto.encrypt("Acme Life, LLC");
+
+ data.add(new ReplaceableItem().withName("account_02").withAttributes(
+  new ReplaceableAttribute().withName("name").withValue(encryptedName)));
+
+ sdb.batchPutAttributes(new BatchPutAttributesRequest(domain, data));
+
+ String qry = "select * from " + SimpleDBUtils.quoteName(domain) 
+   + " where name = '" + encryptedName + "'";
+
+ SelectRequest selectRequest = new SelectRequest(qry);
+ for (Item item : sdb.select(selectRequest).getItems()) {
+  Assert.assertEquals("account_02", item.getName());
+ }
+}
+</pre></td></tr></tbody></table><br>
+			<p>这里，我采用了与 MongoDB 示例相同的步骤：我从一个现有的密钥库读取数据，获取 Amazon 的 SimpleDB 的连接，然后插入一个帐户记录，该记录的 <code>name</code> 属性已加密。最后，我按名称插糟帐户，使用加密的值作为它的密钥。 </p>
+			<div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="N1023E"><span class="atitle">结束语</span></a></p>
+			<p>尽管云计算有望让您的数据可供广大群体访问，但您也可以通过许多方法来保护敏感数据。在本文中，我介绍了如何使用 Java 
+平台库来保护云基础架构（比如 MongoDB 或 SimpleDB）上静止的数据。私钥加密为数据管理员提供了数据安全保护。将私钥存储在您的 
+Java <code>KeyStore</code> 中，会使它们可管理且安全。这是访问私钥的惟一密码，您绝对不希望在靠近云的任何地方以明文形式存储该密码。</p>
+			<p>在一些搜索上下文中，存储的已加密数据的行为方式与明文数据不同。准确匹配非常有用，而涉及非准确匹配的条件查询可能会令人感到头疼。这里的解决方案取决于您如何处理（或者<em>不处理</em>）对比操作。在考虑您将加密何种内容时，始终需要考虑到您想要的查询。加密所有数据可能有些小题大作，所以一定要考虑查询的内容和方式。</p>
+		<!-- CMA ID: 800523 --> <!-- Site ID: 10 --> <!-- XSLT stylesheet used to transform this file: dw-document-html-6.0.xsl -->
+<br>
+<p><a name="resources"><span class="atitle">参考资料 </span></a></p><p><strong>学习</strong></p><ul><li><a href="http://www.ibm.com/developerworks/cn/java/j-javadev2/"><em>Java 开发 2.0</em></a>：这个 dW 系列探索重新定义 Java 开发前景的技术，比如：<a href="http://www.ibm.com/developerworks/cn/java/j-javadev2-15/">用 Hadoop MapReduce 进行大数据分析</a>（2011 年 1 月）、<a href="http://www.ibm.com/developerworks/cn/java/j-javadev2-13/">使用 Objectify-Appengine 进行 Twitter 挖掘，第 1 部分</a>（2010 年 11 月）、<a href="http://www.ibm.com/developerworks/cn/java/j-javadev2-12/">MongoDB：拥有 RDBMS 特性的 NoSQL 数据存储</a>（2010 年 9 月）和 <a href="http://www.ibm.com/developerworks/cn/java/j-javadev2-9/">使用 Amazon SimpleDB 进行云存储，第 1 部分</a>（2010 年 6 月）。<br><br></li><li>“<a href="http://www.ibm.com/developerworks/java/tutorials/j-sec1/" onmouseover="linkQueryAppend(this)">Java 安全性，第 1 部分：密码术基础</a>”（Brad Rubin，2002 年 7 月 19 日）：Java 平台为编写安全的应用程序提供了一个优秀的基础。学习加密的基础和它如何在 Java 编程语言中实现。<br><br></li><li>“<a href="http://www.ibm.com/developerworks/cn/cloud/library/cl-datacentermigration/">利用委托特权提升云安全性</a>”（Jim Zierick，developerWorks，2011 年 12 月）：探讨将数据中心迁移到云的情形，以及云计算的安全性和合规性意义。<br><br></li><li><a href="http://www.ibm.com/developerworks/training/kp/cl-kp-cloudpolicy/" onmouseover="linkQueryAppend(this)">Cloud computing: Build an effective cloud policy</a>（developerWorks，2011 年 11 月）：开始学习如何编写策略来定义基础架构、安全性、性能或您的应用程序集将在其中运行的公共交互框架。<br><br></li><li>“<a href="http://www.ibm.com/developerworks/library/pa-bigiron5/" onmouseover="linkQueryAppend(this)"><em>Big iron lessons, Part 5</em>: Introduction to cryptography, from Egypt through Enigma</a>”（Sam Siewert，developerWorks，2005 年 7 月）：在学习更多密码知识时体验乐趣，借助此教程，您可以构建您自己的 paper enigma 编码器，然后查阅再现其操作的源代码。<br><br></li><li><a href="http://www.ibm.com/developerworks/cn/training/kp/j-kp-nosql/" onmouseover="linkQueryAppend(this)">学习路线图：使用 NoSQL 数据库分析大规模数据</a>（developerWorks，2011 年 5 月）：一个 dW 资源集合，介绍了 NoSQL、大数据和数据挖掘知识。<br><br></li><li>
+浏览
+<a href="http://www.ibm.com/developerworks/apps/SendTo?bookstore=safari">Java 技术书店</a>：查找关于这些主题和其他技术主题的图书。
+<br><br></li><li>
+				<a href="http://www.ibm.com/developerworks/cn/java/">developerWorks 中国网站 Java 技术专区</a>：查找关于 Java 编程每个方面的数百篇文章。
+<br><br></li></ul><p><strong>讨论</strong></p><ul><li>加入 <a href="http://www.ibm.com/developerworks/cn/community/">developerWorks 中文社区</a>。查看开发人员推动的博客、论坛、群和维基，并联系其他 developerWorks 用户。<br><br></li></ul>
+<p><a name="author"><span class="atitle">关于作者</span></a></p><div class="ibm-container ibm-portrait-module ibm-alternate-two"><div class="ibm-container-body"><img src="index_files/p-anglover.jpg" class="dw-author-img" alt="/developerworks/i/p-anglover.jpg" height="80" width="64"><p><a name="author1"> </a>Andrew Glover 是一位具有行为驱动开发、持续集成和敏捷软件开发激情的开发人员、作家、演说家和企业家。他是 <a href="http://www.easyb.org/">easyb</a> 行为驱动开发 (Behavior-Driven Development, BDD) 框架的创建者和以下三本书的合著者：<a href="http://www.amazon.com/gp/product/0321336380?ie=UTF8&amp;tag=thdibl-20&amp;linkCode=as2&amp;camp=1789&amp;creative=9325&amp;creativeASIN=0321336380">持续集成</a>、<a href="http://www.manning.com/koenig/">Groovy 在行动</a> 和 <a href="http://www.wiley.com/WileyCDA/WileyTitle/productCd-047144846X.html">Java 测试模式</a>。</p></div></div>
+<!-- MAIN_COLUMN_CONTENT_END -->
+</div>
+<!-- MAIN_COLUMN_END-->
+
+</div></div></div></div></body></html>

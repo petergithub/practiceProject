@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="resource-file-converter" default="native" basedir="../">
+  <property file="config/longxiclub.properties" />
+  <property name="resource.dir" value="${resource.dir}" />
+  <property name="model.build.dir" value="${build.dir}" />
+  <target name="native">
+   <delete file="${resource.dir}/ApplicationResources_zh_CN.properties"/>
+  	<exec dir="${resource.dir}" executable="native2ascii" >
+  	<arg line="-encoding GBK
+  	ApplicationResources_zh_CN_src.properties
+  	ApplicationResources_zh_CN.properties"/>
+  	</exec>
+    <copy todir="${model.build.dir}/com/longxiclub/resource">
+      <fileset dir="${resource.dir}"/>
+    </copy>
+  </target>
+</project>

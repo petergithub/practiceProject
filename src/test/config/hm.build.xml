@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="longxiclub-Hibernate-Mapping-Generation" default="hibernate" basedir="../">
+    <property file="config/longxiclub.properties" />
+
+    <property name="hibernate.config.dir" value="${config.dir}" />
+    <property name="log4j.config.dir" value="${config.dir}" />
+    <property name="model.src.dir"   value="${src.dir}/model" />
+    <property name="model.build.dir" value="${build.dir}" />
+    <property name="hibernate-mapping.gen.dir" value="${build.dir}" />
+
+    <!-- =================================================================== -->
+    <!-- Define the class path                                               -->
+    <!-- =================================================================== -->
+    <path id="xdoclet.class.path">
+        <fileset dir="${xdoclet.lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <!-- =================================================================== -->
+    <!-- Initialise                                                          -->
+    <!-- =================================================================== -->
+    <target name="init" depends = "clean">
+        <tstamp>
+            <format property="TODAY" pattern="d-MM-yy"/>
+        </tstamp>
+        <taskdef
+            name="hibernatedoclet"
+            classname="xdoclet.modules.hibernate.HibernateDocletTask"
+            classpathref="xdoclet.class.path"
+        />
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Prepares the directory structure                                    -->
+    <!-- =================================================================== -->
+    <target name="prepare" depends="init">
+        <mkdir dir="${hibernate-mapping.gen.dir}"/>
+    </target>
+
+
+
+    <!-- =================================================================== -->
+    <!-- Invoke XDoclet's hibernate                                          -->
+    <!-- =================================================================== -->
+    <target name="hibernate" depends="prepare" description="Generate mapping documents (run jar first)">
+
+        <echo>+---------------------------------------------------+</echo>
+        <echo>|                                                   |</echo>
+        <echo>| R U N N I N G   H I B E R N A T E D O C L E T     |</echo>
+        <echo>|                                                   |</echo>
+        <echo>+---------------------------------------------------+</echo>
+
+        <hibernatedoclet
+            destdir="${hibernate-mapping.gen.dir}"
+            mergedir="${model.src.dir}"
+            excludedtags="@version,@author,@todo,@see"
+            addedtags="@xdoclet-generated at ${TODAY},@copyright ShangPin,@author Judy Dong"
+            force="true"
+            verbose="false">
+
+            <fileset dir="${model.src.dir}">
+
+     
+            </fileset>
+            <hibernate version="2.0"/>
+        </hibernatedoclet>
+    	
+    	<copydir dest="${model.build.dir}" src="${config.dir}"></copydir>
+    	
+    	<replace dir="${hibernate-mapping.gen.dir}" value="&lt;hibernate-mapping default-lazy=&quot;false&quot; &gt;">
+			<include name="**/*.hbm.xml"/>
+			<replacetoken><![CDATA[<hibernate-mapping>]]></replacetoken>
+		</replace>
+    	<replace dir="${hibernate-mapping.gen.dir}" value="Hibernate Mapping DTD 3.0">
+			<include name="**/*.hbm.xml"/>
+			<replacetoken>Hibernate Mapping DTD 2.0</replacetoken>
+		</replace>
+		<replace dir="${hibernate-mapping.gen.dir}" value="hibernate-mapping-3.0.dtd">
+	         <include name="**/*.hbm.xml"/>
+	         <replacetoken>hibernate-mapping-2.0.dtd</replacetoken>
+		</replace>
+
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Clean                                                               -->
+    <!-- =================================================================== -->
+    <target name="clean">
+    	<delete>
+    		<fileset dir="${hibernate-mapping.gen.dir}" includes="**/*.xml"/>
+        </delete>
+    </target>
+</project>
