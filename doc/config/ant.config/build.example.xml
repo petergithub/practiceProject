@@ -1,0 +1,46 @@
+<?xml version="1.0" ?> 
+<project name="AntExample2" default="war">
+	
+	<property name="web.dir" location="WebContent"/>
+	<property name="web.lib.dir" location="${web.dir}/WEB-INF/lib"/>
+	<property name="build.classes.dir" location="build/classes"/>
+	<property name="dist.dir" location="dist"/>
+	<property name="project.name" value="AntExample2" />
+	
+	<!-- if there is a properties file 
+		web.dir=WebContent
+		web.lib.dir=${web.dir}/WEB-INF/lib
+	-->
+	<property file="build.properties" />
+
+	<path id="compile.classpath">
+		<fileset dir="${web.lib.dir}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="init">
+		<mkdir dir="${build.classes.dir}"/>
+		<mkdir dir="${dist.dir}" />
+	</target>
+	
+	<target name="compile" depends="init" >
+		<javac destdir="${build.classes.dir}" debug="true" srcdir="src">
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+	
+	<target name="war" depends="compile">
+		<war destfile="${dist.dir}/${project.name}.war" webxml="${web.dir}/WEB-INF/web.xml">
+			<fileset dir="${web.dir}"/>
+			<lib dir="${web.lib.dir}"/>
+			<classes dir="${build.classes.dir}"/>
+		</war>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${dist.dir}" />
+		<delete dir="${build.classes.dir}" />
+	</target>
+	
+</project>

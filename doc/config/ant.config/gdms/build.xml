@@ -1,0 +1,781 @@
+<?xml version="1.0" ?>
+
+<project default="main" basedir=".">
+
+	<!-- PROPERTIES DEFINITION -->
+	<!-- INPUT:
+				buildtype
+				
+				cvs.user
+				cvs.repository
+				cvs.module
+				cvs.module.sm
+				cvs.module.xm.sm
+				
+				keepalive.extra.string
+				wl.appname
+				wl.target
+				
+				dctm.docbaseName
+				dctm.userName
+				dctm.loginTix
+				
+				email.notification
+	-->
+	<!-- TOMCAT -->
+	<property name="tomcat.home" value="/app/dmfdev08/gdms-tomcat-6.0.18" />
+	<property name="wl.apps" value="/app/dmfdev08/bea/apps" />
+	
+	<!-- CVS -->
+	<property name="cvs.root" value=":ext:${cvs.user}@sf-cvs.pfizer.com:/cvsroot/${cvs.repository}" />
+	<property name="cvs.exportdir" value="." />
+	<property name="cvs.tag" value="HEAD" />
+
+	<!-- Environmental -->
+	<property name="documentum" value="/app/dmfdev08"/>
+	<property name="dmhome" value="${documentum}/product/5.3_SP3"/>
+	<property name="dfc.dir" location="${documentum}/share/dfc"/>
+	<property name="wl.home" value="${documentum}/bea"/>
+	<property name="java.home" value="{wl.home}/bea92/jdk150_12"/>
+	<!-- JROCKET 	<property name="java.home" value="/app/dmio53/tools/jmrc-3.1.0-1.4.2"/> -->
+	<property name="adlib.dir" value="${documentum}/dmf-rendering"/>
+
+	<!-- Build -->
+	<property name="docbase.name" value="gdmsd02"/>
+	<property name="adlib.dtf.id" value="200000"/>	
+	<property name="adlib.bof.dir" value="${adlib.dir}/${docbase.name}/BOF"/>
+	<property name="jms.dir" value="${dmhome}/tomcat_gdms"/>
+	<property name="jms.lib.dir" location="${jms.dir}/webapps/DmMethods/WEB-INF/lib"/>
+	<property name="cs.bof.cache.dir" location="${documentum}/share/cache/5.3.0.317/bof/${docbase.name}"/>
+
+	<!-- Compile -->
+	<property name="src.dir" location="${cvs.module}" />
+	<property name="class.dir" location="${src.dir}/WEB-INF/classes" />
+	<property name="src.dir.sm" location="${cvs.module.sm}" />
+	<property name="src.dir.xm.sm" location="${cvs.module.xm.sm}" />
+	<property name="lib.dir" location="${src.dir}/WEB-INF/lib" />
+	<property name="webtop.src.dir" location="${src.dir}/webtop/src" />
+	<property name="xmContent.src.dir" location="${src.dir}/xmContent/src" />
+	<property name="xmLabeling.src.dir" location="${src.dir}/xmLabeling/src" />
+	<property name="gdms.src.dir" location="${src.dir}/gdms/src" />
+
+	<!-- WAR -->
+	<property name="war.dir" value="." />
+	<property name="war.name" value="gdms.war" />
+	<property name="excl" value="${src.dir}/xmContent/library/component/changenotice"/>
+	<property name="sub.dir" value="${src.dir}/xmLabeling/library/subscription"/>
+	<property name="webcomp" value="${src.dir}/webcomponent/library/locator"/>
+	<property name="vdoc" value="${src.dir}/gdms/library/component/viewassemblies"/>
+
+	<!-- END PROPERTIES DEFINITION -->
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties" />
+	<taskdef resource="org/tigris/subversion/svnant/svnantlib.xml"  />
+
+<path id="project.classpath">
+		<pathelement path="${classpath}"/>
+		<pathelement location="${class.dir}" />
+		<fileset dir="./">
+				<include name="*.jar" />
+		</fileset>
+		<fileset dir="${lib.dir}">
+				<include name="*.jar" />
+		</fileset>
+		<fileset dir="${dfc.dir}">
+				<include name="*.jar" />
+		</fileset>
+		<dirset dir="${cvs.module}">
+				<include name="**/classes" />
+		</dirset>
+</path>
+ <path id="weblogic.jsp.classpath">
+		<path refid="project.classpath"/>
+		<fileset dir="${wl.home}/wlserver_10.3/server/lib">
+				<include name="weblogic.jar" />
+		</fileset>
+		<fileset dir="${java.home}/lib">
+				<include name="tools.jar"/>
+		</fileset>
+		<fileset dir="${java.home}/../lib">
+				<include name="tools.jar"/>
+		</fileset>
+</path>
+<!-- ===== MAIN ====== -->
+    <target name="main" depends="">
+		
+	<echo>INPUT PARAMETERS:</echo>
+	<echo>buildtype=${buildtype}</echo>
+	<echo>cvs.user=${cvs.user}</echo>
+	<echo>cvs.repository=${cvs.repository}</echo>
+	<echo>cvs.module=${cvs.module}</echo>
+	<echo>cvs.module.sm=${cvs.module.sm}</echo>
+	<echo>keepalive.extra.string=${keepalive.extra.string}</echo>
+	<echo>wl.appname=${wl.appname}</echo>
+	<echo>wl.target=${wl.target}</echo>
+	<echo>dctm.docbaseName=${dctm.docbaseName}</echo>
+	<echo>dctm.userName=${dctm.userName}</echo>
+	<echo>email.notification=${email.notification}</echo>
+
+	<if>
+		<equals arg1="${buildtype}" arg2="BOF" />
+		<then>
+			<echo>==== BOF Build ====</echo>
+			<antcall target="emailStartNotification" />
+			<antcall target="export" />
+			<antcall target="compile" />
+			<antcall target="buildBOFs" />
+<!--
+	<antcall target="checkinBOFs" />
+-->
+			<antcall target="emailEndNotification" />
+		</then>
+	<elseif>
+		<equals arg1="${buildtype}" arg2="WAR" />
+		<then>
+			<echo>==== WAR Build ====</echo>
+			<antcall target="emailStartNotification" />
+			<antcall target="export" />
+			<antcall target="compile" />
+			<antcall target="buildBOFs" />
+			<antcall target="generateKeepAlive" />
+<!--
+			<antcall target="precompileJSP" />
+-->
+			<antcall target="buildweblogicwar" />
+			<antcall target="undeployfromweblogic" />
+			<antcall target="deploytoweblogic" />
+			<antcall target="emailEndNotification" />
+		</then>
+		</elseif>
+		<elseif>
+			<equals arg1="${buildtype}" arg2="DEV" />
+			<then>
+				<antcall target="dev" />
+			</then>
+		</elseif>
+		<elseif>
+			<equals arg1="${buildtype}" arg2="BOFWAR" />
+			<then>
+				<echo>==== BOF and WAR Build ====</echo>
+			<!--	<antcall target="emailStartNotification" />-->				
+				<antcall target="export" />
+				<antcall target="compile" />
+				<antcall target="buildBOFs" />
+<!--
+				<antcall target="precompileJSP" />
+				<antcall target="deploy" />
+				<antcall target="checkinBOFs" />
+				<antcall target="emailEndNotification" />
+-->
+			</then>
+		</elseif>
+		<elseif>
+			<equals arg1="${buildtype}" arg2="SM" />
+			<then>
+				<echo>==== Server Methods Build ====</echo>
+				<exec dir="." executable="buildsm.sh" />
+			</then>
+		</elseif>
+		<elseif>
+			<equals arg1="${buildtype}" arg2="ALL" />
+			<then>
+				<echo>==== BOF, WAR and Server Methods Build ====</echo>
+				<antcall target="emailStartNotification" />				
+				<antcall target="export" />
+				<antcall target="compile" />
+				<antcall target="buildBOFs" />
+				<antcall target="precompileJSP" />
+				<antcall target="buildweblogicwar" />
+				<antcall target="undeployfromweblogic" />
+				<antcall target="deploy" />
+				<antcall target="checkinBOFs" />
+				
+				<exec dir="." executable="buildsm.sh" />
+								
+				<antcall target="emailEndNotification" />
+			</then>
+		</elseif>
+		<else>
+			<echo message="Invalid buildtype, please specify WAR, BOFWAR, SM or ALL" />
+		</else>
+	</if>	
+	</target>
+
+	<target name="deployDevTomcat">
+		<echo>==== Deploy to tomcat ====</echo>
+<!--
+		<antcall target="emailStartNotification" />
+-->
+		<antcall target="export" />
+		<antcall target="compile" />
+		<antcall target="buildBOFs" />
+		<antcall target="buildtomcat" />
+		<antcall target="deployToTomcat"/>
+		<antcall target="restartTomcat"/>
+		<antcall target="emailEndNotification" />	
+	</target>	
+
+	<target name="deployDevWeblogic">
+		<echo>==== Deploy to weblogic  ====</echo>
+		<antcall target="emailStartNotification" />
+		<antcall target="export" />
+		<antcall target="compile" />
+		<antcall target="buildBOFs" />
+		<antcall target="buildweblogic" />
+		<antcall target="deploytoweblogic"/>
+		<antcall target="emailEndNotification" />	
+	</target>
+<!-- ===== EMAIL START NOTIFICATION ====== -->
+	<target name="emailStartNotification" >
+		<echo>==== EMAIL START NOTIFICATION ====</echo>
+		<tstamp>  
+			<format property="startTime" pattern="dd-MMM-yyyy HH:mm:ss"/>  
+		</tstamp>  
+		<mail mailhost="nlsun866.pfizer.com" 
+					subject="GDMS AutoBuild Process - Starting Soon" 
+					tolist="${email.notification}"
+					from="dmio53@nlsun866" >
+			<message>The automated build process will be started now.  It is now ${startTime}</message>
+		</mail>
+	</target>
+	
+	<!-- ===== EMAIL END NOTIFICATION ====== -->
+	<target name="emailEndNotification" >
+		<echo>==== EMAIL END NOTIFICATION ====</echo>
+		<tstamp>  
+			<format property="endTime" pattern="dd-MMM-yyyy HH:mm:ss"/>  
+		</tstamp>  
+		
+		<loadfile srcfile="build.output" property="log.tail">
+		  <filterchain>
+		    <tailfilter lines="15"/>
+		  </filterchain>
+		</loadfile>
+		<mail mailhost="nlsun866.pfizer.com" 
+					subject="GDMS AutoBuild Process - Finished" 
+					tolist="${email.notification}"
+					from="dmio53@nlsun866">
+			<message>The automated build has finished at ${endTime}${line.separator}${line.separator}Log tail:${line.separator}${log.tail}</message>
+		</mail>
+	</target>
+
+<!-- ===== CLEAN ====== -->
+	<target name="clean" >
+		<echo>==== CLEAN ====</echo>
+		<delete	includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${src.dir}" includes="*/**" defaultexcludes="false">
+			</fileset>
+		</delete>
+		<delete dir="${src.dir}" failonerror="false"/>
+	</target>
+	
+<!-- ===== MAKEDIR ====== -->
+	<target name="makedir">
+	<echo>==== MAKEDIR ====</echo>
+		<mkdir dir="${src.dir}" />
+		<mkdir dir="${src.dir.sm}" />
+		<mkdir dir="${class.dir}" />
+	</target>
+
+<!-- ===== EXPORT ====== -->
+	<target name="export" depends="clean">
+		<echo>==== EXPORT ====</echo>
+        <!-- Execute the SVN command -->
+		<property name="src.url" value="http://sf-svn.pfizer.com/svn/repos/gdmsr4svn/${cvs.module}"/>
+		<svn username="${cvs.user}" password="${cvs.password}" svnkit="true" javahl="false">
+			<export srcUrl="${src.url}" destPath="${cvs.exportdir}/${cvs.module}" revision="HEAD"/>
+		</svn>
+    </target>
+
+	<target name="quickupdate" depends="">
+        <echo>==== EXPORT ====</echo>
+        <!-- Execute the CVS command -->
+        <cvs cvsRoot="${cvs.root}"
+                dest="${cvs.exportdir}"
+                package="${cvs.module}"
+                command="update -C -d -P gdmsr4/WEB-INF/lib/gtcBOF.jar" 
+                tag="${cvs.tag}" />
+
+    </target>
+
+<!-- ===== COMPILE ====== -->
+	<target name="compile">
+		<echo>==== PRE-COMPILE CLEAN====</echo>
+<!--
+		<delete>
+			<fileset dir="${src.dir}" includes=".classpath" />
+			<fileset dir="${src.dir}" includes=".project" />
+			<fileset dir="${class.dir}/com/pfizer" includes="**/*" />
+			<fileset dir="${class.dir}/com/glemser" includes="**/*" />
+		</delete>
+-->
+		<echo>==== COMPILE ====</echo>
+		
+		<echo>Building ${xmContent.src.dir}</echo>
+                <javac  srcdir="${xmContent.src.dir}" debug="on" debuglevel="lines" 
+                                                destdir="${class.dir}"
+                                                excludes=""
+                                                source="1.5"
+                                                target="5"
+						nowarn="yes">
+                        <classpath refid="project.classpath" />
+                </javac>
+	
+		<echo>Building ${xmLabeling.src.dir}</echo>
+		<javac 	srcdir="${xmLabeling.src.dir}" debug="on" debuglevel="lines"
+						destdir="${class.dir}" 
+						excludes=""
+						source="1.5"
+						target="5"
+						nowarn="yes">
+			<classpath refid="project.classpath" />
+		</javac>
+		
+		<echo>Building ${gdms.src.dir}</echo>
+		<javac 	srcdir="${gdms.src.dir}" debug="on" debuglevel="lines"
+						destdir="${class.dir}" 
+						excludes=""
+						source="1.5"
+						target="5"
+						nowarn="yes">
+			<classpath refid="project.classpath" />
+		</javac>	
+	</target>
+	
+<!-- ==== BUILD BOFS ==== -->
+	<target name="buildBOFs" depends="">
+		<echo>==== BUILD BOFS====</echo>
+		<delete>
+			<fileset dir="${lib.dir}" includes="gtcBOF.jar" />
+			<fileset dir="${lib.dir}" includes="gtcIBOF.jar" />
+		</delete>
+		<jar jarfile="${lib.dir}/gtcBOF.jar" basedir="${class.dir}"
+			includes="com/glemser/bof/boconfig/ConfigManager.class, com/glemser/bof/boconfig/ConfigurationObject.class, com/glemser/bof/boconfig/IConfigConstants.class, com/glemser/bof/boconfig/IDocbaseConstants.class, com/glemser/bof/sbo/*, com/glemser/bof/sbo/coreConfig/implementations/*, com/glemser/bof/sbo/internal/implementations/*, com/glemser/bof/tbo/*, com/glemser/common/eSignature/*, com/glemser/common/helper/*, com/glemser/common/spl/*, com/glemser/common/util/*" />
+		
+	<jar jarfile="${lib.dir}/gtcBOF.jar" basedir="${class.dir}" update="true"
+			includes="com/pfizer/wte/gdms/common/util/AutoNameSequence.class,
+								com/pfizer/wte/gdms/common/helper/ProcessVendorAttribute.class,
+								com/pfizer/wte/gdms/bof/sbo/implementations/*,
+								com/pfizer/wte/gdms/common/helper/GetGTCXMLanguage.class,
+								com/pfizer/wte/gdms/common/helper/GetXMLanguage.class,
+								com/pfizer/wte/gdms/common/helper/GetTranslationStatusDefaultValue.class,
+								com/pfizer/wte/gdms/common/helper/CheckLegalHold.class,
+								com/pfizer/wte/gdms/common/helper/autofile/BatchRecordAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/helper/autofile/AnalyticalAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/helper/autofile/MasterBatchRecordReportAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/helper/autofile/ComplianceReportAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/helper/autofile/SpecificationsAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/helper/autofile/ProcessDevelopmentValidationtAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/helper/autofile/AutoFileConstants.class,
+								com/pfizer/wte/gdms/common/helper/autofile/AutofileParam.class,
+								com/pfizer/wte/gdms/common/helper/autofile/BaseAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/util/PDFOverlayWithPedigree.class,
+								com/pfizer/wte/gdms/common/util/IGDMSConstants.class,
+								com/pfizer/wte/gdms/common/helper/GetRetentionCode.class,
+								com/pfizer/wte/gdms/common/helper/GetCreatorName.class,
+								com/pfizer/wte/gdms/bof/tbo/implementations/GDMSBusinessObject.class,
+								com/pfizer/wte/gdms/common/helper/DateUtil.class,
+								com/pfizer/wte/gdms/common/helper/autofile/PackCodeRequestAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/helper/autofile/TemplateAutoFileHelper.class,
+								com/pfizer/wte/gdms/common/util/VendorUtil.class,
+								com/pfizer/wte/gdms/common/eSignature/SignaturePageG.class" />
+
+		<jar jarfile="${lib.dir}/gtcBOF.jar" basedir="${xmLabeling.src.dir}" update="true"
+				includes="**/*.xsl" />
+
+
+		<jar jarfile="${lib.dir}/gtcIBOF.jar" basedir="${class.dir}"
+			includes="com/glemser/bof/tbo/interfaces/*,
+								com/glemser/bof/sbo/internal/interfaces/*,
+								com/glemser/bof/sbo/coreConfig/interfaces/*,
+								com/glemser/bof/boconfig/IConfigurationObject.class" />
+
+		<jar jarfile="${lib.dir}/gtcIBOF.jar" basedir="${class.dir}" update="true"
+			includes="com/pfizer/wte/gdms/bof/sbo/interfaces/*,
+								com/pfizer/wte/gdms/bof/tbo/interfaces/IGDMSBusinessObject.class" />
+								
+		<copy file="${lib.dir}/gtcBOF.jar" tofile="./gtcBOF.jar" overwrite="true" preservelastmodified="true" />
+		<copy file="${lib.dir}/gtcIBOF.jar" tofile="./gtcIBOF.jar" overwrite="true" preservelastmodified="true" />
+
+	</target>
+
+<!-- ===== SAVEJSP ====== -->
+<target name="backupJSP" depends="">
+	<echo>==== backupJSP ====</echo>
+	<move file="${excl}\individualchangenoticereport.jsp" tofile="${excl}\individualchangenoticereport.jsp.err"/>
+	<move file="${excl}\changeNoticeResponseInfo.jsp" tofile="${excl}\changeNoticeResponseInfo.jsp.err"/>
+</target>
+
+
+<!-- ===== COMPILEJSP ====== -->
+<target name="compileJSP" depends="backupJSP">
+	<echo>==== compileJSP ====</echo>
+	<!--
+	<apply executable="java" parallel="yes" failonerror="yes" dir="${src.dir}">
+	<arg line="-Xms512m -Xmx512m weblogic.jspc -depend -verboseJspc -verboseJavac -deprecation -compileAll -d ${class.dir}"/>
+	<fileset dir="${src.dir}" includes="*.jsp"/>
+	</apply>
+	-->
+	<echo></echo>
+	<java classname="weblogic.jspc" fork="yes" maxmemory="1538m">
+		<classpath refid="weblogic.jsp.classpath"/>
+		<sysproperty key="weblogic.jps.windows.caseSensitive" value="false" />
+		<arg line="-forceGeneration -keepgenerated -depend -verboseJspc -verboseJavac -compileAll -deprecation -webapp ${cvs.module} -d ${class.dir}"/>
+	</java>
+</target>
+
+<!-- ===== RESTOREJSP ====== -->
+<target name="restoreJSP" depends="compileJSP">
+	<echo>==== restoreJSP ====</echo>
+	<move file="${excl}\individualchangenoticereport.jsp.err" tofile="${excl}\individualchangenoticereport.jsp"/>
+	<move file="${excl}\changeNoticeResponseInfo.jsp.err" tofile="${excl}\changeNoticeResponseInfo.jsp"/> 
+</target>
+
+<target name="fixCompile" depends="">
+	<echo>==== restoreJSP ====</echo>
+	<move file="${excl}\individualchangenoticereport.jsp.err" tofile="${excl}\individualchangenoticereport.jsp"/>
+	<move file="${excl}\changeNoticeResponseInfo.jsp.err" tofile="${excl}\changeNoticeResponseInfo.jsp"/>
+</target>
+
+<target name="precompileJSP" depends="restoreJSP">
+	<echo>==== precompileJSP ====</echo>
+</target>
+
+
+<!-- ===== GENERATE KEEPALIVE ====== -->
+<target name="generateKeepAlive" depends="">
+	<echo>==== GENERATE KEEPALIVE ====</echo>
+	<tstamp>  
+		<format property="buildTime" pattern="dd-MMM-yyyy HH:mm:ss"/>  
+	</tstamp>  
+	<copy file="./keepalive_template.html" toFile="./${cvs.module}/keepalive.html" overwrite="true" />
+	<replace file="./${cvs.module}/keepalive.html" token="#RELEASE#" value="${cvs.module}"/>
+	<replace file="./${cvs.module}/keepalive.html" token="#BUILD#" value="${buildTime}"/>
+	<replace file="./${cvs.module}/keepalive.html" token="#EXTRA#" value="${keepalive.extra.string}"/>
+</target>
+
+
+<!-- ===== BUILDWAR ====== -->
+<target name="buildwar" depends="generateKeepAlive">
+	<echo>==== BUILDWAR ====</echo>
+	<jar jarfile="${war.dir}/${war.name}" 
+			basedir="${src.dir}" 
+			excludes="dist/*,${src.dir}/META-INF/*"
+			compress="false"
+			/>
+</target>
+
+<!-- ===== BUILDWEBLOGICWAR ====== -->
+<target name="buildweblogicwar" depends="">
+	<echo>==== BUILD Weblogic WAR ====</echo>
+<!--
+	<copy file="./weblogic_files/web.xml" toFile="./${cvs.module}/WEB-INF/web.xml" overwrite="true" />
+	<copy file="./weblogic_files/weblogic.xml" toFile="./${cvs.module}/WEB-INF/weblogic.xml" overwrite="true" />
+	<copy file="./weblogic_files/app.xml" toFile="./${cvs.module}/gdms/app.xml" overwrite="true" />
+-->
+	<copy file="./weblogic_files/app.xml" toFile="./${cvs.module}/gdms/app.xml" overwrite="true" />
+	<copy file="./weblogic_files/dfc.properties" toFile="./${cvs.module}/WEB-INF/classes/dfc.properties" overwrite="true" />
+	<copy file="./${cvs.module}/gdms/src/com/documentum/web/formext/Environment.properties" toFile="./${cvs.module}/WEB-INF/classes/com/documentum/web/formext/Environment.properties" overwrite="true"/>
+	<copy file="./${cvs.module}/gdms/src/com/documentum/web/formext/session/TrustedAuthenticatorCredentials.properties" toFile="./${cvs.module}/WEB-INF/classes/com/documentum/web/formext/session/TrustedAuthenticatorCredentials.properties" overwrite="true"/>
+	<copy file="./weblogic_files/log4j_weblogic.properties" toFile="./${cvs.module}/WEB-INF/classes/log4j.properties" overwrite="true" />
+	<antcall target="buildwar" />
+</target>
+
+<!-- ===== build for development test Weblogic====== -->
+<target name="buildweblogic" depends="">
+	<echo>==== BUILD Weblogic WAR ====</echo>
+	<copy file="./weblogic_files/app.xml" toFile="./${cvs.module}/gdms/app.xml" overwrite="true" />
+	<copy file="./weblogic_files/dfc.properties_local" toFile="./${cvs.module}/WEB-INF/classes/dfc.properties" overwrite="true" />
+	<copy file="./weblogic_files/statusbar.jsp" toFile="./${cvs.module}/gdms/library/component/statusbar/statusbar.jsp" overwrite="true" />
+	<copy file="./${cvs.module}/gdms/src/com/documentum/web/formext/Environment.properties" toFile="./${cvs.module}/WEB-INF/classes/com/documentum/web/formext/Environment.properties" overwrite="true"/>
+	<copy file="./${cvs.module}/gdms/src/com/documentum/web/formext/session/TrustedAuthenticatorCredentials.properties" toFile="./${cvs.module}/WEB-INF/classes/com/documentum/web/formext/session/TrustedAuthenticatorCredentials.properties" overwrite="true"/>
+	<copy file="./weblogic_files/log4j_weblogic.properties" toFile="./${cvs.module}/WEB-INF/classes/log4j.properties" overwrite="true" />
+	<antcall target="buildwar" />
+</target>
+
+<!-- ===== build for development test tomcat====== -->
+<target name="buildtomcat" depends="">
+	<echo>==== BUILD Tomcat WAR ====</echo>
+	<copy file="./tomcat_files/app.xml" toFile="./${cvs.module}/gdms/app.xml" overwrite="true" />
+	<copy file="./tomcat_files/statusbar_tomcat.jsp" toFile="./${cvs.module}/gdms/library/component/statusbar/statusbar.jsp" overwrite="true" />
+	<copy file="./tomcat_files/dfc.properties" toFile="./${cvs.module}/WEB-INF/classes/dfc.properties" overwrite="true" />
+	<copy file="./${cvs.module}/gdms/src/com/documentum/web/formext/Environment.properties" toFile="./${cvs.module}/WEB-INF/classes/com/documentum/web/formext/Environment.properties" overwrite="true"/>
+	<copy file="./${cvs.module}/gdms/src/com/documentum/web/formext/session/TrustedAuthenticatorCredentials.properties" toFile="./${cvs.module}/WEB-INF/classes/com/documentum/web/formext/session/TrustedAuthenticatorCredentials.properties" overwrite="true"/>
+	<copy file="./tomcat_files/log4j_tomcat.properties" toFile="./${cvs.module}/WEB-INF/classes/log4j.properties" overwrite="true" />
+	<copy file="./tomcat_files/web.xml" toFile="./${cvs.module}/WEB-INF/web.xml" overwrite="true" />
+	<antcall target="buildwar" />
+</target>
+
+<!-- ==== WEBLOGIC ITEMS ===== 
+<taskdef name="wldeploy" classname="weblogic.ant.taskdefs.management.WLDeploy" />-->
+
+<target name="deploytoweblogic" depends="">
+	<echo>==== DEPLOY ====</echo>
+	<copy todir="${wl.apps}/gdms" overwrite="true">  
+	        <fileset dir="${cvs.module}" includes="**"/>  
+	</copy>
+<!--
+	<wldeploy action="deploy" verbose="true" debug="true"
+		name="gdms" source="${war.dir}/${war.name}"
+		 nowait="false" remote="false"
+		user="weblogic" password="weblogic"
+                adminurl="t3://amrndhl176:6666"
+		/>
+-->
+</target> 
+
+<target name="deployToTomcat" depends="">
+    <echo>==== DEPLOY gdms.war TO TOMCAT ====</echo>
+	<!-- <scp todir="dmfdev08:1dmf2013!@amrndhl176.pfizer.com:/app/dmfdev08/gdms-tomcat-6.0.18/webapps" file="gdms.war"/> -->
+    <copy file="gdms.war" toFile="${tomcat.home}/webapps/gdms.war" overwrite="true"/>
+</target>
+
+<target name="restartTomcat" depends="">
+    <echo>==== RESTARTING TOMCAT ====</echo>
+	<exec executable="${tomcat.home}/bin/shutdown.sh"/>
+	<sleep seconds="5"/>
+	<exec executable="rm">
+		<arg value="-rf"/>
+		<arg value="${tomcat.home}/webapps/gdms"/>
+	</exec>
+	<exec executable="${tomcat.home}/bin/startup.sh"/>
+	<!--
+	<sshexec host="amrndhl176.pfizer.com" username="dmfdev08" password="1dmf2013!" command="/app/dmfdev08/gdms-tomcat-6.0.18/bin/shutdown.sh"/>
+	<sleep minutes="1"/>
+	<sshexec host="amrndhl176.pfizer.com" username="dmfdev08" password="1dmf2013!" command="rm -fR /app/dmfdev08/gdms-tomcat-6.0.18/webapps/gdms"/>
+	<sshexec host="amrndhl176.pfizer.com" username="dmfdev08" password="1dmf2013!" command="/app/dmfdev08/gdms-tomcat-6.0.18/bin/startup.sh"/>
+	-->
+</target>
+
+<target name="undeployfromweblogic" depends="">
+	<echo>==== UNDEPLOY ====</echo>
+	<wldeploy
+		action="undeploy" verbose="true" debug="true"
+		name="gdms" 
+		user="weblogic" password="weblogic"
+		adminurl="t3://amrndhl176:6666" 
+		failonerror="false" />
+</target> 
+
+<target name="clearWLCache" depends="">
+		<echo>==== DELETING WEBLOGIC CACHE ====</echo>
+		<sshexec host="gsun912" username="gdmsbld" password="pfizer00" command="/app/scripts/deletecache.sh"/>
+</target>
+
+<!-- ==== DEPLOY ==== -->
+<target name="deploy" depends="">
+	<echo>==== DEPLOY ====</echo>
+	<if>
+		<equals arg1="${dctm.docbaseName}" arg2="gdmsd02" />
+		<then>
+			<echo>==== Dev1 Deploy ====</echo>
+			<ant antfile="deployScriptsDev1.xml" target="deploytodev1" inheritAll="true" />
+		</then>
+		<elseif>
+			<equals arg1="${dctm.docbaseName}" arg2="gdmsdev2" />
+			<then>
+				<echo>==== Dev2 Deploy ====</echo>
+				<ant antfile="deployScriptsDev2.xml" target="deploytodev2" inheritAll="true" />
+			</then>
+		</elseif>
+		<elseif>
+			<equals arg1="${dctm.docbaseName}" arg2="gdmst02" />
+			<then>
+				<echo>==== Test Deploy ====</echo>
+				<ant antfile="deployScriptsTest.xml" target="deploytotest" inheritAll="true" />
+			</then>
+		</elseif>
+		<elseif>
+			<equals arg1="${dctm.docbaseName}" arg2="gdms" />
+			<then>
+				<echo>==== Production Deploy ====</echo>
+				<ant antfile="deployScriptsProd.xml" target="deploytoprod" inheritAll="true" />
+			</then>
+		</elseif>
+		<else>
+			<echo message="Unrecognized docbase for deployment" />
+		</else>
+	</if>
+</target>
+	
+<target name="checkinBOF" depends="">
+	<ant antfile="bofPackaging.xml" inheritAll="true">
+		<property name="bof.jar" value="./gtcBOF.jar"/>
+		<property name="ibof.jar" value="./gtcIBOF.jar"/>
+		<property name="dctm.docbaseName" value="gdms_claris"/>
+		<property name="dctm.userName" value="dmfprd08"/>
+		<property name="dctm.domain" value=""/>
+		<property name="dctm.loginTix" value="652PRDbnhaw7"/>
+	</ant>
+</target>
+
+<!-- ==== CHECKIN BOFS ==== -->
+<target name="checkinBOFs" depends="">
+	<echo>==== CHECKIN BOFS ====</echo>
+
+<!--
+	<ant antfile="bofPackaging.xml" inheritAll="true">
+		<property name="bof.jar" value="./gtcBOF.jar"/>
+		<property name="ibof.jar" value="./gtcIBOF.jar"/>
+		
+		
+		<property name="dctm.docbaseName" value="${dctm.docbaseName}"/>
+		<property name="dctm.userName" value="${dctm.userName}"/>
+		<property name="dctm.domain" value=""/>
+		<property name="dctm.loginTix" value="${dctm.loginTix}"/>
+	</ant>
+	<ant antfile="bofPackaging.xml" inheritAll="true">
+                <property name="bof.jar" value="./gtcBOF.jar"/>
+                <property name="ibof.jar" value="./gtcIBOF.jar"/>
+
+
+                <property name="dctm.docbaseName" value="gdmsd04"/>
+                <property name="dctm.userName" value="dmfdev08"/>
+                <property name="dctm.domain" value=""/>
+                <property name="dctm.loginTix" value="1dmf2010!"/>
+        </ant>
+-->
+	<ant antfile="bofPackaging.xml" inheritAll="true">
+                <property name="bof.jar" value="./gtcBOF.jar"/>
+                <property name="ibof.jar" value="./gtcIBOF.jar"/>
+
+
+                <property name="dctm.docbaseName" value="gdms"/>
+                <property name="dctm.userName" value="gdms"/>
+                <property name="dctm.domain" value=""/>
+                <property name="dctm.loginTix" value="pfizer2007"/>
+        </ant>
+</target>
+
+<!-- ==== DEPLOY TO TEST ==== -->
+<target name="deploytotest" depends="">
+	<echo>==== Deploy To Test ====</echo>
+	<!-- needs commons-net-1.4.1.jar.. not compatible with commons-net-2.0.jar -->
+	<ant antfile="deployScripts.xml" target="deploytotest" inheritAll="true" />
+</target>
+</project>
+
+<!--  OLD Deploy to dev scripts -->
+<!--
+<target name="deploytoadlib" depends="startadlib">
+	<echo>==== BOF DEPLOYMENT TO ADLIB COMPLETED ====</echo>  
+</target>
+
+<target name="stopadlib" depends="">
+	<echo>==== STOPPING ADLIB DTF CONNECTOR ====</echo>
+	<exec executable="${adlib.dir}/stopAdlibConnector.ksh" output="/dev/null">
+		<arg value="${docbase.name}"/>
+		<arg value="${adlib.dtf.id}"/>
+	</exec>
+</target>
+
+<target name="copytoadlib" depends="stopadlib">
+	<echo>==== COPYING BOFs TO ADLIB DTF CONNECTOR ====</echo>
+	<copy file="${adlib.bof.dir}/gtcBOF.jar" tofile="${adlib.bof.dir}/gtcBOF.jar.bak.${cvs.module}" overwrite="true" preservelastmodified="true" /> 
+	<copy file="${adlib.bof.dir}/gtcIBOF.jar" tofile="${adlib.bof.dir}/gtcIBOF.jar.bak.${cvs.module}" overwrite="true" preservelastmodified="true" />	
+	<copy file="./gtcBOF.jar" tofile="${adlib.bof.dir}/gtcBOF.jar" overwrite="true" preservelastmodified="true" />
+	<copy file="./gtcIBOF.jar" tofile="${adlib.bof.dir}/gtcIBOF.jar" overwrite="true" preservelastmodified="true" />
+</target>
+
+<target name="startadlib" depends="copytoadlib">
+	<echo>==== STARTING ADLIB DTF CONNECTOR ====</echo>
+	<exec executable="${adlib.dir}/startAdlibConnector.ksh" spawn="true">
+		<arg value="${docbase.name}"/>
+		<arg value="${adlib.dtf.id}"/>
+	</exec>
+</target>
+
+<target name="deploytojms" depends="startjms">
+	<echo>==== BOF DEPLOYMENT TO JMS COMPLETED ====</echo>
+</target>
+
+<target name="stopjms" depends="">
+	<echo>==== STOPPING JMS ====</echo>
+	<exec executable="${jms.dir}/bin/shutdown.sh" output="/dev/null">
+	</exec>
+</target>
+
+<target name="copytojms" depends="stopjms">
+	<echo>==== COPYING BOFs TO JMS ====</echo>
+	<copy file="${jms.lib.dir}/gtcBOF.jar" tofile="${jms.lib.dir}/gtcBOF.jar.bak.${cvs.module}" overwrite="true" preservelastmodified="true" />
+	<copy file="${jms.lib.dir}/gtcIBOF.jar" tofile="${jms.lib.dir}/gtcIBOF.jar.bak.${cvs.module}" overwrite="true" preservelastmodified="true" />
+	<copy file="./gtcBOF.jar" tofile="${jms.lib.dir}/gtcBOF.jar" overwrite="true" preservelastmodified="true" />
+	<copy file="./gtcIBOF.jar" tofile="${jms.lib.dir}/gtcIBOF.jar" overwrite="true" preservelastmodified="true" />
+</target>
+
+<target name="startjms" depends="copytojms">
+	<echo>==== STARTING JMS ====</echo>
+	<exec executable="${jms.dir}/bin/startup.sh" output="/dev/null">
+	</exec>
+</target>
+
+<target name="deletecsbofcache" depends="">
+	<echo>==== DELETING CONTENT SERVER BOF CACHE ====</echo>
+	<delete includeemptydirs="true">
+		<fileset dir="${cs.bof.cache.dir}" includes="**/*"/>
+	</delete>
+</target>
+
+<target name="deploytofti" depends="ftptofti">
+	<echo>==== BOF DEPLOYMENT TO INDEX SERVER COMPLETED ====</echo>
+</target>
+
+<target name="ftptofti" depends="">
+	<echo>==== FTP'ing BOFs TO INDEX SERVER ====</echo>
+	<ftp server="nlsun868.pfizer.com"
+		remotedir="/app/gdmsftd/share/IndexAgents/IndexAgent1/webapps/IndexAgent1/WEB-INF/lib"
+		userid="gdmsftd"
+		password="pfizer2007"
+		passive="yes"
+		binary="yes">
+		<fileset dir=".">
+			<include name="gtcBOF.jar"/>
+			<include name="gtcIBOF.jar"/>
+		</fileset>
+	</ftp>	
+</target>
+
+<target name="restartindexagent" depends="ftptofti">
+	<echo>==== RESTARTING INDEX AGENT ====</echo>
+	<telnet userid="gdmsftd" password="pfizer2007" server="nlsun868.pfizer.com" timeout="20">
+		<read>$</read>
+		<write echo="true">cd /app/gdmsftd/share/IndexAgents/IndexAgent1;./shutdownIndexAgent.sh</write>
+		<read timeout="10">$</read>
+		<write echo="true">rm -rf /app/gdmsftd/share/cache/5.3.0.317/bof/gdmsd02/*</write>
+		<read timeout="10">$</read>
+		<write echo="true">./startupIndexAgent.sh</write>
+		<read timeout="10">$</read>
+	</telnet>
+</target>
+
+<target name="deploytoda" depends="restartda">
+	<echo>==== BOF DEPLOYMENT TO DA COMPLETED ====</echo>
+</target>
+
+<target name="ftptoda" depends="">
+	<echo>==== FTP'ing BOFs TO DA ====</echo>
+	<ftp server="nlsun866.pfizer.com"
+		remotedir="/app/gdmsd03/product/5.3_SP3/tomcat-gdms/webapps/da/WEB-INF/lib"
+		userid="gdmsd03"
+		password="pfizer07"
+		passive="yes"
+		binary="yes">
+		<fileset dir=".">
+			<include name="gtcBOF.jar"/>
+			<include name="gtcIBOF.jar"/>
+		</fileset>
+	</ftp>
+</target>
+
+<target name="restartda" depends="ftptoda">
+	<echo>==== RESTARTING DA ====</echo>
+	<telnet userid="gdmsd03" password="pfizer07" server="nlsun866.pfizer.com" timeout="20">
+		<read>$</read>
+		<write echo="true">cd /app/gdmsd03/product/5.3_SP3/tomcat-gdms/bin; ./shutdown.sh</write>
+		<read timeout="10">$</read>
+		<write echo="true">rm -rf /app/gdmsd03/share/cache/5.3.0.317/bof/gdmsd02/*</write>
+		<read timeout="10">$</read>
+		<write echo="true">./startup.sh</write>
+		<read timeout="10">$</read>
+	</telnet>
+</target>
+-->

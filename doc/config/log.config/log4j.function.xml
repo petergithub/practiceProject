@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM"log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<appender name="CON" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p %F (line:%L) - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="DEBUG" />
+			<param name="levelMax" value="ERROR" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter>
+	</appender>
+
+	<appender name="INFOLOG" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true" />
+		<param name="File" value="../webapps/ROOT/teyes_info_log.htm" />
+		<param name="DatePattern" value="yyyy-MM-dd" />
+		<layout class="org.apache.log4j.HTMLLayout" />
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="INFO" />
+			<param name="levelMax" value="INFO" />
+			<param name="acceptOnMatch" value="true" />
+		</filter>
+	</appender>
+
+	<appender name="ERRLOG" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Append" value="true" />
+		<param name="File" value="../webapps/ROOT/teyes_err_log.htm" />
+		<param name="DatePattern" value="yyyy-MM-dd" />
+		<layout class="org.apache.log4j.HTMLLayout" />
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="ERROR" />
+			<param name="levelMax" value="ERROR" />
+			<param name="acceptOnMatch" value="true" />
+		</filter>
+	</appender>
+	<logger name="com.ebt.tsef" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="CON" />
+		<appender-ref ref="ERRLOG" />
+		<appender-ref ref="INFOLOG" />
+	</logger>
+	<logger name="com.cddx.teyes" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="CON" />
+		<appender-ref ref="ERRLOG" />
+		<appender-ref ref="INFOLOG" />
+	</logger>
+	<root>
+		<level value="FATAL" />
+		<appender-ref ref="ERRLOG" />
+	</root>
+</log4j:configuration> 

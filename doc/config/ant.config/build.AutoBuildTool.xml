@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="AutoBuildTool" basedir="." default="importFile">
+    <!-- Load user overrides -->
+    <property file="build.properties"/>
+    <!-- Directory structure of the project -->
+	<property name="temp.dir" value="${basedir}/temp"/>
+    <property name="build.dir" value="${basedir}/${webapp.name}"/>
+    <property name="webapp.war" value="${webapp.name}.war"/>
+	<property name="webtop.war" value="webtop65.war"/>
+    <property name="lib.dir" location="${build.dir}/WEB-INF/lib"/>
+	<property name="classes.dir" location="${build.dir}/WEB-INF/classes"/>
+    <!-- The source directory for the whole project -->
+    <property name="src" value="${temp.dir}/com"/>
+	<!-- Data needed to use the exporting and importing utility --> 
+	<property name="util.src" value="src"/>
+	<property name="basedir" value="utilclasses"/>
+	<property name="util.lib" value="lib"/>
+	<property name="util.config" value="config"/>
+	
+	<path id="util.classpath">
+		<fileset dir="${util.lib}" includes="*.jar"/>
+    	<path location="${basedir}"/>
+	</path>
+		
+    <path id="compile.classpath">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+		<fileset dir="${util.lib}/tomcat5" includes="*.jar"/>
+    	<path location="${classes.dir}"/>
+    </path>
+
+	<target name="resetworkarea" description="clean all temp folders">
+		<echo message="-------- GSK Webtop Auto Build Tool ------------"/>
+		<delete dir="${build.dir}" />
+		<delete dir="${temp.dir}" />
+	</target>
+			
+	<target name="createworkarea" depends="resetworkarea" description="create all temp folders">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${temp.dir}" />
+		<mkdir dir="${basedir}"/>
+	</target>
+
+	<target name="getInput" depends="createworkarea">
+		<input message="Please input docbase name:" addproperty="docbase.name"/>
+		<input message="Please input user name:" addproperty="user.account"/>
+		<input message="Please input password:" addproperty="user.password"/>
+	</target>
+	
+	<target name="exportFiles" depends="getInput">
+		<java classpathref="util.classpath" classname="com.gsk.gcms.Export" fork="true">
+			<arg value="${docbase.name}"/>
+			<arg value="${user.account}"/>
+			<arg value="${user.password}"/>
+			<arg value="${export.source.deploy.dir}"/>
+			<arg value="${export.source.src.dir}"/>
+			<arg value="${export.source.env.dir}"/>
+			<arg value="${temp.dir}"/>
+		</java>
+	</target>
+	
+	<target name="extractFiles" depends="exportFiles">
+		<unwar src="${webtop.war}" dest="${build.dir}"/>
+	</target>
+	
+	<target name="movefiles" depends="extractFiles">
+		<move todir="${build.dir}/WEB-INF/classes" file="${temp.dir}/dfc.properties"/>
+		<move todir="${build.dir}/custom" file="${temp.dir}/app.xml"/>
+		<move todir="${build.dir}">
+			<fileset dir="${temp.dir}/custom"/>
+		</move>
+		<move todir="${build.dir}/WEB-INF/lib">
+			<fileset dir="${temp.dir}/lib"/>
+		</move>
+		<move todir="${build.dir}/WEB-INF/tlds">
+			<fileset dir="${temp.dir}/tlds"/>
+		</move>
+		<move todir="${build.dir}/WEB-INF/classes">
+			<fileset dir="${temp.dir}/classes"/>
+		</move>
+	</target>
+		  	
+	<target name="compile" depends="movefiles">
+			<echo>Compiling source code...</echo>
+			<mkdir dir="${build.dir}/classes" />
+			<javac srcdir="${src}" destdir="${build.dir}/classes" debug="true" debuglevel="lines,source,vars"  classpathref="compile.classpath"/>
+			<jar destfile="${lib.dir}/${webapp.name}.jar">
+				<fileset dir="${build.dir}/classes" includes="**/*.class"/>
+			</jar>
+			<delete dir="${build.dir}/classes" />
+			<delete dir="${src}" />
+			<delete file="${build.dir}/${webapp.name}.jar" />
+	</target>
+	
+	<target name="warfiles" depends="compile">
+	    <war destfile="${webapp.war}" webxml="${build.dir}/WEB-INF/web.xml" basedir="${build.dir}"/>
+		<delete dir="${build.dir}" />
+		<delete dir="${temp.dir}" />
+	</target>
+	
+	<target name="importFile" depends="warfiles">
+		<java classpathref="util.classpath" classname="com.gsk.gcms.Import" fork="true">
+			<arg value="${docbase.name}"/>
+			<arg value="${user.account}"/>
+			<arg value="${user.password}"/>
+			<arg value="${webapp.war}"/>
+			<arg value="${import.target.dir}"/>
+		</java>
+	</target>
+</project>

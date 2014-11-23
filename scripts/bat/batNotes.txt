@@ -1,0 +1,210 @@
+在bat中的注释是# or REM or ::
+如果你想叫它在DOS中显示那么你加上ECHO ON就可以，不显示是ECHO OFF。
+@echo off(加@表示连echo off都不显示，不然会显示出echo off的命令)
+
+
+
+############################################
+# 命令行直接对注册表操作
+############################################
+把下面代码贴到 命令行 里执行，然后右键任意文件(夹)看看效果 Cmd Here
+REG ADD "HKCR\*\shell\Cmd Here\command" /ve /t REG_EXPAND_SZ /d %ComSpec%
+REG ADD "HKCR\Directory\shell\Cmd Here\command" /ve /t REG_EXPAND_SZ /d "%ComSpec% /k cd %1"
+REG ADD "HKCR\Drive\shell\Cmd Here\command" /ve /t REG_EXPAND_SZ /d "%ComSpec% /k cd %1"
+
+取消
+echo Y|REG DELETE "HKCR\*\shell\Cmd Here"
+echo Y|REG DELETE "HKCR\Directory\shell\Cmd Here"
+echo Y|REG DELETE "HKCR\Drive\shell\Cmd Here"
+
+echo Y| 是发送 Y 给后面的命令输入，实现自动确认。
+命令行直接对注册表操作似乎很少用，我觉得比 .reg 文件导入更方便的是可以使用变量。
+
+
+############################################
+# delete cache
+############################################
+@echo off
+echo Clean cache......
+
+echo clean Tomcat
+del /f /s /q "C:\ProgramFiles\Apache\Tomcat5.5\bin\documentum\*.*"
+del /f /s /q "C:\ProgramFiles\Apache\Tomcat5.5\work\*.*"
+del /f /s /q "C:\ProgramFiles\Apache\apache-tomcat-5.5.20\temp\*.*"
+RMDIR /s /q "C:\ProgramFiles\Apache\Tomcat5.5\bin\documentum"
+RMDIR /s /q "C:\ProgramFiles\Apache\Tomcat5.5\work"
+
+echo clean Eclipse3.6Workspace gdmsr4p5
+#del /f /s /q "C:\Shang\Work\Eclipse3.6Workspace\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\work\*.*"
+del /f /s /q "C:\Shang\Work\Eclipse3.6Workspace\gdms\gdmsr4p5\work\*.*"
+
+echo clean Documentum
+del /f /s /q "C:\Documentum\cache\*.*"
+del /f /s /q "C:\Documents and Settings\shangp01\Documentum\*.*"
+RMDIR /s /q "C:\Documentum\cache"
+RMDIR /s /q "C:\Documents and Settings\shangp01\Documentum\*.*"
+
+echo clean Samson
+del /f /s /q "C:\ProgramFiles\Samson\dmcl"
+RMDIR /s /q "C:\ProgramFiles\Samson\dmcl"
+
+echo clean dqMan
+del /f /s /q "C:\ProgramFiles\dqMan\dmcl"
+RMDIR /s /q "C:\ProgramFiles\dqMan\dmcl"
+
+echo Finished
+echo. & pause
+
+
+############################################
+# restart program Dropbox
+############################################
+taskkill /im dropbox.exe /f
+start "" "C:\Documents and Settings\shangp01\Application Data\Dropbox\bin\Dropbox.exe"
+
+
+############################################
+# restart service Oracle 9i
+############################################
+REM "Oracle stop"
+C:
+cd C:\windows\system32
+@echo on
+
+echo stop service Oracle
+REM net stop OracleOraHome92HTTPServer
+REM net stop OracleOraHome92Agent
+REM net stop OracleMTSRecoveryService
+net stop OracleServiceORACLE
+net stop OracleOraHome92TNSListener
+
+REM "Oracle start"
+echo start service Oracle
+REM net start OracleOraHome92HTTPServer
+REM net start OracleOraHome92Agent
+REM net start OracleMTSRecoveryService
+net start OracleServiceORACLE
+net start OracleOraHome92TNSListener
+
+
+############################################
+# set network configuration
+############################################
+# "无线网络连接" 的接口 IP  配置
+set address name="无线网络连接" source=dhcp 
+set dns name="无线网络连接" source=dhcp register=PRIMARY
+set wins name="无线网络连接" source=dhcp
+
+# "本地连接" 的接口 IP  配置
+set address name="本地连接" source=static addr=10.0.0.155 mask=255.255.255.0
+set address name="本地连接" gateway=10.0.0.1 gwmetric=0
+set dns name="本地连接" source=static addr=10.0.0.1 register=PRIMARY
+set wins name="本地连接" source=static addr=none
+
+@ echo off
+rem 设置变量
+set Nic=本地连接  
+rem //可以根据你的需要更改,
+set Add=219.217.225.217
+//默认网关219.217.225.254，首选DNS：202.118.224.101，备用DNS：202.97.224.69
+echo ------------------------------------------------------
+echo 对于不连入局域网的ADSL用户,建议填写IP地址,
+echo 以避免开机进入桌面后因网卡搜索IP地址造成的反应迟钝现象.
+echo 本批处理帮助你快速将网卡ip设置为 %add%
+echo ------------------------------------------------------
+echo 正在设置ip，请稍等几秒....
+
+rem //可以根据你的需要更改
+netsh interface ip set address name=%Nic% source=static addr=%add% mask=255.255.255.0
+
+echo 自动填写ip为 %add% 完成!
+echo ------------------------------------------------------
+pause >nul
+
+
+############################################
+# copy folder exclude some files and compress it with jar or 7zip command
+############################################
+@echo on
+@copy gdms folder for deploy it on 235 server.
+
+echo Copy gdms and classes to current folder
+rmdir /s /q classes
+rmdir /s /q gdms
+del gdms.zip
+del classes.zip
+
+echo C:\Shang\Work\Eclipse3.6Workspace\gdms\gdmsr4p6\gdms\src > list_of_exclusions.txt
+xcopy C:\Shang\Work\Eclipse3.6Workspace\gdms\gdmsr4p6\gdms gdms /E/I/K /EXCLUDE:list_of_exclusions.txt
+del list_of_exclusions.txt
+xcopy C:\Shang\Work\Eclipse3.6Workspace\gdms\gdmsr4p6\WEB-INF\classes classes /E/I/K
+
+jar cvfM gdms.zip gdms
+jar cvfM classes.zip classes
+
+REM "C:\Program Files"\7-Zip\7z a -tzip classes.zip classes
+
+echo copy files to remote server
+%putty%/pscp -pw 1dmf2013! gdms.zip classes.zip dmfdev08@amrndhl235:peter/tom-cat-6.0.18/sbin/
+
+echo. & pause
+
+
+############################################
+# run java class and set class path
+############################################
+@ECHO OFF
+IF "%OS%" == "Windows_NT" setlocal
+
+set EXECUTABLE_CLASS=com.gsk.gcms.ResetGroupMembership
+set EXEC_CLASSPATH=.;.\lib\log4j-1.2.14.jar;.\lib\aspectjrt.jar;.\lib\dfc.jar;.\lib\com.jar;.\lib\certjFIPS.jar;.\lib\dom4j-1.5.2.jar;.\lib\jaxen-1.1-beta-7.jar
+set JAVA_EXECUTABLE=java
+if "%JAVA_HOME%" == "" goto execute
+set JAVA_EXECUTABLE="%JAVA_HOME%\bin\java"
+
+:execute
+%JAVA_EXECUTABLE% -classpath %EXEC_CLASSPATH% %EXECUTABLE_CLASS% %*
+
+
+############################################
+# compute running time
+############################################
+echo Start time: %time%
+set /a StartS=%time:~6,2%
+set /a StartM=%time:~3,2%
+
+echo running other script
+
+set /a EndS=%time:~6,2%
+set /a EndM=%time:~3,2%
+echo End time: %time%
+set /a diffS_=%EndS%-%StartS%
+set /a diffM_=%EndM%-%StartM%
+echo running time:  %diffM_% Minutes %diffS_% Second
+
+
+############################################
+# auto upload files, execute remote shell
+############################################
+pscp.exe -pw pwd filename username@host:directory/subdirectory
+
+export CATALINA_HOME=/app/dmfdev08/peter/tom-cat-6.0.18;
+export CATALINA_BASE=$CATALINA_HOME;
+export JAVA_HOME=/app/dmfdev08/share/java/1.5.0_12/;
+export DOCUMENTUM=/app/dmfdev08;
+export DOCUMENTUM_SHARED=/app/dmfdev08/share;
+export PATH=$JAVA_HOME/bin:$PATH;
+export PP=/app/dmfdev08/peter/tom-cat-6.0.18/sbin/;
+cd $PP
+plink -pw pwd username@host ls;ls
+plink -pw pwd username@host -m local_script.sh
+plink -i %putty%/privateKey.ppk
+plink -i %putty%/putty.ppk dmfdev08@amrndhl235 export JAVA_HOME=/app/dmfdev08/share/java/1.5.0_12/;export PP=/app/dmfdev08/peter/tom-cat-6.0.18/sbin/;cd $PP;./restart.sh
+plink -i %putty%/putty.ppk dmfdev08@amrndhl235 cd ~/dev/artifactChangeTool; ./run.sh c
+
+Windows的控制台会把两个双引号之间的字符串作为一个参数传递给被执行的程序，而不会把双引号也传递给程序
+所以错误命令C:\>plink 192.168.6.200 date "+%F %T"
+Windows 的控制台可不认得单引号，所以上面那个命令的正确用法应该是：
+c:\>plink 192.168.6.200 date '+%F %T'
+
+
