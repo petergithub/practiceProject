@@ -1,5 +1,10 @@
 package doing;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -21,6 +26,8 @@ import javax.swing.SwingUtilities;
 
 import junit.framework.Assert;
 
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
@@ -48,6 +55,24 @@ public class TestClass extends TestBase {
 	}
 	
 	@Test
+	public void testList() {
+		//test list in order
+	  List<String> actual = Arrays.asList("1", "2", "3");
+	  List<String> expected = Arrays.asList("1", "2", "3");
+	  assertEquals(expected, actual);
+	  assertThat(actual, is(expected));
+
+		//test list without order
+	  expected = Arrays.asList("1", "3", "2");
+	  assertThat(actual, is(not(expected)));
+    assertThat("List equality without order", 
+        actual, IsIterableContainingInAnyOrder.containsInAnyOrder(expected.toArray()));
+    
+	  List<Integer> yourList = Arrays.asList(1,2,3,4);
+	  assertThat(yourList, CoreMatchers.hasItems(1,2,3));
+	  assertThat(yourList, not(CoreMatchers.hasItems(1,2,3,4,5)));
+	}
+
 	public void testlog() {
 		log.error("ACL {} doesn't exist", "aclName" );
 		String path = getClass().getResource("/").getPath();

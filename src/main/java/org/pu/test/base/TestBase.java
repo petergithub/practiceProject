@@ -4,9 +4,12 @@
 package org.pu.test.base;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.apache.commons.collections.ListUtils;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.pu.utils.IoUtils;
 
@@ -80,6 +83,12 @@ public class TestBase {
 		String propertiesPath = "application.properties";
 		prop = IoUtils.getProperties(propertiesPath);
 		log.trace("props = {}", prop);
+	}
+	
+	public void testUtils() {
+		Collection<String> list1 = new ArrayList<String>();
+		Collection<String> list2 = new ArrayList<String>();
+		Assert.assertTrue(ListUtils.isEqualList(list1, list2));
 	}
 
 	protected void printCollection(Collection<?> c) {
