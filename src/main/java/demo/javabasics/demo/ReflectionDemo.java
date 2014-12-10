@@ -216,19 +216,19 @@ public class ReflectionDemo {
 	 * call a method using reflection
 	 */
 	public void testClassMethod() throws Exception {
-		Testing t = new Testing("val1", false);
-		Class<?> tClass = t.getClass();
+		Testing instance = new Testing("val1", false);
+		Class<?> tClass = instance.getClass();
 
 		Method gs1Method = tClass.getMethod("getString1", new Class[] {});
-		String str1 = (String) gs1Method.invoke(t, new Object[] {});
+		String str1 = (String) gs1Method.invoke(instance, new Object[] {});
 		System.out.println("getString1 returned: " + str1);
 
 		Method ss1Method = tClass.getMethod("setString1",
 				new Class[] { String.class });
 		System.out.println("calling setString1 with 'val2'");
-		ss1Method.invoke(t, new Object[] { "val2" });
+		ss1Method.invoke(instance, new Object[] { "val2" });
 
-		str1 = (String) gs1Method.invoke(t, new Object[] {});
+		str1 = (String) gs1Method.invoke(instance, new Object[] {});
 		System.out.println("getString1 returned: " + str1);
 
 		try {
@@ -249,13 +249,13 @@ public class ReflectionDemo {
 		Method proSetMethod = tClass.getDeclaredMethod("setProtectedDude",
 				new Class[] { String.class });
 		System.out.println("invoking setProtectedDude with 'blah'");
-		proSetMethod.invoke(t, new Object[] { "blah" });
+		proSetMethod.invoke(instance, new Object[] { "blah" });
 
 		System.out.println("\ngetting declared method 'getProtectedDude'");
 		Method proGetMethod = tClass.getDeclaredMethod("getProtectedDude",
 				new Class[] {});
 		System.out.println("invoking getProtectedDude");
-		String str1Declared = (String) proGetMethod.invoke(t, new Object[] {});
+		String str1Declared = (String) proGetMethod.invoke(instance, new Object[] {});
 		System.out.println("getProtectedDude returned: " + str1Declared);
 	}
 
