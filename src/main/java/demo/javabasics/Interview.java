@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 public class Interview {
 	private static final Logger logger = LoggerFactory.getLogger(Interview.class);
 
-	@Test
 	public void testIntegerEqual() {
 		Integer i = 100;
 		Integer j = 100;
@@ -28,6 +27,14 @@ public class Interview {
 		Assert.assertNotSame(i, j);
 		// it is a object if it is less than -127 and greater than 128
 		// else it is a int type
+	}
+
+	@Test
+	public void testMath() {
+		long round1 = Math.round(12.5);
+		long round2 = Math.round(-12.5);
+		Assert.assertEquals(round1, 13);
+		Assert.assertEquals(round2, -12);
 	}
 
 	public void testYun() throws Exception {

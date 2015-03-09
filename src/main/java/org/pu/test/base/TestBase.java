@@ -5,12 +5,14 @@ package org.pu.test.base;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Properties;
 
 import org.apache.commons.collections.ListUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.pu.utils.DateUtils;
 import org.pu.utils.IoUtils;
 
 
@@ -126,6 +128,7 @@ public class TestBase {
 
 	// @Test
 	public void testSlf4j() {
+		long startTime = Calendar.getInstance().getTimeInMillis();
 		String msg = "{0} log {0} and message {1}";
 		msg = MessageFormat.format(msg, new Object[] { "first", "2", "3" });
 
@@ -136,5 +139,9 @@ public class TestBase {
 		// log.error("error Exception {}.", "object instance", new
 		// Exception("This is a test exception."));
 		// log.fatal("fatal");//not fatal level in slf4j
+		
+		long endTime = Calendar.getInstance().getTimeInMillis();
+		long time = endTime - startTime;
+		log.debug("Operation Duration: {}; exact {} milliseconds", DateUtils.calculateTime(time), time);
 	}
 }

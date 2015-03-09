@@ -6,9 +6,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,6 +57,41 @@ public class TestClass extends TestBase {
 	}
 	
 	@Test
+	public void testGetPackage() {
+    Package a = getClass().getPackage();
+    log.info("a = {}", a);
+	}
+	
+	public void testCreateFile() {
+    String date = "date";
+		open(date);
+		open(date);
+	}
+
+  private void open(String date) {
+    String directory = "log";
+    String prefix = "catalina.";
+    String suffix = ".log";
+    System.setProperty("catalina.base", "c:/cache");
+		// Create the directory if necessary
+    File dir = new File(directory );
+    if (!dir.isAbsolute())
+        dir = new File(System.getProperty("catalina.base"), directory);
+    dir.mkdirs();
+
+    PrintWriter writer;
+		// Open the current log file
+    try {
+				String pathname = dir.getAbsolutePath() + File.separator +
+            prefix + date + suffix;
+        writer = new PrintWriter(new FileWriter(pathname, true), true);
+    } catch (IOException e) {
+        writer = null;
+    }
+    writer.append(date);
+    IoUtils.close(writer);
+}
+	
 	public void testList() {
 		//test list in order
 	  List<String> actual = Arrays.asList("1", "2", "3");

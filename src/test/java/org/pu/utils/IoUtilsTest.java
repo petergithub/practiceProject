@@ -36,13 +36,16 @@ public class IoUtilsTest {
 	@Test
 	public void testPath() {
 		String filePathWithoutPackageFolder = "/C:/sp/Dropbox/base/testProject/target/test-classes/";
-		String filePathWithPackageFolder = filePathWithoutPackageFolder + "org/pu/utils/";
+		String packagePath = "org/pu/utils";
+		String filePathWithPackageFolder = filePathWithoutPackageFolder + packagePath + "/";
 		String filePath = filePathWithPackageFolder + "IoUtilsTest.class";
 		
+		assertEquals(packagePath, getClass().getPackage().getName().replace(".", "/"));
 		assertEquals(filePathWithoutPackageFolder, getClass().getResource("/").getPath());
 		assertEquals(filePathWithoutPackageFolder, ClassLoader.getSystemResource("").getPath());
 		assertEquals(filePathWithPackageFolder, getClass().getResource("").getPath());
 		assertEquals(filePath, ClassLoader.getSystemResource("org/pu/utils/IoUtilsTest.class").getPath());
+		
 		Assert.assertNull(ClassLoader.getSystemResource("/"));
 		Assert.assertNull(ClassLoader.getSystemResource("IoUtilsTest.class"));
 	}
