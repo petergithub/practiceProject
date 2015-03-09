@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * @version Date: Apr 24, 2012 1:29:30 PM
  */
 public class Link {
-	private static final Logger logger = Logger.getLogger(Link.class);
+	private static final Logger log = Logger.getLogger(Link.class);
 
 	/** 构成链表的结点定义 */
 	class Node {
@@ -76,7 +76,7 @@ public class Link {
 	}
 
 	public Link(int size) {
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < size; i++) {
 			this.insert(i);
 		}
 	}
@@ -102,7 +102,7 @@ public class Link {
 	/** 判断当前结点是否为最后一个结点 */
 	public boolean isEnd() {
 		if (length == 0)
-			throw new java.lang.NullPointerException();
+			throw new NullPointerException();
 		else if (length == 1)
 			return true;
 		else
@@ -114,7 +114,7 @@ public class Link {
 		if (length == 1)
 			throw new java.util.NoSuchElementException();
 		else if (length == 0)
-			throw new java.lang.NullPointerException();
+			throw new NullPointerException();
 		else {
 			Node temp = cursor();
 			pointer = temp;
@@ -180,7 +180,7 @@ public class Link {
 	/** 返回当前结点的指针 */
 	private Node cursor() {
 		if (head == null)
-			throw new java.lang.NullPointerException();
+			throw new NullPointerException();
 		else if (pointer == null)
 			return head;
 		else
@@ -192,7 +192,47 @@ public class Link {
 	 */
 	public void reverse() {
 		if (head == null || head.next == null) return;
-		head = reverse(head);
+		head = reverseByOneIteration(head);
+	}
+
+	/**
+	 * reverse the link and return the link with the first Node
+	 * 
+	 * <pre>
+	 * a <- b <- ... <- l    m -> n -> ...
+	 * a <- b <- ... <- l <- m    n -> ...
+	 * 
+	 * Node* iteratively_reverse_list(Node *head) {
+	 *   if(NULL == head || NULL == head->next)
+	 *     return head;
+	 *   Node *p, *q, *r;
+	 *   p = NULL;
+	 *   q = head;
+	 *   while(q) {
+	 *     r = q->next;
+	 *     q->next = p;
+	 *     p = q;
+	 *     q = r;
+	 *   }
+	 *   head->next = NULL;
+	 *   return p;
+	 * }
+	 * </pre>
+	 */
+	public Node reverseByOneIteration(Node head) {
+		if (log.isDebugEnabled())
+			log.debug("Enter reverse(" + head + ")");
+		// return this node as head
+		Node reverseHead = null;
+		while (head != null) {
+			Node temp = new Node(head);
+			temp.next = reverseHead;
+			reverseHead = temp;
+			// move forward the next node
+			head = head.next;
+		}
+		log.debug("Exit reverse()");
+		return reverseHead;
 	}
 
 	/**
@@ -203,20 +243,34 @@ public class Link {
 	 * a <- b <- ... <- l <- m    n -> ...
 	 * </pre>
 	 */
-	public Node reverse(Node head) {
-		if (logger.isDebugEnabled())
-			logger.debug("Enter reverse(" + head + ")");
+	public Node reverseByRecursion(Node head) {
+		if (log.isDebugEnabled())
+			log.debug("Enter reverseByRecursion(" + head + ")");
 		// return this node as head
-		Node reverseHead = null;
-		while (head != null) {
-			Node temp = new Node(head);
-			temp.next = reverseHead;
-			reverseHead = temp;
-			// move forward the next node
-			head = head.next;
-		}
-		logger.debug("Exit reverse()");
-		return reverseHead;
+		if (head == null || head.next == null) return head;
+		Node rHead = reverseByRecursion(head.next);
+		head.next.next = head;
+		head.next = null;
+		log.debug("Exit reverseByRecursion()" + rHead);
+		return rHead;
+	}
+	
+	/**
+	 * 实现单链表部分转置，将相邻两个节点交换，如：a->b->c->d->e，变为：b->a->d->c->e
+	 * @param head
+	 * @return
+	 */
+	public Node reversePartiallyByRecursion(Node head) {
+		if (log.isDebugEnabled())
+			log.debug("Enter reverseByRecursion(" + head + ")");
+		// return this node as head
+		if (head == null || head.next == null) return head;
+		Node ret = head.next;
+		Node rHead = reversePartiallyByRecursion(head.next.next);
+		head.next.next = head;
+		head.next = rHead;
+		log.debug("Exit reverseByRecursion()" + rHead);
+		return ret;
 	}
 
 	/**
