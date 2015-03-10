@@ -1,19 +1,11 @@
-https://samplainsboro@code.google.com/p/samtestproject/ 
-SM7Wj5JD9qn8
-
-https://petergithub@github.com/petergithub/petergithubproject.git
-password1
-
-pyramid
-/pyramid/pyramid/src/org/*
-/pyramid/pyramid/src/org/pi/xml/XMLUtil.java
+This is a tool box and test project
 
 http://localhost:8080/index.html
 http://localhost:8080/servlet/ModernServlet
 http://localhost:8080/servlet/PrimitiveServlet
 
 
--Xms2m -Xmx8m -Djava.rmi.server.hostname=AMRGROLL3DK364 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
+-Xms2m -Xmx8m -Djava.rmi.server.hostname=computerName -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false
 读源码的方法:
 大大前提,把源码全下载下来,按手册的说明,把test跑通.
 1. 堆栈
