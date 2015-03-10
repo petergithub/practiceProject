@@ -33,6 +33,13 @@ update local files:
 2. synchronize workspace
 3. merge
 
+eclipse->Preference->Team->Git->Configuration->Repository Setting
+remote.origin.fetch:+refs/heads/*:refs/remotes/origin/*
+remote.origin.url:https://github.com/petergithub/testProject.git
+
+branch.master.merge:refs/heads/master
+branch.master.remote:origin
+
 git stash if conflict 
 HEAD指向最后一次commit的信息
 git commit --amend	重新提交
