@@ -3,9 +3,8 @@ package demo.algorithm.sort;
 import org.apache.log4j.Logger;
 import org.pu.test.base.TestBase;
 
-
-
 /**
+ * http://zh.wikipedia.org/wiki/排序算法
  * 选择排序（Selection sort）、插入排序（Insertion sort）与气泡排序（Bubble
  * sort）这三个排序方式是初学排序所必须知道的三个基本排序方式
  * ，它们由于速度不快而不实用（平均与最快的时间复杂度都是O(n2)），然而它们排序的方式确是值得观察与探讨的。
@@ -19,7 +18,7 @@ public class SortPrimitive extends TestBase {
 		int[] array = { 92, 77, 67, 8, 6, 84, 55, 85, 43, 67 };
 		logger.info("array before");
 		printArray(array);
-		// insertSort(array);
+		 insertionSort(array);
 		bubbleSort(array);
 		logger.info("array after Sort()");
 		printArray(array);
@@ -45,11 +44,11 @@ public class SortPrimitive extends TestBase {
 	 */
 	public static void selectionSort(int[] number) {
 		for (int i = 0; i < number.length - 1; i++) {
-			int m = i;
+			int selectPos = i;
 			for (int j = i + 1; j < number.length; j++)
-				if (number[j] < number[m]) m = j;
+				if (number[j] < number[selectPos]) selectPos = j;
 
-			if (i != m) swap(number, i, m);
+			if (i != selectPos) swap(number, i, selectPos);
 		}
 	}
 
@@ -57,7 +56,18 @@ public class SortPrimitive extends TestBase {
 	 * <pre>
 	 * 插入排序
 	 * 像是玩朴克一样，我们将牌分作两堆，每次从后面一堆的牌抽出最前端的牌，
-	 * 然后插入前面一堆牌的适当位置，例如: 
+	 * 然后插入前面一堆牌的最小位置.
+	 * http://zh.wikipedia.org/wiki/插入排序
+	 * 一般来说，插入排序都采用in-place在数组上实现。具体算法描述如下：
+	 * 1.	从第一个元素开始，该元素可以认为已经被排序
+	 * 2.	取出下一个元素，在已经排序的元素序列中从后向前扫描
+	 * 3.	如果该元素（已排序）大于新元素，将该元素移到下一位置
+	 * 4.	重复步骤3，直到找到已排序的元素小于或者等于新元素的位置
+	 * 5.	将新元素插入到该位置后
+	 * 6.	重复步骤2~5
+	 * 如果比较操作的代价比交换操作大的话，可以采用二分查找法来减少比较操作的数目。
+	 * 该算法可以认为是插入排序的一个变种，称为二分查找插入排序。
+	 * 例如: 
 	 * 	排序前: 92 77 67 8 6 84 55 85 43 67
 	 * 	1. [77 92] 67 8 6 84 55 85 43 67 将77插入92前
 	 * 	2. [67 77 92] 8 6 84 55 85 43 67 将67插入77前
@@ -70,18 +80,21 @@ public class SortPrimitive extends TestBase {
 	 * 	9. [6 8 43 55 67 67 77 84 85 92] ......
 	 * </pre>
 	 */
-	public static void insertSort(int[] number) {
+	public static void insertionSort(int[] number) {
 		for (int i = 1; i < number.length; i++) {
-			for (int j = i; (j > 0) && (number[j] < number[j - 1]); j--) {
-				swap(number, j, j - 1);
+			int valueToInsert = number[i];
+			int holePos = i;
+			for (; (holePos > 0) && (number[holePos - 1] > valueToInsert); holePos--) {
+				number[holePos] = number[holePos - 1];
 			}
+			number[holePos] = valueToInsert;
 		}
 	}
 
 	/**
 	 * <pre>
 	 * 气泡排序法
-	 * 	 顾名思义，就是排序时，最大的元素会如同气泡一样移至右端，
+	 * 就是排序时，最大的元素会如同气泡一样移至右端，
 	 * 其利用比较相邻元素的方法，将大的元素交换至右端，所以大的元素会不断的往右移动，
 	 * 直到适当的位置为止。 基本的气泡排序法可以利用旗标的方式稍微减少一些比较的时间，
 	 * 当寻访完阵列后都没有发生任何的交换动作，表示排序已经完成，
@@ -104,21 +117,13 @@ public class SortPrimitive extends TestBase {
 		boolean flag = true;
 		for (int i = 0; i < number.length - 1 && flag; i++) {
 			flag = false;
-			for (int j = 0; j < number.length - i - 1; j++) {
-				if (number[j + 1] < number[j]) {
+			for (int j = 0; j < number.length - 1 - i; j++) {
+				if (number[j] > number[j + 1]) {
 					swap(number, j + 1, j);
 					flag = true;
 				}
 			}
 		}
-
-		// for(int i=0;i<number.length;i++){
-		// for(int j=number.length-1;j>i;j--){
-		// if(number[j]<number[j-1]){
-		// SortUtil.swap(number,j,j-1);
-		// }
-		// }
-		// }
 	}
 
 	private static void swap(int[] number, int i, int j) {
