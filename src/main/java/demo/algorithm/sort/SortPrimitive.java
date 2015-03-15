@@ -1,7 +1,11 @@
 package demo.algorithm.sort;
 
-import org.apache.log4j.Logger;
+import java.util.Random;
+
+import org.junit.Test;
 import org.pu.test.base.TestBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * http://zh.wikipedia.org/wiki/排序算法
@@ -10,17 +14,17 @@ import org.pu.test.base.TestBase;
  * ，它们由于速度不快而不实用（平均与最快的时间复杂度都是O(n2)），然而它们排序的方式确是值得观察与探讨的。
  */
 public class SortPrimitive extends TestBase {
-	protected static final Logger logger = Logger
-			.getLogger(SortPrimitive.class);
+	private static final Logger log = LoggerFactory.getLogger(SortPrimitive.class);
 
-	@org.junit.Test
+	@Test
 	public void testSort() {
 		int[] array = { 92, 77, 67, 8, 6, 84, 55, 85, 43, 67 };
-		logger.info("array before");
+		log.info("array before");
 		printArray(array);
-		 insertionSort(array);
-		bubbleSort(array);
-		logger.info("array after Sort()");
+//		insertionSort(array);
+//		bubbleSort(array);
+		quickSort(array);
+		log.info("array after Sort()");
 		printArray(array);
 	}
 
@@ -42,13 +46,13 @@ public class SortPrimitive extends TestBase {
 	 * 	9. [1 10 31 33 37 48 60 70 80] 80 ......
 	 * </pre>
 	 */
-	public static void selectionSort(int[] number) {
-		for (int i = 0; i < number.length - 1; i++) {
+	public static void selectionSort(int[] array) {
+		for (int i = 0; i < array.length - 1; i++) {
 			int selectPos = i;
-			for (int j = i + 1; j < number.length; j++)
-				if (number[j] < number[selectPos]) selectPos = j;
+			for (int j = i + 1; j < array.length; j++)
+				if (array[j] < array[selectPos]) selectPos = j;
 
-			if (i != selectPos) swap(number, i, selectPos);
+			if (i != selectPos) swap(array, i, selectPos);
 		}
 	}
 
@@ -80,14 +84,14 @@ public class SortPrimitive extends TestBase {
 	 * 	9. [6 8 43 55 67 67 77 84 85 92] ......
 	 * </pre>
 	 */
-	public static void insertionSort(int[] number) {
-		for (int i = 1; i < number.length; i++) {
-			int valueToInsert = number[i];
+	public static void insertionSort(int[] array) {
+		for (int i = 1; i < array.length; i++) {
+			int valueToInsert = array[i];
 			int holePos = i;
-			for (; (holePos > 0) && (number[holePos - 1] > valueToInsert); holePos--) {
-				number[holePos] = number[holePos - 1];
+			for (; (holePos > 0) && (array[holePos - 1] > valueToInsert); holePos--) {
+				array[holePos] = array[holePos - 1];
 			}
-			number[holePos] = valueToInsert;
+			array[holePos] = valueToInsert;
 		}
 	}
 
@@ -113,22 +117,98 @@ public class SortPrimitive extends TestBase {
 	 * 表示接下来的i+2至n已经排序完毕，这也增进了气泡排序的效率。
 	 * </pre>
 	 */
-	public static void bubbleSort(int[] number) {
+	public static void bubbleSort(int[] array) {
 		boolean flag = true;
-		for (int i = 0; i < number.length - 1 && flag; i++) {
+		for (int i = 0; i < array.length - 1 && flag; i++) {
 			flag = false;
-			for (int j = 0; j < number.length - 1 - i; j++) {
-				if (number[j] > number[j + 1]) {
-					swap(number, j + 1, j);
+			for (int j = 0; j < array.length - 1 - i; j++) {
+				if (array[j] > array[j + 1]) {
+					swap(array, j + 1, j);
 					flag = true;
 				}
 			}
 		}
 	}
+	
+	/**
+	 * <pre>
+	 * 伪代码，此算法可以被表示为：
+	 *  function quicksort(q)
+	 *      var list less, pivotList, greater
+	 *      if length(q) ≤ 1 {
+	 *          return q
+	 *      } else {
+	 *          select a pivot value pivot from q
+	 *          for each x in q except the pivot element
+	 *              if x < pivot then add x to less
+	 *              if x ≥ pivot then add x to greater
+	 *          add pivot to pivotList
+	 *          return concatenate(quicksort(less), pivotList, quicksort(greater))
+	 *      }
+	 * </pre>
+	 * 
+	 * @param array
+	 */
+	public static void quickSort(int[] array) {
+		qSort(array, 0, array.length-1);
+	}
 
-	private static void swap(int[] number, int i, int j) {
-		int temp = number[i];
-		number[i] = number[j];
-		number[j] = temp;
+	private static void qSort(int[] array, int left, int right) {
+		log.debug("Enter qSort({},{})", left, right);
+		if (left < right) {
+			int index = partition2(array, left, right);
+			qSort(array, left, index-1);
+			qSort(array, index+1, right);
+		}
+	}
+
+	/**
+	 * http://blog.csdn.net/morewindows/article/details/6684558
+	 */
+	private static int partition2(int[] array, int left, int right) {
+		int index = left;//以左边的数为基准数， 如果以中间的数作为基准数，
+		// 可以将中间的数和第一个数进行交换 就转化为以左边为基准的情况了。如下面注释
+		// index = left + new Random().nextInt(right-left+1);
+		// swap(array, index, left);
+		// index = left;
+		int key = array[index];// array[index]就是第一个坑
+		while (left < right) {
+			while (left < right && array[right] >= key) {// 从右向左找小于key的数来填array[index]
+				right--;
+			}
+			array[left] = array[right];// 将array[right]填到array[left]中，array[right]就形成了一个新的坑
+
+			// 从左向右找大于或等于key的数来填array[right]
+			while (left < right && array[left] <= key) {
+				left++;
+			}
+			array[right] = array[left];// 将array[left]填到array[right]中，array[left]就形成了一个新的坑
+		}
+		 //退出时，left等于right。将key填到这个坑中。  
+		array[left] = key;
+		return left;
+	}
+
+	/**
+	 * http://zh.wikipedia.org/wiki/快速排序#Java
+	 */
+	private static int partition(int[] array, int left, int right) {
+		int index = left;
+		 index = left + new Random().nextInt(right-left+1);
+		int pivot = array[index];
+		swap(array, index, right);
+		for (int i = index = left; i < right; ++i) {
+			if (array[i] <= pivot) {
+				swap(array, index++, i);
+			}
+		}
+		swap(array, index, right);
+		return index;
+	}
+
+	private static void swap(int[] array, int i, int j) {
+		int temp = array[i];
+		array[i] = array[j];
+		array[j] = temp;
 	}
 }
