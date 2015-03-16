@@ -102,28 +102,28 @@ public class TestBase {
 
 	protected <E> void printArray(E[] array) {
 		int length = array.length;
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < length; i++) {
-//			log.debug("array[{}] = {}", i, array[i]);
 			if (i == length - 1) {
-				System.out.print(array[i]);
+				sb.append(array[i]);
 			} else {
-				System.out.print(array[i] + ",");
+				sb.append(array[i]).append(", ");
 			}
 		}
-		System.out.println();
+		log.debug("array = {}", sb);
 	}
 
 	protected void printArray(int[] array) {
 		int length = array.length;
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < length; i++) {
-			log.debug("array[{}] = {}", i, array[i]);
 			if (i == length - 1) {
-				System.out.print(array[i]);
+				sb.append(array[i]);
 			} else {
-				System.out.print(array[i] + ", ");
+				sb.append(array[i]).append(", ");
 			}
 		}
-		System.out.println();
+		log.debug("array = {}", sb);
 	}
 
 	// @Test
