@@ -1,6 +1,8 @@
 package demo.algorithm.link;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * 链表是一种重要的数据结构，在程序设计中占有很重要的地位。C语言和C＋＋语言中是用指针来实现链表结构的，由于Java语言不提供指针，
@@ -34,8 +36,8 @@ import org.apache.log4j.Logger;
  * @version Date: Apr 24, 2012 1:29:30 PM
  */
 public class Link {
-	private static final Logger log = Logger.getLogger(Link.class);
-
+	private static final Logger log = LoggerFactory.getLogger(Link.class);
+	
 	/** 构成链表的结点定义 */
 	class Node {
 		private Object data;
@@ -220,6 +222,21 @@ public class Link {
 	 * </pre>
 	 */
 	public Node reverseByOneIteration(Node head) {
+		if (head == null || head.next == null) return head;
+		
+		Node current = head;
+		Node pre = null;
+		Node next = null;
+		while (current != null) {
+			next = current.next;
+			current.next = pre;
+			pre = current;
+			current = next;
+		}
+		return pre;
+	}
+	
+	public Node reverseByOneIteration2(Node head) {
 		if (log.isDebugEnabled())
 			log.debug("Enter reverse(" + head + ")");
 		// return this node as head
