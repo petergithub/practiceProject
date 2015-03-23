@@ -1,7 +1,5 @@
 package demo.algorithm.sort;
 
-import java.util.Random;
-
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.slf4j.Logger;
@@ -15,6 +13,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SortPrimitive extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(SortPrimitive.class);
+
 
 	@Test
 	public void testSort() {
@@ -173,7 +172,7 @@ public class SortPrimitive extends TestBase {
 		// index = left;
 		int key = array[index];// array[index]就是第一个坑
 		while (left < right) {
-			while (left < right && array[right] >= key) {// 从右向左找小于key的数来填array[index]
+			while (left < right && key <= array[right]) {// 从右向左找小于key的数来填array[index]
 				right--;
 			}
 			array[left] = array[right];// 将array[right]填到array[left]中，array[right]就形成了一个新的坑
@@ -194,9 +193,9 @@ public class SortPrimitive extends TestBase {
 	 */
 	private static int partition(int[] array, int left, int right) {
 		int index = left;
-		 index = left + new Random().nextInt(right-left+1);
+//		 index = left + new Random().nextInt(right-left+1);
 		int pivot = array[index];
-		swap(array, index, right);
+//		swap(array, index, right);
 		for (int i = index = left; i < right; ++i) {
 			if (array[i] <= pivot) {
 				swap(array, index++, i);
