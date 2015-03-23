@@ -197,4 +197,8 @@ Then: More Things You Can Do
     * Delete your fork
       At some point you may decide that you want to delete your fork. To delete a fork, just follow the same steps as you would to delete a regular repo.
 
-	  
+Get rid of large files
+https://help.github.com/articles/remove-sensitive-data/	  
+git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty
+git gc --aggressive --prune
+git push origin --force --all
