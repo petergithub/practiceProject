@@ -13,7 +13,7 @@ import org.junit.Test;
 public class BinaryTree {
 
 	private TreeNode root = null;
-	private StringBuilder stringBuilder = new StringBuilder();
+	public static StringBuilder stringBuilder = new StringBuilder();
 
 	public BinaryTree() {
 //		root = new TreeNode(1, "rootNode(A)");
@@ -132,7 +132,7 @@ public class BinaryTree {
 	// 前序遍历
 	public void preOrder(TreeNode subTree) {
 		if (subTree != null) {
-			visted(subTree);
+			visit(subTree);
 			preOrder(subTree.leftChild);
 			preOrder(subTree.rightChild);
 		}
@@ -142,7 +142,7 @@ public class BinaryTree {
 	public void inOrder(TreeNode subTree) {
 		if (subTree != null) {
 			inOrder(subTree.leftChild);
-			visted(subTree);
+			visit(subTree);
 			inOrder(subTree.rightChild);
 		}
 	}
@@ -152,7 +152,7 @@ public class BinaryTree {
 		if (subTree != null) {
 			postOrder(subTree.leftChild);
 			postOrder(subTree.rightChild);
-			visted(subTree);
+			visit(subTree);
 		}
 	}
 
@@ -162,11 +162,11 @@ public class BinaryTree {
 		TreeNode node = p;
 		while (node != null || stack.size() > 0) {
 			while (node != null) {
-				visted(node);
+				visit(node);
 				stack.push(node);
 				node = node.leftChild;
 			}
-			while (stack.size() > 0) {
+			if (stack.size() > 0) {
 				node = stack.pop();
 				node = node.rightChild;
 			}
@@ -186,7 +186,7 @@ public class BinaryTree {
 			// 栈非空
 			if (stack.size() > 0) {
 				node = stack.pop();
-				visted(node);
+				visit(node);
 				node = node.rightChild;
 			}
 		}
@@ -203,7 +203,7 @@ public class BinaryTree {
 			}
 			// 当前结点无右子树或右子树已经输出
 			while (p != null && (p.rightChild == null || p.rightChild == node)) {
-				visted(p);
+				visit(p);
 				// 纪录上一个已输出结点
 				node = p;
 				if (stack.empty()) return;
@@ -215,8 +215,8 @@ public class BinaryTree {
 		}
 	}
 
-	public void visted(TreeNode subTree) {
-		subTree.isVisted = true;
+	public void visit(TreeNode subTree) {
+		subTree.isVisited = true;
 //		System.out.println("key:" + subTree.key + "--name:" + subTree.data);
 		stringBuilder.append(subTree.data);
 	}
@@ -229,7 +229,7 @@ public class BinaryTree {
 	private class TreeNode {
 		private int key = 0;
 		private String data = null;
-		private boolean isVisted = false;
+		private boolean isVisited = false;
 		private TreeNode leftChild = null;
 		private TreeNode rightChild = null;
 
@@ -257,32 +257,32 @@ public class BinaryTree {
 		System.out.println("the height of the tree is " + bt.height());
 
 		System.out.println("*******(前序遍历)[ABDECF]遍历*****************");
-		stringBuilder = new StringBuilder("");
+		stringBuilder = new StringBuilder();
 		bt.preOrder(bt.root);
 		Assert.assertEquals("ABDECF", stringBuilder.toString());
 
 		System.out.println("*******(中序遍历)[DBEACF]遍历*****************");
-		stringBuilder = new StringBuilder("");
+		stringBuilder = new StringBuilder();
 		bt.inOrder(bt.root);
 		Assert.assertEquals("DBEACF", stringBuilder.toString());
 
 		System.out.println("*******(后序遍历)[DEBFCA]遍历*****************");
-		stringBuilder = new StringBuilder("");
+		stringBuilder = new StringBuilder();
 		bt.postOrder(bt.root);
 		Assert.assertEquals("DEBFCA", stringBuilder.toString());
 
 		System.out.println("***非递归实现****(前序遍历)[ABDECF]遍历*****************");
-		stringBuilder = new StringBuilder("");
+		stringBuilder = new StringBuilder();
 		bt.nonRecPreOrder(bt.root);
 		Assert.assertEquals("ABDECF", stringBuilder.toString());
 
 		System.out.println("***非递归实现****(中序遍历)[DBEACF]遍历*****************");
-		stringBuilder = new StringBuilder("");
+		stringBuilder = new StringBuilder();
 		bt.nonRecInOrder(bt.root);
 		Assert.assertEquals("DBEACF", stringBuilder.toString());
 
 		System.out.println("***非递归实现****(后序遍历)[DEBFCA]遍历*****************");
-		stringBuilder = new StringBuilder("");
+		stringBuilder = new StringBuilder();
 		bt.noRecPostOrder(bt.root);
 		Assert.assertEquals("DEBFCA", stringBuilder.toString());
 	}
