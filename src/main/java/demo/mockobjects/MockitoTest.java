@@ -1,4 +1,4 @@
-package doing;
+package demo.mockobjects;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,7 +23,7 @@ import org.mockito.Mockito;
 public class MockitoTest {
 	
 	/**
-	 * 1. Let's verify some behaviour! 
+	 * 1. Let's verify some behavior! 
 	 * Once created, mock will remember all interactions. Then you can
 	 * selectively verify whatever interaction you are interested in.
 	 * 
