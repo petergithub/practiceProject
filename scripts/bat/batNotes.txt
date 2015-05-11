@@ -121,6 +121,23 @@ echo 自动填写ip为 %add% 完成!
 echo ------------------------------------------------------
 pause >nul
 
+REM	 IP地址参数说明：
+REM	 1.name：网络连接名称，一般为“本地连接”。你自己取的什么名就是什么名字。
+REM	 2.source：获取IP的途径。动态获取，则为dhcp，手动设置，则为static。
+REM	 3.addr：要设置的IP地址。
+REM	 4.mask：子网掩码。
+REM	 5.gateway：网关地址。
+REM	 6.gwmetric：网关跃点数，可以设置为整型数值，也可以设置为“自动”:auto。
+ 	
+REM	 DNS参数说明：
+REM	 1.name：网络连接名称，一般为“本地连接”。你自己取的什么名就是什么名字。
+REM	 2.source：获取IP的途径。动态获取，则为dhcp，手动设置，则为static。
+REM	 3.addr：要设置的IP地址。
+REM	 4.register：
+		REM primary: 只在主 DNS 后缀下注册。
+		REM none: 禁用动态 DNS 注册。
+		REM both: 在主 DNS 后缀下注册，也在特定连接后缀下注册。
+REM	 5.index：设置的DNS的顺序号。
 
 ############################################
 # copy folder exclude some files and compress it with jar or 7zip command
