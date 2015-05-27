@@ -1,3 +1,9 @@
 /build
 /target
 /lib
+src/main/webapp/WEB-INF/classes/*
+.tomcatplugin
+*.class
+*.wav
+*.zip
+.#webclasspath

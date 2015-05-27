@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,8 +29,8 @@ import javax.swing.SwingUtilities;
 
 import junit.framework.Assert;
 
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
+import org.json.JSONException;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
@@ -37,6 +38,9 @@ import org.pu.utils.EscapeChars;
 import org.pu.utils.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * @author Shang Pu
@@ -47,92 +51,200 @@ public class TestClass extends TestBase {
 	String code;
 
 	// TODO: take a look PropertyDescriptor
-//	@Test(expected = NullPointerException.class)
+
+	// @Test
+	public void testEmptyList() {
+
+		List<String> emptyList = new ArrayList<>();
+		log.info("emptyList = {}", emptyList);
+		String str = emptyList.get(0);
+		log.info("str = {}", str);
+		System.out.println(str);
+		Assert.assertNotNull(str);
+	}
+
+	// @Test(expected = NullPointerException.class)
 	@SuppressWarnings("null")
 	public void testNullList() {
 		List<String> list = null;
 		for (String s : list) {
 			log.info("s = {}", s);
 		}
+
+		List<String> emptyList = new ArrayList<>();
+		String str = emptyList.get(0);
+		Assert.assertNotNull(str);
 	}
-	
+
+	/**
+	 * ["000","001"]
+	 */
 	@Test
+	public void testJsonArray() {
+		String result = "[\"000\",\"001\"]";
+		log.info("result = {}", result);
+		String item1 = "000";
+		String item2 = "001";
+
+		JSONArray jsonArrayFast = new JSONArray();
+		jsonArrayFast.add(0, item1);
+		jsonArrayFast.add(1, item2);
+		String orderStr = jsonArrayFast.toJSONString();
+		Assert.assertEquals(result, orderStr);
+
+		jsonArrayFast = JSONArray.parseArray(result);
+		Object[] array = jsonArrayFast.toArray();
+		for (Object o : array) {
+			Assert.assertTrue(item1.equals(o) || item2.equals(o));
+		}
+
+		org.json.JSONArray jsonArray = new org.json.JSONArray();
+		jsonArray.put(item1);
+		jsonArray.put(item2);
+		orderStr = jsonArray.toString();
+		Assert.assertEquals(result, orderStr);
+
+		try {
+			jsonArray = new org.json.JSONArray(result);
+			for (int i = 0; i < jsonArray.length(); i++) {
+				Assert.assertTrue(item1.equals(jsonArray.getString(i))
+						|| item2.equals(jsonArray.getString(i)));
+			}
+		} catch (JSONException e) {
+			log.error("JSONException in TestClass.testJsonArray()", e);
+		}
+	}
+
+	public void testJsonPro() {
+		// {"response":0,"itemList":[{"price":1.5,"fashion":{},
+		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
+
+		// build json
+		JSONObject jsonArrayStr = new JSONObject();
+		int response = 0;
+		jsonArrayStr.put("response", response);
+
+		JSONArray itemArray = new JSONArray();
+
+		JSONObject item = new JSONObject();
+		double price = 1.5;
+		item.put("price", price);
+		JSONObject fashinon = new JSONObject();
+		item.put("fashinon", fashinon);
+
+		JSONObject product = new JSONObject();
+		product.put("productId", 2);
+		String name = "IDOL 2 MINI FlipCase CLOUDY";
+		product.put("name", name);
+		item.put("product", product);
+		itemArray.add(item);
+
+		jsonArrayStr.put("itemArray", itemArray);
+		String jsonStr = jsonArrayStr.toString();
+		log.info("json = {}", jsonArrayStr);
+
+		// Resolve json string
+		jsonArrayStr = JSONObject.parseObject(jsonStr);
+		Assert.assertEquals(response, jsonArrayStr.getIntValue("response"));
+		JSONArray jsonArray = jsonArrayStr.getJSONArray("itemList");
+		for (Object o : jsonArray.toArray()) {
+			item = (JSONObject) o;
+			log.info("item = {}", item);
+			Assert.assertEquals(price, item.getDoubleValue("price"));
+			product = item.getJSONObject("product");
+			Assert.assertEquals(name, product.getString("name"));
+		}
+	}
+
+	public void testSwitch() {
+		Integer i = new Integer(1) + new Integer(2);
+		switch (i) {
+			case 3:
+				System.out.println("three");
+				break;
+			default:
+				System.out.println("other");
+				break;
+		}
+	}
+
+	public void testWait() throws InterruptedException {
+		this.wait();
+	}
+
 	public void testGetPackage() {
-    Package a = getClass().getPackage();
-    log.info("a = {}", a);
+		Package a = getClass().getPackage();
+		log.info("a = {}", a);
 	}
-	
+
 	public void testCreateFile() {
-    String date = "date";
+		String date = "date";
 		open(date);
 		open(date);
 	}
 
-  private void open(String date) {
-    String directory = "log";
-    String prefix = "catalina.";
-    String suffix = ".log";
-    System.setProperty("catalina.base", "c:/cache");
+	private void open(String date) {
+		String directory = "log";
+		String prefix = "catalina.";
+		String suffix = ".log";
+		System.setProperty("catalina.base", "c:/cache");
 		// Create the directory if necessary
-    File dir = new File(directory );
-    if (!dir.isAbsolute())
-        dir = new File(System.getProperty("catalina.base"), directory);
-    dir.mkdirs();
+		File dir = new File(directory);
+		if (!dir.isAbsolute()) dir = new File(System.getProperty("catalina.base"), directory);
+		dir.mkdirs();
 
-    PrintWriter writer;
+		PrintWriter writer;
 		// Open the current log file
-    try {
-				String pathname = dir.getAbsolutePath() + File.separator +
-            prefix + date + suffix;
-        writer = new PrintWriter(new FileWriter(pathname, true), true);
-    } catch (IOException e) {
-        writer = null;
-    }
-    writer.append(date);
-    IoUtils.close(writer);
-}
-	
-	public void testList() {
-		//test list in order
-	  List<String> actual = Arrays.asList("1", "2", "3");
-	  List<String> expected = Arrays.asList("1", "2", "3");
-	  assertEquals(expected, actual);
-	  assertThat(actual, is(expected));
+		try {
+			String pathname = dir.getAbsolutePath() + File.separator + prefix + date + suffix;
+			writer = new PrintWriter(new FileWriter(pathname, true), true);
+		} catch (IOException e) {
+			writer = null;
+		}
+		writer.append(date);
+		IoUtils.close(writer);
+	}
 
-		//test list without order
-	  expected = Arrays.asList("1", "3", "2");
-	  assertThat(actual, is(not(expected)));
-    assertThat("List equality without order", 
-        actual, IsIterableContainingInAnyOrder.containsInAnyOrder(expected.toArray()));
-    
-	  List<Integer> yourList = Arrays.asList(1,2,3,4);
-	  assertThat(yourList, CoreMatchers.hasItems(1,2,3));
-	  assertThat(yourList, not(CoreMatchers.hasItems(1,2,3,4,5)));
+	public void testList() {
+		// test list in order
+		List<String> actual = Arrays.asList("1", "2", "3");
+		List<String> expected = Arrays.asList("1", "2", "3");
+		assertEquals(expected, actual);
+		assertThat(actual, is(expected));
+
+		// test list without order
+		expected = Arrays.asList("1", "3", "2");
+		assertThat(actual, is(not(expected)));
+		assertThat("List equality without order", actual,
+				IsIterableContainingInAnyOrder.containsInAnyOrder(expected.toArray()));
+
+		List<Integer> yourList = Arrays.asList(1, 2, 3, 4);
+		// assertThat(yourList, CoreMatchers.hasItems(1,2,3));
+		// assertThat(yourList, not(CoreMatchers.hasItems(1,2,3,4,5)));
 	}
 
 	public void testlog() {
-		log.error("ACL {} doesn't exist", "aclName" );
+		log.error("ACL {} doesn't exist", "aclName");
 		String path = getClass().getResource("/").getPath();
-		///C:/sp/Dropbox/base/testProject/target/test-classes/
+		// /C:/sp/Dropbox/base/testProject/target/test-classes/
 		log.info("path = {}", getClass().getResource("/").getPath());
 		log.info("path = {}", getClass().getResource("/").getPath());
-		
+
 		getClass().getResourceAsStream("");
-		
+
 	}
-	
+
 	public void testSubstring2() {
 		String dql = "select gpseqnum, gpseqnum, compound, generic_name, trade_name from dm_dbo.pfe_t_compound_data where (lower(trade_name) like '%${filter}%' or lower(compound) like '%${filter}%' or lower(generic_name) like '%${filter}%') and active_flag='T' order by compound, trade_name, generic_name";
 		String orderByPart = "";
-    int orderByIndex = dql.toLowerCase().indexOf(" order by");
-    if (orderByIndex > -1) {
-      orderByPart = dql.substring(orderByIndex);
-      dql = dql.substring(0, orderByIndex);
-    }
-    log.info("orderByPart = {}", orderByPart);
+		int orderByIndex = dql.toLowerCase().indexOf(" order by");
+		if (orderByIndex > -1) {
+			orderByPart = dql.substring(orderByIndex);
+			dql = dql.substring(0, orderByIndex);
+		}
+		log.info("orderByPart = {}", orderByPart);
 	}
-	
-	
+
 	public void testEscape() {
 		String str = "the data might contain & or ! or % or ' or # etc";
 		String escapedXml3 = org.apache.commons.lang3.StringEscapeUtils.escapeXml(str);
@@ -141,31 +253,32 @@ public class TestClass extends TestBase {
 		log.info("escapedXml = {}", escapedXml);
 		log.info("EscapeChars.forHTML = {}", EscapeChars.forHTML(str));
 	}
-	
+
 	public void testSplit() {
 		String attrValues = "5 mg�10 mg�20 mg�40 mg";
 		String appendVal = "";
 		while (attrValues != null) {
-      String attrValue;
+			String attrValue;
 			if (attrValues.indexOf(Constants.VALUE_DELIMITER) >= 0) {
-          attrValue = attrValues.substring(0, attrValues.indexOf(Constants.VALUE_DELIMITER));
-          attrValues = attrValues.substring(attrValues.indexOf(Constants.VALUE_DELIMITER) + 1);
-      } else {
-          attrValue = attrValues;
-          attrValues = null;
-      }
-      if (!((attrValue.equalsIgnoreCase("null")) || (attrValue.equalsIgnoreCase("nulldate")))) {
-				appendVal = "append,id,attrName," + attrValue; 
-      }
-      log.info("appendVal = {}", appendVal);
+				attrValue = attrValues.substring(0, attrValues.indexOf(Constants.VALUE_DELIMITER));
+				attrValues = attrValues
+						.substring(attrValues.indexOf(Constants.VALUE_DELIMITER) + 1);
+			} else {
+				attrValue = attrValues;
+				attrValues = null;
+			}
+			if (!((attrValue.equalsIgnoreCase("null")) || (attrValue.equalsIgnoreCase("nulldate")))) {
+				appendVal = "append,id,attrName," + attrValue;
+			}
+			log.info("appendVal = {}", appendVal);
 		}
 	}
-	
+
 	public void testInteger() {
-		int num= 6553800;
+		int num = 6553800;
 		log.info("int = {}", num);
 	}
-	
+
 	public void testStringa() {
 		String src = "http://gdms5dev.pfizer.com/gdms/index.jsp";
 		String target = "http://gdms5dev.pfizer.com/gdms/drl/objectId/";
@@ -178,43 +291,49 @@ public class TestClass extends TestBase {
 
 		user = user.substring(0, user.indexOf(".\""));
 		log.info("user = {}", user);
-		
+
 	}
-	
+
 	public void testSubstring() {
 		String str = null;
-		log.info("str = {}", str);//print str = null
+		log.info("str = {}", str);// print str = null
 		String message = "<h2>HTTP ERROR: 500</h2><pre>Could not find link neurontin-03.jpg</pre>";
 		String start = "<pre>";
-		message = message.substring(message.indexOf(start) + start.length(), message.indexOf("</pre>"));
+		message = message.substring(message.indexOf(start) + start.length(),
+				message.indexOf("</pre>"));
 		log.info("message = {}", message);
 	}
-	
-	public void testTempFolder() throws IOException{
-		File temp = File.createTempFile("test","");
+
+	public void testTempFolder() throws IOException {
+		File temp = File.createTempFile("test", "");
 		temp.delete();
 		temp.mkdir();
 		log.info("temp.getAbsolutePath() = {}", temp.getAbsolutePath());
 	}
-	
+
 	public void testString2() {
 		String docType = "pfe_sop";
-				
-		String r_object_id  = "10101";
+
+		String r_object_id = "10101";
 		String dql = new StringBuilder("select r_object_id from ")
-		.append(docType).append(" (all) where r_object_id='").append(r_object_id)
-		.append("' and pfe_xm_p_effective_date is not nulldate and Date(now)>=pfe_xm_p_effective_date and r_lock_owner is nullstring and xm_status = 'Approved' and r_policy_id = (select r_object_id from dm_policy where object_name = 'pfe_l_lifecycle_1')")
-		.toString();
+				.append(docType)
+				.append(" (all) where r_object_id='")
+				.append(r_object_id)
+				.append("' and pfe_xm_p_effective_date is not nulldate and Date(now)>=pfe_xm_p_effective_date and r_lock_owner is nullstring and xm_status = 'Approved' and r_policy_id = (select r_object_id from dm_policy where object_name = 'pfe_l_lifecycle_1')")
+				.toString();
 		log.info("dql = {}", dql);
-		
+
 		docType = "gtc_xm_prescribing_info";
 		String dqlLc4 = new StringBuilder("select r_object_id from ")
-		.append(docType).append(" (all) where r_object_id='").append(r_object_id)
-		.append("' and pfe_xm_p_effective_date is not nulldate and Date(now)>=pfe_xm_p_effective_date and r_lock_owner is nullstring and r_policy_id = (select r_object_id from dm_policy where object_name = 'pfe_l_lifecycle_4') and xm_status='Internally Approved' and (ha_submission_status in ('No Notification/Submission Required','Not Subject to Regulation','HA Notify') or (ha_submission_status = 'HA Submission' and ha_response = 'HA Approved'))")
-		.toString();
-		
+				.append(docType)
+				.append(" (all) where r_object_id='")
+				.append(r_object_id)
+				.append("' and pfe_xm_p_effective_date is not nulldate and Date(now)>=pfe_xm_p_effective_date and r_lock_owner is nullstring and r_policy_id = (select r_object_id from dm_policy where object_name = 'pfe_l_lifecycle_4') and xm_status='Internally Approved' and (ha_submission_status in ('No Notification/Submission Required','Not Subject to Regulation','HA Notify') or (ha_submission_status = 'HA Submission' and ha_response = 'HA Approved'))")
+				.toString();
+
 		log.info("dqlLc4 = {}", dqlLc4);
 	}
+
 	public void testString() {
 		String lifecycle1_id = "4601d7f980005eaf";
 		String lifecycle4_id = "4601d7f980005eb7";
@@ -223,8 +342,7 @@ public class TestClass extends TestBase {
 			String docType = (String) iterator.next();
 			String queryStr = new StringBuilder("select r_object_id from ")
 					.append(docType)
-					.append(
-							" (all) where Date(now)>=pfe_xm_p_effective_date and pfe_xm_p_effective_date is not nulldate and r_lock_owner is nullstring and ((r_policy_id = '")
+					.append(" (all) where Date(now)>=pfe_xm_p_effective_date and pfe_xm_p_effective_date is not nulldate and r_lock_owner is nullstring and ((r_policy_id = '")
 					.append(lifecycle1_id)
 					.append("' and xm_status='Approved') or (r_policy_id = '")
 
@@ -234,8 +352,7 @@ public class TestClass extends TestBase {
 					// iii. Submission Status is “HA Notify”
 					// iv. Submission Status is “HA Submission” and HA Response is “HA Approved”
 					.append(lifecycle4_id)
-					.append(
-							"' and xm_status='Internally Approved' and (ha_submission_status in ('No Notification/Submission Required','Not Subject to Regulation','HA Notify') or (ha_submission_status = 'HA Submission' and ha_response = 'HA Approved'))))")
+					.append("' and xm_status='Internally Approved' and (ha_submission_status in ('No Notification/Submission Required','Not Subject to Regulation','HA Notify') or (ha_submission_status = 'HA Submission' and ha_response = 'HA Approved'))))")
 					.toString();
 			log.info("queryStr = {}", queryStr);
 
