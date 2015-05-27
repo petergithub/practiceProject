@@ -1,5 +1,6 @@
 package demo;
 
+import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -557,5 +558,23 @@ public class BasicDemo {
 
 	public void testSystemIn() throws IOException {
 		System.in.read();
+	}
+	
+	public void testConvertRGBtoHex() {
+		int r = 184;
+		int g = 204;
+		int b = 228;
+		//Use capital X's if you want your resulting hex-digits to be capitalized (#FFFFFF vs. #ffffff)
+		String format = "#%02X%02X%02X"; 
+		String hex = String.format(format, r, g, b);
+		log.info("hex2 = {}", hex);
+		
+		Color color = new Color(r,g,b);
+		String hex2 = Integer.toHexString(color.getRGB() & 0xffffff);
+		if (hex2.length() < 6) {
+		    hex2 = "0" + hex2;
+		}
+		hex2 = "#" + hex2;
+		log.info("hex = {}", hex2);
 	}
 }
