@@ -32,6 +32,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,6 @@ import doing.TestClass;
 public class BasicDemo {
 	private static final Logger log = LoggerFactory.getLogger(BasicDemo.class);
 
-	@org.junit.Test
 	public void testCallJs() {
 		ScriptEngineManager manager = new ScriptEngineManager();
 		ScriptEngine engine = manager.getEngineByName("JavaScript");
@@ -429,6 +429,7 @@ public class BasicDemo {
 	/**
 	 * Runtime的exec方法 可以在Java去运行外部的另一程序
 	 */
+	@Test
 	public void testRuntime() {
 		Runtime rt = Runtime.getRuntime();
 		try {
@@ -446,9 +447,13 @@ public class BasicDemo {
 				log.info("External program terminate normally.");
 			else
 				log.info("External program terminate abnormally.");
+			
+			String result = org.pu.utils.Utils.exeCmd(cmd, "GBK");
+			log.info("result = {}", result);
 		} catch (Exception e) {
 			log.error("Exception in testRuntime()", e);
 		}
+		
 	}
 
 	/**

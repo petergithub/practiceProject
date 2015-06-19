@@ -3,6 +3,7 @@ package org.pu.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -11,6 +12,7 @@ import java.io.Writer;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
 import java.util.ArrayList;
@@ -323,5 +325,35 @@ public class Utils {
 			log.error("InterruptedException in Utils.sleep()", e);
 			return false;
 		}
+	}
+	
+	/**
+	 * Runtime.getRuntime().exec(cmd)
+	 * @param cmd
+	 * @param charset GBK, UTF-8
+	 * @return response of cmd
+	 */
+	public static String exeCmd(String cmd, String charset) {
+		Runtime runtime = Runtime.getRuntime();
+		Process proc = null;
+		String retStr = "";
+		InputStreamReader insReader = null;
+		char[] tmpBuffer = new char[1024];
+		int nRet = 0;
+
+		try {
+			proc = runtime.exec(cmd);
+			insReader = new InputStreamReader(proc.getInputStream(), Charset.forName(charset));
+
+			while ((nRet = insReader.read(tmpBuffer, 0, 1024)) != -1) {
+				retStr += new String(tmpBuffer, 0, nRet);
+			}
+
+		} catch (Exception e) {
+			retStr = "<font color=\"red\">bad command \"" + cmd + "\"</font>";
+		} finally {
+			IoUtils.close(insReader);
+		}
+		return retStr;
 	}
 }

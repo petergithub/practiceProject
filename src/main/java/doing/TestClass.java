@@ -51,10 +51,15 @@ public class TestClass extends TestBase {
 	String code;
 
 	// TODO: take a look PropertyDescriptor
-
-	// @Test
+	
+	@Test
+	public void execommand() {
+		String command = "D:\\sp\\work\\script\\testBat.bat";
+		String result = org.pu.utils.Utils.exeCmd(command, "gbk");
+		log.info("result = {}", result);
+	}
+	
 	public void testEmptyList() {
-
 		List<String> emptyList = new ArrayList<>();
 		log.info("emptyList = {}", emptyList);
 		String str = emptyList.get(0);
@@ -79,7 +84,6 @@ public class TestClass extends TestBase {
 	/**
 	 * ["000","001"]
 	 */
-	@Test
 	public void testJsonArray() {
 		String result = "[\"000\",\"001\"]";
 		log.info("result = {}", result);
@@ -116,44 +120,72 @@ public class TestClass extends TestBase {
 	}
 
 	public void testJsonPro() {
-		// {"response":0,"itemList":[{"price":1.5,"fashion":{},
+		// {"response":0,"itemArray":[{"price":1.5,"fashion":{},
 		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
 
 		// build json
-		JSONObject jsonArrayStr = new JSONObject();
+		JSONObject fastjson = new JSONObject();
 		int response = 0;
-		jsonArrayStr.put("response", response);
+		fastjson.put("response", response);
 
 		JSONArray itemArray = new JSONArray();
 
-		JSONObject item = new JSONObject();
+		JSONObject fastjsonItem = new JSONObject();
 		double price = 1.5;
-		item.put("price", price);
+		fastjsonItem.put("price", price);
 		JSONObject fashinon = new JSONObject();
-		item.put("fashinon", fashinon);
+		fastjsonItem.put("fashinon", fashinon);
 
-		JSONObject product = new JSONObject();
-		product.put("productId", 2);
+		JSONObject fastjsonProduct = new JSONObject();
+		fastjsonProduct.put("productId", 2);
 		String name = "IDOL 2 MINI FlipCase CLOUDY";
-		product.put("name", name);
-		item.put("product", product);
-		itemArray.add(item);
+		fastjsonProduct.put("name", name);
+		fastjsonItem.put("product", fastjsonProduct);
+		itemArray.add(fastjsonItem);
 
-		jsonArrayStr.put("itemArray", itemArray);
-		String jsonStr = jsonArrayStr.toString();
-		log.info("json = {}", jsonArrayStr);
+		fastjson.put("itemArray", itemArray);
+		String jsonStr = fastjson.toString();
+		log.info("json = {}", fastjson);
 
-		// Resolve json string
-		jsonArrayStr = JSONObject.parseObject(jsonStr);
-		Assert.assertEquals(response, jsonArrayStr.getIntValue("response"));
-		JSONArray jsonArray = jsonArrayStr.getJSONArray("itemList");
-		for (Object o : jsonArray.toArray()) {
-			item = (JSONObject) o;
-			log.info("item = {}", item);
-			Assert.assertEquals(price, item.getDoubleValue("price"));
-			product = item.getJSONObject("product");
-			Assert.assertEquals(name, product.getString("name"));
+		// Resolve json string with fastjson
+		fastjson = JSONObject.parseObject(jsonStr);
+		Assert.assertEquals(response, fastjson.getIntValue("response"));
+		JSONArray fastjsonArray = fastjson.getJSONArray("itemArray");
+		for (Object o : fastjsonArray.toArray()) {
+			fastjsonItem = (JSONObject) o;
+			log.info("item = {}", fastjsonItem);
+			Assert.assertEquals(price, fastjsonItem.getDoubleValue("price"));
+			fastjsonProduct = fastjsonItem.getJSONObject("product");
+			Assert.assertEquals(name, fastjsonProduct.getString("name"));
 		}
+
+		// Resolve json string with org.json.JSONObject
+		try {
+			org.json.JSONObject json = new org.json.JSONObject(jsonStr);
+			Assert.assertEquals(response, json.getInt("response"));
+			org.json.JSONArray jsonArray = json.getJSONArray("itemArray");
+			for (int i = 0; i < jsonArray.length(); i++) {
+				org.json.JSONObject item = jsonArray.getJSONObject(i);
+				log.info("item = {}", item);
+				Assert.assertEquals(price, item.getDouble("price"));
+				org.json.JSONObject product = item.getJSONObject("product");
+				Assert.assertEquals(name, product.getString("name"));
+			}
+		} catch (JSONException e) {
+			log.error("JSONException in TestClass.testJsonPro()", e);
+		}
+	}
+	
+	public void testJsonDuplicate() {
+		// {"response":0,"itemArray":[{"price":1.5,"fashion":{},
+		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
+
+		// build json
+		JSONObject fastjson = new JSONObject();
+		int response = 0;
+		fastjson.put("response", response);
+		fastjson.put("response", 1);
+		log.info("fastjson = {}", fastjson);
 	}
 
 	public void testSwitch() {
@@ -277,6 +309,8 @@ public class TestClass extends TestBase {
 	public void testInteger() {
 		int num = 6553800;
 		log.info("int = {}", num);
+		Integer one = 1;
+		Assert.assertTrue(1==one);
 	}
 
 	public void testStringa() {
