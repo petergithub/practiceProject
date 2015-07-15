@@ -14,6 +14,8 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -30,7 +32,6 @@ import javax.swing.SwingUtilities;
 import junit.framework.Assert;
 
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
-import org.json.JSONException;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
@@ -39,24 +40,56 @@ import org.pu.utils.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
 /**
  * @author Shang Pu
  * @version Date: Apr 15, 2012 11:08:53 AM
  */
 public class TestClass extends TestBase {
-	private final Logger log = LoggerFactory.getLogger(TestClass.class);
+	private final static Logger log = LoggerFactory.getLogger(TestClass.class);
 	String code;
 
 	// TODO: take a look PropertyDescriptor
 	
 	@Test
-	public void execommand() {
-		String command = "D:\\sp\\work\\script\\testBat.bat";
-		String result = org.pu.utils.Utils.exeCmd(command, "gbk");
+	public void execommand() throws IOException {
+		String cmd = "D:\\sp\\work\\script\\testBat.bat";
+		cmd = "cmd /C start cmd /K bash --login -i";
+		cmd = "explorer /select, /e,D:\\sudoers.txt";
+		Runtime.getRuntime().exec(cmd);
+		Runtime.getRuntime().exec(cmd, null, new File("D:\\sudoers.txt"));
+		String result = org.pu.utils.Utils.exeCmd(cmd, "gbk");
 		log.info("result = {}", result);
+	}
+	
+	public void testDate() {
+		long localTimeStamp = System.currentTimeMillis();
+		log.info("localDate = {}", new Date(localTimeStamp));
+		log.info("utcDate = {}", new Date(converLocalTimeToUtcTime(localTimeStamp)));
+	}
+	
+	public static long getLocalToUtcDelta() {
+	    Calendar local = Calendar.getInstance();
+	    local.clear();
+	    local.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
+	    return local.getTimeInMillis();
+	}
+
+	public static long converLocalTimeToUtcTime(long timeSinceLocalEpoch) {
+		log.info("Enter converLocalTimeToUtcTime(timeSinceLocalEpoch[{}])", timeSinceLocalEpoch);
+	    return timeSinceLocalEpoch + getLocalToUtcDelta();
+	}
+	
+	public void testInteger() {
+		int num = 6553800;
+		log.info("6553800 int = {}", num);
+		Integer one = 1;
+		Integer oneInit = new Integer(1);
+		Integer oneInitAnother = new Integer(1);
+		Assert.assertTrue(1==one);
+		Assert.assertTrue(1==oneInit);
+		Assert.assertTrue(oneInit.equals(1));
+		Assert.assertTrue(oneInit.equals(oneInitAnother));
+		Assert.assertFalse(oneInit == oneInitAnother);//object compare
 	}
 	
 	public void testEmptyList() {
@@ -79,113 +112,6 @@ public class TestClass extends TestBase {
 		List<String> emptyList = new ArrayList<>();
 		String str = emptyList.get(0);
 		Assert.assertNotNull(str);
-	}
-
-	/**
-	 * ["000","001"]
-	 */
-	public void testJsonArray() {
-		String result = "[\"000\",\"001\"]";
-		log.info("result = {}", result);
-		String item1 = "000";
-		String item2 = "001";
-
-		JSONArray jsonArrayFast = new JSONArray();
-		jsonArrayFast.add(0, item1);
-		jsonArrayFast.add(1, item2);
-		String orderStr = jsonArrayFast.toJSONString();
-		Assert.assertEquals(result, orderStr);
-
-		jsonArrayFast = JSONArray.parseArray(result);
-		Object[] array = jsonArrayFast.toArray();
-		for (Object o : array) {
-			Assert.assertTrue(item1.equals(o) || item2.equals(o));
-		}
-
-		org.json.JSONArray jsonArray = new org.json.JSONArray();
-		jsonArray.put(item1);
-		jsonArray.put(item2);
-		orderStr = jsonArray.toString();
-		Assert.assertEquals(result, orderStr);
-
-		try {
-			jsonArray = new org.json.JSONArray(result);
-			for (int i = 0; i < jsonArray.length(); i++) {
-				Assert.assertTrue(item1.equals(jsonArray.getString(i))
-						|| item2.equals(jsonArray.getString(i)));
-			}
-		} catch (JSONException e) {
-			log.error("JSONException in TestClass.testJsonArray()", e);
-		}
-	}
-
-	public void testJsonPro() {
-		// {"response":0,"itemArray":[{"price":1.5,"fashion":{},
-		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
-
-		// build json
-		JSONObject fastjson = new JSONObject();
-		int response = 0;
-		fastjson.put("response", response);
-
-		JSONArray itemArray = new JSONArray();
-
-		JSONObject fastjsonItem = new JSONObject();
-		double price = 1.5;
-		fastjsonItem.put("price", price);
-		JSONObject fashinon = new JSONObject();
-		fastjsonItem.put("fashinon", fashinon);
-
-		JSONObject fastjsonProduct = new JSONObject();
-		fastjsonProduct.put("productId", 2);
-		String name = "IDOL 2 MINI FlipCase CLOUDY";
-		fastjsonProduct.put("name", name);
-		fastjsonItem.put("product", fastjsonProduct);
-		itemArray.add(fastjsonItem);
-
-		fastjson.put("itemArray", itemArray);
-		String jsonStr = fastjson.toString();
-		log.info("json = {}", fastjson);
-
-		// Resolve json string with fastjson
-		fastjson = JSONObject.parseObject(jsonStr);
-		Assert.assertEquals(response, fastjson.getIntValue("response"));
-		JSONArray fastjsonArray = fastjson.getJSONArray("itemArray");
-		for (Object o : fastjsonArray.toArray()) {
-			fastjsonItem = (JSONObject) o;
-			log.info("item = {}", fastjsonItem);
-			Assert.assertEquals(price, fastjsonItem.getDoubleValue("price"));
-			fastjsonProduct = fastjsonItem.getJSONObject("product");
-			Assert.assertEquals(name, fastjsonProduct.getString("name"));
-		}
-
-		// Resolve json string with org.json.JSONObject
-		try {
-			org.json.JSONObject json = new org.json.JSONObject(jsonStr);
-			Assert.assertEquals(response, json.getInt("response"));
-			org.json.JSONArray jsonArray = json.getJSONArray("itemArray");
-			for (int i = 0; i < jsonArray.length(); i++) {
-				org.json.JSONObject item = jsonArray.getJSONObject(i);
-				log.info("item = {}", item);
-				Assert.assertEquals(price, item.getDouble("price"));
-				org.json.JSONObject product = item.getJSONObject("product");
-				Assert.assertEquals(name, product.getString("name"));
-			}
-		} catch (JSONException e) {
-			log.error("JSONException in TestClass.testJsonPro()", e);
-		}
-	}
-	
-	public void testJsonDuplicate() {
-		// {"response":0,"itemArray":[{"price":1.5,"fashion":{},
-		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
-
-		// build json
-		JSONObject fastjson = new JSONObject();
-		int response = 0;
-		fastjson.put("response", response);
-		fastjson.put("response", 1);
-		log.info("fastjson = {}", fastjson);
 	}
 
 	public void testSwitch() {
@@ -304,13 +230,6 @@ public class TestClass extends TestBase {
 			}
 			log.info("appendVal = {}", appendVal);
 		}
-	}
-
-	public void testInteger() {
-		int num = 6553800;
-		log.info("int = {}", num);
-		Integer one = 1;
-		Assert.assertTrue(1==one);
 	}
 
 	public void testStringa() {
