@@ -16,6 +16,17 @@ mysqladmin -u root -password ab12
 注：因为开始时root没有密码，所以-p旧密码一项就可以省略了。
 2、再将root的密码改为djg345。
 mysqladmin -u root -p ab12 password djg345
+
+MySQL忘记root密码
+1、在DOS窗口下输入net stop mysql5 或 net stop mysql
+2、开一个DOS窗口，这个需要切换到mysql的bin目录输入mysqld --skip-grant-tables;
+3、再开一个DOS窗口，mysql -u root
+4、输入：
+use mysql
+update user set password=password("password") where user="root";
+flush privileges;
+exit
+5、使用任务管理器，找到mysqld-nt的进程，结束进程 
 三、增加新用户。
 （注意：和上面不同，下面的因为是MYSQL环境中的命令，所以后面都带一个分号作为命令结束符）
 格式：grant select on 数据库.* to 用户名@登录主机 identified by “密码”
