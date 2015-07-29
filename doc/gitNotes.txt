@@ -1,69 +1,56 @@
-
 git://github.com/petergithub/helloworld.git
 git push https://github.com/petergithub/eclipsePluginOpen.git master
-samplainsboro@gmail.com	password1
-Learn from http://pcottle.github.com/learnGitBranching/
-git clone git@github.com:username/Spoon-Knife.git	//Get files the first time
-1. add files
-	$ git add README	//Stages your README file, adding it to the list of files to be committed
-	$ git add . -A	// if there is deleted files
-2. commit to local repo
-	$ git commit -m 'commit message'	//Commits your files, adding the message "first commit"
-	$ git commit -a		// if there is deleted files 无法把新增文件或文件夹加入进来，如果你新增了文件或文件夹，那么就要先git add .，再git commit
-  1. if didn't push the repo to remote, execut this 
-		$ git remote add origin git@github.com:petergithub/MyProject.git	//Sets the origin for the Hello-World repo
-  2. if just files modified, push it to remote
-		$ git push -u origin master	//Sends your commit to GitHub
-		$ git push origin master | $ git push url master
-5. update
-	$ git fetch origin	//Pulls in changes not present in your local repository, without modifying your files
-	$ git merge origin/master	//Merges any changes fetched into your working files
 
-eclipse EGit
-check in files:
-1. Team -> Commit, to commit your changes to the local Git repository. 
-2. Team -> Push, to push your change to a remote Git repository (see the GitHub chapter). 
-update local files:
-1. fetch from upstream
-2. Advanced->synchronize->master
-3. update in Team Synchronizing perspective
-4. merge
-
-1. fetch from upstream
-2. synchronize workspace
-3. merge
-
-eclipse->Preference->Team->Git->Configuration->Repository Setting
-remote.origin.fetch:+refs/heads/*:refs/remotes/origin/*
-remote.origin.url:https://github.com/petergithub/testProject.git
-
-branch.master.merge:refs/heads/master
-branch.master.remote:origin
-
-git stash if conflict 
 HEAD指向最后一次commit的信息
-git commit --amend	重新提交
-git status	查看工作目录发生了什么变更
-git branch	查看现存的分枝,*代表的意思是我们正在这个分枝上工作
-git branch experimental //创建一个试验分支，名称叫experimental
-git checkout experimental //转移到experimental分支
-git branch -d	在分支已经合并到主干后删除分支
-git branch -D	不论如何都删除分支
-git diff	比较当前与索引文件(即只在git add之前使用有效,如果已经add了,那么此命令输出为空)
-git diff HEAD	比较HEAD与工作中的代码
-git diff -cached or git diff -staged	比较index file和仓库之间代码的区别
-git diff master devBranch	在合并某分枝前查看变更内容
-git diff master...devBranch	如果你目前正处在dev分枝上,在创建dev分枝之后,在这条分枝上的差异对比
-git diff ...devBranch	如果你目前正处在master分枝上,在这条分枝上的差异对比
-git log	查看开发日志
-git log -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改
-gitk	git GUI查看图形化分支信息
-git gui
-git reset	–mixed是git reset的默认选项,撤销最近的一次commit，只保留working tree的源代码级的修改，而index file和commit都会回复到上
-一次commit的状态
-git remote show [remote-name]	查看某个远程仓库的详细信息
 git cat-file -p [SHA-1]	输出数据内容
 git cat-file -t [SHA-1]	输出数据对象的类型
+
+git log --stat -2 查看详细提交影响的文件 -p //输出非常详细的日志内容，包括了每次都做了哪些源码的修改
+git log --oneline
+
+把feature_branch上所有提交合并为一次提交到当前分支上再commit
+git merge --squash feature_branch
+git commit -v
+
+git commit --amend -m "Comment"
+git pull --rebase origin master合并上游的修改到自己的仓库中,并把自己的提交移到同步了中央仓库修改后的master分支的顶部
+git rebase -i HEAD~3 重写历史
+git rebase --onto master commitId 在非master分支上执行,在master上重复commitId之后的提交,开区间
+git rebase A B 会把在 A 分支里提交的改变移到 B 分支里重放一遍。
+git cherry-pick 建议尽可能的使用cherry pick在各个分支间同步代码而不是merge
+git merge --no-ff myfeature 将feature 分支合并到当前分支
+	-no-ff 标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
+git branch -m <oldname> <newname>
+git branch -a: show all branch (remote and local)
+git checkout -b feature/portal3.0 origin/feature/portal3.0: Branch feature/portal3.0 set up to track remote branch feature/portal3.0 from origin.
+
+git stash
+Do the merge, and then pull the stash:
+git stash pop
+
+已通过http协议clone的工程，可以在项目根目录通过 git remote set-url 变更远程仓库地址， 如
+git remote set-url origin ssh://git@stash.lab.tclclouds.com:7999/os/developer-platform.git
+批量修改为ssh协议
+find . -name config | grep .git | xargs sed -i 's#http://pu.shang@121.40.71.149:7990/scm#ssh://git@121.40.71.149:7999#g'
+ssh://git@121.40.71.149:7999/~pu.shang/storelocal.git
+http://pu.shang@121.40.71.149:7990/scm/~pu.shang/storelocal.git
+ssh://git@121.40.71.149:7999/ecc/aot-commerce-platform-membership.git
+http://pu.shang@121.40.71.149:7990/scm/ecc/aot-commerce-platform-membership.git
+git remote add origin <server> 将你的仓库连接到某个远程服务器
+添加另一个仓库存储分支
+git remote add storeLocal URL
+git push storeLocal localWebstore
+删除远程仓库
+git remote rm remoteRepository
+git remote show origin 查看远程仓库信息
+
+git push remoteMachine localBranch:remoteBranch
+git push origin global:global
+
+git tag -m "comment" tagName
+git push origin tagName
+git push origin --tags: 推送refs/tags/*
+git push -u origin master 将本地的master分支推送到origin主机，同时指定origin为默认主机,如果当前分支与多个主机存在追踪关系，则可以使用-u选项指定一个默认主机，这样后面就可以不加任何参数使用git push
 
 将 Current working directory 记为 (1)
 将 Index file 记为 (2)
@@ -75,10 +62,49 @@ git commit -a两者的直接结合
 从时间上看，可以认为(1)是最新的代码，(2)比较旧，(3)更旧
 按时间排序就是 (1) <- (2) <- (3)
 git diff得到的是从(2)到(1)的变化
-git diff –cached得到的是从(3)到(2)的变化
+git diff --cached得到的是从(3)到(2)的变化
 git diff HEAD得到的是从(3)到(1)的变化
+git diff global origin/global: fetch后对比文件
+gitk: view commite graph
 
-git中文乱码解决
+########### restore flies BEGIN ##########
+撤销工作区操作 git checkout -- <file_name>
+这个命令有2种情况需要考虑：
+    一种是file_name自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；
+    一种是file_name已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。
+    总之，就是让这个文件回到最近一次git commit或git add时的状态。
+回退总结
+    场景1：当你改乱了工作区某个文件的内容，想直接丢弃工作区的修改时，用命令git checkout -- <file_name>
+    场景2：当你不但改乱了工作区某个文件的内容，还添加到了暂存区时，想丢弃修改，分两步，第一步用命令git reset HEAD <file_name>，就回到了场景1，第二步按场景1操作。
+    场景3：已经提交了不合适的修改到版本库时，想要撤销本次提交，参考版本回退(git reset --hard HEAD^)，不过前提是没有推送到远程库。
+恢复 git reset --hard 删除的文件 通过git reflog找到commitID,然后git reset --hard commitID
+########### restore fliess END ##########
+
+########### untrack files BEGIN ##########
+删掉已经track的文件
+This will tell git you want to start ignoring the changes to the file
+git update-index --assume-unchanged path/to/file
+When you want to start keeping track again
+git update-index --no-assume-unchanged path/to/file
+停止追踪一个文件 git rm --cached path/to/file
+
+.gitignore文件的例子:
+# 此为注释 – 将被 Git 忽略 
+*.a                          # 忽略所有 .a 结尾的文件 
+!lib.a                       # 但 lib.a 除外 
+/TODO                   # 仅仅忽略项目根目录下的 TODO 文件,不包括 subdir/TODO 
+build/                      # 忽略 build/ 目录下的所有文件 
+doc/*.txt                  # 会忽略 doc/notes.txt 但不包括 doc/server/arch.txt 
+########### untrack files END ##########
+
+########### Get rid of large files BEGIN ##########
+https://help.github.com/articles/remove-sensitive-data/	  
+git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty
+git gc --aggressive --prune
+git push origin --force --all
+########### Get rid of large files END ##########
+
+########### git中文乱码解决 BEGIN ##########
 	注：这些是git bash中的中文乱码问题
 ls命令查看当前文件夹下文件时，中文文件、文件名乱码：
 	编辑git安装目录下 git/etc/git-completion.bash ，新增一行 alias ls='ls --show-control-chars --color=auto'
@@ -93,7 +119,9 @@ git log无法显示中文注释：
 	说明：我们的代码库是统一用的 utf-8，这样设置可以在 git gui 中正常显示代码中的中文。
 	[i18n]commitencoding = GB2312
 	说明：如果没有这一条，虽然我们在本地用 $ git log 看自己的中文修订没问题，但，一、我们的 log 推到服务器后会变成乱码；二、别人在 Linux 下推的中文 log 我们 pull 过来之后看起来也是乱码。这是因为，我们的 commit log 会被先存放在项目的 .git/COMMIT_EDITMSG 文件中；在中文 Windows 里，新建文件用的是 GB2312 的编码；但是 Git 不知道，当成默认的 utf-8 的送出去了，所以就乱码了。有了这条之后，Git 会先将其转换成 utf-8，再发出去，于是就没问题了。 
+########### git中文乱码解决 END ##########
 
+########### create repository BEGIN ##########
 Create A Repo
 
 First: Create A Repo
@@ -126,95 +154,18 @@ THE CODE ABOVE EXECUTES ACTIONS LOCALLY, meaning you still haven't done anything
 		
 	Now if you look at your repository on GitHub, you will see your README has been added to it.
 Your README has been created 
-
-
-
-FORK A REPO
-
-First: Fork A Repo
-	At some point you may find yourself wanting to contribute to someone else's project, or would like to use someone's project as the starting point for your own. This is known as "forking." For this tutorial, we'll be using the Spoon-Knife project.
-
-	Fork the "Spoon-Knife " repo
-	To fork this project, click the "Fork" button.
-	
-Next: Set Up Your Local Repo
-	You've successfully forked the Spoon-Knife repo, but so far it only exists on GitHub. To be able to work on the project, you will need to clone it to your local machine.
-
-1. Clone the "Spoon-Knife" project Run the following code:
-		$ git clone git@github.com:username/Spoon-Knife.git	//Clones your copy of the repo into the current directory in terminal
-2. Configure remotes
-    When a repo is cloned, it has a default remote called origin that points to your fork on GitHub, not the original repo it was forked from. To keep track of the original repo, you need to add another remote named upstream:
-		$ cd Spoon-KnifeChanges 	//the active directory in the prompt to the newly cloned "Spoon-Knife" directory
-		$ git remote add upstream git://github.com/octocat/Spoon-Knife.git	//Assigns the original repo to a remote called "upstream"
-		$ git fetch upstream	//Pulls in changes not present in your local repository, without modifying your files
-
-Then: More Things You Can Do
-	You've successfully forked a repo, but get a load of these other cool things you can do:
-
-    * Push commits
-      Once you've made some commits to a forked repo and want to push it to your forked project, you do it the same way you would with a regular repo:
-		$ git push origin master	//Pushes commits to your remote repo stored on GitHub
-
-    * Pull in upstream changes
-      If the original repo you forked your project from gets updated, you can add those updates to your fork by running the following code:
-		$ git fetch upstream	//Fetches any new changes from the original repo
-		$ git merge upstream/master	//Merges any changes fetched into your working files
-
-	What is the difference between fetch and pull?
-      There are two ways to get commits from a remote repo or branch: fetch and pull. While they might seem similar at first, there are distinct differences you should consider.
-      Pull
-            $ git pull upstream	//Pulls commits from 'upstream' and adds them to the local repo
-		When you use pull, Git tries to automatically do your work for you. It is context sensitive, so Git will merge any pulled commits into the branch you are currently working in. One thing to keep in mind is that pull automatically merges the commits without letting you review them first. If you don't closely manage your branches you may run into frequent conflicts.
-      Fetch/Merge
-            $ git fetch upstream	//Fetches any new commits from the original repo
-            $ git merge upstream/master	//Merges any commits fetched into your working files
-		When you fetch, Git gathers any commits from the target branch that do not exist in your current branch and stores them in your local repo. However, it does not merge them with your current branch. This is particularly useful if you need to keep your repo up to date but are working on something that might break if you update your files. To integrate the commits into your master branch, you use merge. This combines the specified branches and prompts you if there are any conflicts.
-
-	* Work with branches
-      Branching allows you to build new features or test out ideas without putting your main project at risk. A Git branch is a small file that references the commit it was spawned from. This makes Git branches very small and easy to work with.
-      
-	How do I use branches?
-      Branches are pretty easy to work with and will save you a lot of headaches, especially when working with multiple people. To create a branch and begin working in it, use the following script:
-            $ git branch mybranch	//Creates a new branch called "mybranch"
-            $ git checkout mybranch	//Makes "mybranch" the active branch
-
-      Alternatively, you can use the shortcut:
-            $ git checkout -b mybranch	//Creates a new branch called "mybranch" and makes it the active branch
-
-	  To switch between branches, use checkout.
-            $ git checkout master	//Makes "master" the active branch
-            $ git checkout mybranch	//Makes "mybranch" the active branch
-
-      Once you're finished working on your branch and are ready to combine it back into the master branch, use merge.
-            $ git checkout master	//Makes "master" the active branch
-            $ git merge mybranch	//Merges the commits from "mybranch" into "master"
-            $ git branch -d mybranch	//Deletes the "mybranch" branch
-
-	* Pull requests
-      If you are hoping to contribute back to the original fork, you can send the original author a pull request(http://help.github.com/pull-requests/).
-    * Unwatch the main repo
-      When you fork a particularly popular repo, you may find yourself with a lot of unwanted updates about it. To unsubscribe from updates to the main repo, click the "Unwatch" button on the main repo.
-    * Delete your fork
-      At some point you may decide that you want to delete your fork. To delete a fork, just follow the same steps as you would to delete a regular repo.
-
-==================BEGIN Get rid of large files==============================
-https://help.github.com/articles/remove-sensitive-data/	  
-git filter-branch --index-filter 'git rm -r --cached --ignore-unmatch FILE_NAME' --prune-empty
-git gc --aggressive --prune
-git push origin --force --all
-==================END Get rid of large files==============================
-
-==================BEGIN You have an empty repository To get started==============================
+########### create repository END ##########
+########### You have an empty repository To get started BEGIN ##########
 You have an empty repository To get started you will need to run these commands in your terminal.
 
 Configure Git for the first time
-	git config --global user.name "商普"
-	git config --global user.email "pu.shang@tcl.com"
+	git config --global user.name peter
+	git config --global user.email "email@gmail.com"
 
 Working with your repository
 I just want to clone this repository
 If you want to simply clone this empty repository then run this command in your terminal.
-	it clone http://pu.shang@121.40.71.149:7990/scm/ecc/aot-commerce-platform-inner-service.git
+	it clone http://username@host/project.git
 
 My code is ready to be pushed
 If you already have code ready to be pushed to this repository then run this in your terminal.
@@ -222,12 +173,12 @@ If you already have code ready to be pushed to this repository then run this in 
 	git init
 	git add --all
 	git commit -m "Initial Commit"
-	git remote add origin http://pu.shang@121.40.71.149:7990/scm/ecc/aot-commerce-platform-inner-service.git
+	git remote add origin http://username@host/project.git
 	git push origin master
 My code is already tracked by Git
 
 If your code is already tracked by Git then set this repository as your "origin" to push to.
 	cd existing-project
-	git remote set-url origin http://pu.shang@121.40.71.149:7990/scm/ecc/aot-commerce-platform-inner-service.git
+	git remote set-url origin http://username@host/project.git
 	git push origin master
-==================END You have an empty repository To get started==============================
+########### You have an empty repository To get started END ##########

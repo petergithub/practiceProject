@@ -67,13 +67,14 @@ Spring artifact versioning
 3.1.1.BUILD-SNAPSHOT - nightly snapshot of the 3.1.1 maintenance release
 3.1.1.RELEASE        - final GA release of 3.1.1 
 
-Bash
+########### Bash BEGIN ##########
 vi ~/.bash_profile
 export CLICOLOR="true"
 alias ll='ls -l'
 alias l='ls -a'
+########### Bash END ##########
 
-Vim
+########### Vim BEGIN ##########
 nu是显示行号，ts是tabstop，sts是softtabstop，sw是shiftwidth，这三个参数和tab制表符相关的
 et是expandtab，即把自动把一个tab扩展为空格。si是smart indent，ai是auto indent，有何区别呢？
 
@@ -85,6 +86,23 @@ syntax on
 filetype plugin on
 ruler是在右下角显示光标当前位置，hlsearch是高亮搜索关键字，最后把根据文件类型作相关调整的插件也打开。
 例如Makefile里是必须要用到tab制表符的，即使你之前设置了expandtab，设置了filetype plugin on之后，按tab也不会用空格代替制表符。
+########### Vim END ##########
+
+########### putty显示中文 BEGIN ##########
+在window-〉Appearance-〉Translation中，Received data assumed to be in which character set 中,把Use font encoding改为UTF-8.
+如果经常使用,把这些设置保存在session里面.
+########### putty显示中文 END ##########
+
+########### windows BEGIN ##########
+replace one line in notepad++ which contain REPLEACH_THIS_LINE	^.*REPLEACH_THIS_LINE.*$\r\n
+F4 重复上一步操作，比如，插入行、设置格式等等频繁的操作, 公式里面切换绝对引用，直接点选目标，按F4轮流切换
+Alt+Shift+D    - Current date;
+Alt+Shift+T    - Current time.
+start cmd /k
+type: Windows Displays the contents of a text file or files.
+nslookup http://wsyc.lqwang.com/
+tracert http://haijia.bjxueche.net/
+########### windows END ##########
 
 Bug report for Tomcat
 +---------------------------------------------------------------------------+
