@@ -1,5 +1,7 @@
 package doing;
+
 import java.lang.reflect.Field;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -13,38 +15,9 @@ import org.springframework.util.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-
 public class JsonDemo extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(JsonDemo.class);
 
-	@Test
-	public void testToJson() {
-		JSONObject json = paramToJson(new PaymentParams("merchantId", "mOutOrderId"));
-		log.info("json = {}", json);
-	}
-	
-	private JSONObject paramToJson(Object params) {
-		Field[] fields = params.getClass().getDeclaredFields();
-		JSONObject jObject = new JSONObject();
-		for (Field f : fields) {
-			try {
-				String key = f.getName();
-				String value = (String) f.get(params);
-
-				log.info("in paramToJSON(key[{}],value[{}])", key, value);
-				if (!StringUtils.isEmpty(key) && !StringUtils.isEmpty(value)) {
-					key = key.trim();
-					value = value.trim();
-					jObject.put(key, value);
-				}
-			} catch (Exception e) {
-				log.error("Exception in ParameterUtil.signAndAssembleParams()", e);
-			}
-
-		}
-		return jObject;
-	}
-	
 	/**
 	 * ["000","001"]
 	 */
@@ -84,6 +57,7 @@ public class JsonDemo extends TestBase {
 		}
 	}
 
+	@Test
 	public void testJsonPro() {
 		// {"response":0,"itemArray":[{"price":1.5,"fashion":{},
 		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
@@ -114,6 +88,9 @@ public class JsonDemo extends TestBase {
 
 		// Resolve json string with fastjson
 		fastjson = JSONObject.parseObject(jsonStr);
+		Set<String> keysFastjson = fastjson.keySet();
+		log.info("get all keys = {}", keysFastjson);
+
 		Assert.assertEquals(response, fastjson.getIntValue("response"));
 		JSONArray fastjsonArray = fastjson.getJSONArray("itemArray");
 		for (Object o : fastjsonArray.toArray()) {
@@ -127,6 +104,9 @@ public class JsonDemo extends TestBase {
 		// Resolve json string with org.json.JSONObject
 		try {
 			org.json.JSONObject json = new org.json.JSONObject(jsonStr);
+			String[] keys = org.json.JSONObject.getNames(json);
+			printArray(keys);
+
 			Assert.assertEquals(response, json.getInt("response"));
 			org.json.JSONArray jsonArray = json.getJSONArray("itemArray");
 			for (int i = 0; i < jsonArray.length(); i++) {
@@ -140,27 +120,58 @@ public class JsonDemo extends TestBase {
 			log.error("JSONException in TestClass.testJsonPro()", e);
 		}
 	}
-	
-	public void testJsonDuplicate() {
-		// {"response":0,"itemArray":[{"price":1.5,"fashion":{},
-		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
 
-		// build json
+	public void testJsonDuplicate() {
 		JSONObject fastjson = new JSONObject();
-		int response = 0;
-		fastjson.put("response", response);
+		fastjson.put("response", 0);
 		fastjson.put("response", 1);
-		log.info("fastjson = {}", fastjson);
+		// {"response":1}
+		Assert.assertEquals("{\"response\":1}", fastjson.toJSONString());
 	}
-	
+
+	public void testToJson() {
+		JSONObject fastjson = paramToJson(new PaymentParams("merchantId", "mOutOrderId"));
+		log.info("fastjson = {}", fastjson);
+		// {"mOutOrderId":"mOutOrderId","merchantId":"merchantId"}
+		Assert.assertEquals("{\"mOutOrderId\":\"mOutOrderId\",\"merchantId\":\"merchantId\"}",
+				fastjson.toJSONString());
+	}
+
+	private JSONObject paramToJson(Object params) {
+		Field[] fields = params.getClass().getDeclaredFields();
+		JSONObject jObject = new JSONObject();
+		for (Field f : fields) {
+			try {
+				String key = f.getName();
+				// skip the this pointer
+				if ("this$0".equals(key))
+					continue;
+
+				String value = (String) f.get(params);
+
+				log.info("in paramToJSON(key[{}],value[{}])", key, value);
+				if (!StringUtils.isEmpty(key) && !StringUtils.isEmpty(value)) {
+					key = key.trim();
+					value = value.trim();
+					jObject.put(key, value);
+				}
+			} catch (Exception e) {
+				log.error("Exception in ParameterUtil.signAndAssembleParams()", e);
+			}
+
+		}
+		return jObject;
+	}
+
 	class PaymentParams {
 		public String merchantId;
 		public String mOutOrderId;
-		
+
 		public PaymentParams(String merchantId, String mOutOrderId) {
 			this.merchantId = merchantId;
 			this.mOutOrderId = mOutOrderId;
 		}
+
 		public String getMerchantId() {
 			return merchantId;
 		}
