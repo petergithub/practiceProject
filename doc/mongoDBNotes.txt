@@ -4,6 +4,8 @@ use test
 show collections
 db.collectionName.findOne()
 
+mongod --replSet replSetName -f mongod.conf --fork
+
 post = {title:title}
 db.blog.insert(post)
 db.blog.find()
