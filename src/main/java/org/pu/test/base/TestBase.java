@@ -102,10 +102,10 @@ public class TestBase {
 
 	protected <E> void printArray(E[] array) {
 		int length = array.length;
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("[");
 		for (int i = 0; i < length; i++) {
 			if (i == length - 1) {
-				sb.append(array[i]);
+				sb.append(array[i]).append("]");
 			} else {
 				sb.append(array[i]).append(", ");
 			}
@@ -115,10 +115,10 @@ public class TestBase {
 
 	protected void printArray(int[] array) {
 		int length = array.length;
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("[");
 		for (int i = 0; i < length; i++) {
 			if (i == length - 1) {
-				sb.append(array[i]);
+				sb.append(array[i]).append("]");
 			} else {
 				sb.append(array[i]).append(", ");
 			}
