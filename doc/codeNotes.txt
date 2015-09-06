@@ -51,6 +51,9 @@ Symbol (name)                    Escape Sequence
 ' (apostrophe or single quote)   &#39;
 " (double-quote)                 &#34;
 
+\u0026	&
+\u003d	=
+
 
 
 ASCII control characters (character code 0-31)
