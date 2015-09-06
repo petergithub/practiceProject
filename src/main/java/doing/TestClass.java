@@ -15,10 +15,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Currency;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.sound.sampled.AudioInputStream;
@@ -49,8 +51,34 @@ public class TestClass extends TestBase {
 	String code;
 
 	// TODO: take a look PropertyDescriptor
-	
+
 	@Test
+	public void exeCurrency() throws IOException {
+		Currency currency = Currency.getInstance("CNY");
+		Assert.assertEquals("CNY", currency.getCurrencyCode());
+		Assert.assertEquals("CNY", currency.getSymbol());
+		Assert.assertEquals("￥", currency.getSymbol(Locale.CHINA));
+		Assert.assertEquals("Chinese Yuan", currency.getDisplayName(Locale.US));
+		Assert.assertEquals("Chinese Yuan", currency.getDisplayName(Locale.CHINESE));
+		Assert.assertEquals("人民币", currency.getDisplayName(Locale.CHINA));
+		
+		currency = Currency.getInstance(Locale.US);
+		Assert.assertEquals("USD", currency.getCurrencyCode());
+		Assert.assertEquals("$", currency.getSymbol());
+		Assert.assertEquals("$", currency.getSymbol(Locale.US));
+		
+		currency = Currency.getInstance(Locale.FRANCE);
+		Assert.assertEquals("EUR", currency.getCurrencyCode());
+		Assert.assertEquals("EUR", currency.getSymbol());
+		Assert.assertEquals("€", currency.getSymbol(Locale.FRANCE));
+		
+		Locale locale = new Locale("Chinese");
+		log.info("locale = {}", locale);
+		log.info("locale.getCountry() = {}", locale.getCountry());
+		log.info("locale.getDisplayCountry() = {}", locale.getDisplayCountry());
+		log.info("locale.getDisplayLanguage() = {}", locale.getDisplayLanguage());
+	}
+	
 	public void execommand() throws IOException {
 		String cmd = "D:\\sp\\work\\script\\testBat.bat";
 		cmd = "cmd /C start cmd /K bash --login -i";
@@ -60,38 +88,38 @@ public class TestClass extends TestBase {
 		String result = org.pu.utils.Utils.exeCmd(cmd, "gbk");
 		log.info("result = {}", result);
 	}
-	
+
 	public void testDate() {
 		long localTimeStamp = System.currentTimeMillis();
 		log.info("localDate = {}", new Date(localTimeStamp));
 		log.info("utcDate = {}", new Date(converLocalTimeToUtcTime(localTimeStamp)));
 	}
-	
+
 	public static long getLocalToUtcDelta() {
-	    Calendar local = Calendar.getInstance();
-	    local.clear();
-	    local.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
-	    return local.getTimeInMillis();
+		Calendar local = Calendar.getInstance();
+		local.clear();
+		local.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
+		return local.getTimeInMillis();
 	}
 
 	public static long converLocalTimeToUtcTime(long timeSinceLocalEpoch) {
 		log.info("Enter converLocalTimeToUtcTime(timeSinceLocalEpoch[{}])", timeSinceLocalEpoch);
-	    return timeSinceLocalEpoch + getLocalToUtcDelta();
+		return timeSinceLocalEpoch + getLocalToUtcDelta();
 	}
-	
+
 	public void testInteger() {
 		int num = 6553800;
 		log.info("6553800 int = {}", num);
 		Integer one = 1;
 		Integer oneInit = new Integer(1);
 		Integer oneInitAnother = new Integer(1);
-		Assert.assertTrue(1==one);
-		Assert.assertTrue(1==oneInit);
+		Assert.assertTrue(1 == one);
+		Assert.assertTrue(1 == oneInit);
 		Assert.assertTrue(oneInit.equals(1));
 		Assert.assertTrue(oneInit.equals(oneInitAnother));
-		Assert.assertFalse(oneInit == oneInitAnother);//object compare
+		Assert.assertFalse(oneInit == oneInitAnother);// object compare
 	}
-	
+
 	public void testEmptyList() {
 		List<String> emptyList = new ArrayList<>();
 		log.info("emptyList = {}", emptyList);
@@ -117,12 +145,12 @@ public class TestClass extends TestBase {
 	public void testSwitch() {
 		Integer i = new Integer(1) + new Integer(2);
 		switch (i) {
-			case 3:
-				System.out.println("three");
-				break;
-			default:
-				System.out.println("other");
-				break;
+		case 3:
+			System.out.println("three");
+			break;
+		default:
+			System.out.println("other");
+			break;
 		}
 	}
 
@@ -148,7 +176,8 @@ public class TestClass extends TestBase {
 		System.setProperty("catalina.base", "c:/cache");
 		// Create the directory if necessary
 		File dir = new File(directory);
-		if (!dir.isAbsolute()) dir = new File(System.getProperty("catalina.base"), directory);
+		if (!dir.isAbsolute())
+			dir = new File(System.getProperty("catalina.base"), directory);
 		dir.mkdirs();
 
 		PrintWriter writer;
@@ -300,10 +329,12 @@ public class TestClass extends TestBase {
 					.append("' and xm_status='Approved') or (r_policy_id = '")
 
 					// c. make effective:
-					// i. Submission Status is “No Notification/Submission Required”
+					// i. Submission Status is “No Notification/Submission
+					// Required”
 					// ii. Submission Status is “Not Subject to Regulation”
 					// iii. Submission Status is “HA Notify”
-					// iv. Submission Status is “HA Submission” and HA Response is “HA Approved”
+					// iv. Submission Status is “HA Submission” and HA Response
+					// is “HA Approved”
 					.append(lifecycle4_id)
 					.append("' and xm_status='Internally Approved' and (ha_submission_status in ('No Notification/Submission Required','Not Subject to Regulation','HA Notify') or (ha_submission_status = 'HA Submission' and ha_response = 'HA Approved'))))")
 					.toString();
