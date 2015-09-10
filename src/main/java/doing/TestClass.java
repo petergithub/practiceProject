@@ -34,6 +34,9 @@ import javax.swing.SwingUtilities;
 import junit.framework.Assert;
 
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
@@ -53,6 +56,31 @@ public class TestClass extends TestBase {
 	// TODO: take a look PropertyDescriptor
 
 	@Test
+	public void testJodaDate() {
+		DateTime dt = new DateTime(2005, 3, 26, 12, 0, 0, 0);
+		Date date = dt.toDate();
+		log.info("dt = {}, date = {}", dt, date);
+		DateTime plusPeriod = dt.plus(Period.days(1));
+		DateTime plusDuration = dt.plus(new Duration(24L * 60L * 60L * 1000L));
+		DateTime onedayLater = dt.plusDays(1);
+		Assert.assertEquals(onedayLater, plusDuration);
+		Assert.assertEquals(onedayLater, plusPeriod);
+		log.info("onedayLater = {}", onedayLater);
+		DateTime twoHoursLater = dt.plusHours(2);
+		log.info("twoHoursLater = {}", twoHoursLater);
+
+		java.util.Date juDate = new Date();
+		dt = new DateTime(juDate);
+
+		String monthName = dt.monthOfYear().getAsText();
+		String frenchShortName = dt.monthOfYear().getAsShortText(Locale.CHINA);
+		boolean isLeapYear = dt.year().isLeap();
+		DateTime rounded = dt.dayOfMonth().roundFloorCopy();
+		DateTime year2000 = dt.withYear(2000);
+		log.debug("monthName[{}],frenchShortName[{}],isLeapYear[{}],rounded[{}],year2000[{}]",
+				new Object[] { monthName, frenchShortName, isLeapYear, rounded, year2000 });
+	}
+
 	public void exeCurrency() throws IOException {
 		Currency currency = Currency.getInstance("CNY");
 		Assert.assertEquals("CNY", currency.getCurrencyCode());
@@ -61,24 +89,24 @@ public class TestClass extends TestBase {
 		Assert.assertEquals("Chinese Yuan", currency.getDisplayName(Locale.US));
 		Assert.assertEquals("Chinese Yuan", currency.getDisplayName(Locale.CHINESE));
 		Assert.assertEquals("人民币", currency.getDisplayName(Locale.CHINA));
-		
+
 		currency = Currency.getInstance(Locale.US);
 		Assert.assertEquals("USD", currency.getCurrencyCode());
 		Assert.assertEquals("$", currency.getSymbol());
 		Assert.assertEquals("$", currency.getSymbol(Locale.US));
-		
+
 		currency = Currency.getInstance(Locale.FRANCE);
 		Assert.assertEquals("EUR", currency.getCurrencyCode());
 		Assert.assertEquals("EUR", currency.getSymbol());
 		Assert.assertEquals("€", currency.getSymbol(Locale.FRANCE));
-		
+
 		Locale locale = new Locale("Chinese");
 		log.info("locale = {}", locale);
 		log.info("locale.getCountry() = {}", locale.getCountry());
 		log.info("locale.getDisplayCountry() = {}", locale.getDisplayCountry());
 		log.info("locale.getDisplayLanguage() = {}", locale.getDisplayLanguage());
 	}
-	
+
 	public void execommand() throws IOException {
 		String cmd = "D:\\sp\\work\\script\\testBat.bat";
 		cmd = "cmd /C start cmd /K bash --login -i";
