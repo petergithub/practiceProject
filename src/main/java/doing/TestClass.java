@@ -1,10 +1,5 @@
 package doing;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -12,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
@@ -33,11 +27,6 @@ import javax.swing.SwingUtilities;
 
 import junit.framework.Assert;
 
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-import org.joda.time.Period;
-import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
 import org.pu.utils.EscapeChars;
@@ -55,30 +44,15 @@ public class TestClass extends TestBase {
 
 	// TODO: take a look PropertyDescriptor
 
-	@Test
-	public void testJodaDate() {
-		DateTime dt = new DateTime(2005, 3, 26, 12, 0, 0, 0);
-		Date date = dt.toDate();
-		log.info("dt = {}, date = {}", dt, date);
-		DateTime plusPeriod = dt.plus(Period.days(1));
-		DateTime plusDuration = dt.plus(new Duration(24L * 60L * 60L * 1000L));
-		DateTime onedayLater = dt.plusDays(1);
-		Assert.assertEquals(onedayLater, plusDuration);
-		Assert.assertEquals(onedayLater, plusPeriod);
-		log.info("onedayLater = {}", onedayLater);
-		DateTime twoHoursLater = dt.plusHours(2);
-		log.info("twoHoursLater = {}", twoHoursLater);
-
-		java.util.Date juDate = new Date();
-		dt = new DateTime(juDate);
-
-		String monthName = dt.monthOfYear().getAsText();
-		String frenchShortName = dt.monthOfYear().getAsShortText(Locale.CHINA);
-		boolean isLeapYear = dt.year().isLeap();
-		DateTime rounded = dt.dayOfMonth().roundFloorCopy();
-		DateTime year2000 = dt.withYear(2000);
-		log.debug("monthName[{}],frenchShortName[{}],isLeapYear[{}],rounded[{}],year2000[{}]",
-				new Object[] { monthName, frenchShortName, isLeapYear, rounded, year2000 });
+	public void test() {
+		String[] array = {"a","b"};
+		mutilpleParams(array);
+		mutilpleParams("aa","bb");
+		mutilpleParams("aaa");
+	}
+	
+	public void mutilpleParams(String... strings ) {
+		log.info(" = {}", Arrays.asList(strings));
 	}
 
 	public void exeCurrency() throws IOException {
@@ -148,28 +122,6 @@ public class TestClass extends TestBase {
 		Assert.assertFalse(oneInit == oneInitAnother);// object compare
 	}
 
-	public void testEmptyList() {
-		List<String> emptyList = new ArrayList<>();
-		log.info("emptyList = {}", emptyList);
-		String str = emptyList.get(0);
-		log.info("str = {}", str);
-		System.out.println(str);
-		Assert.assertNotNull(str);
-	}
-
-	// @Test(expected = NullPointerException.class)
-	@SuppressWarnings("null")
-	public void testNullList() {
-		List<String> list = null;
-		for (String s : list) {
-			log.info("s = {}", s);
-		}
-
-		List<String> emptyList = new ArrayList<>();
-		String str = emptyList.get(0);
-		Assert.assertNotNull(str);
-	}
-
 	public void testSwitch() {
 		Integer i = new Integer(1) + new Integer(2);
 		switch (i) {
@@ -218,24 +170,6 @@ public class TestClass extends TestBase {
 		}
 		writer.append(date);
 		IoUtils.close(writer);
-	}
-
-	public void testList() {
-		// test list in order
-		List<String> actual = Arrays.asList("1", "2", "3");
-		List<String> expected = Arrays.asList("1", "2", "3");
-		assertEquals(expected, actual);
-		assertThat(actual, is(expected));
-
-		// test list without order
-		expected = Arrays.asList("1", "3", "2");
-		assertThat(actual, is(not(expected)));
-		assertThat("List equality without order", actual,
-				IsIterableContainingInAnyOrder.containsInAnyOrder(expected.toArray()));
-
-		List<Integer> yourList = Arrays.asList(1, 2, 3, 4);
-		// assertThat(yourList, CoreMatchers.hasItems(1,2,3));
-		// assertThat(yourList, not(CoreMatchers.hasItems(1,2,3,4,5)));
 	}
 
 	public void testlog() {

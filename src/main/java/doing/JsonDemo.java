@@ -1,10 +1,12 @@
 package doing;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
@@ -12,8 +14,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 
 public class JsonDemo extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(JsonDemo.class);
@@ -58,6 +62,12 @@ public class JsonDemo extends TestBase {
 	}
 
 	@Test
+	public void testJsonDate() {
+		PaymentParams pay = new PaymentParams("merchantId", "mOutOrderId", new DateTime().toDate());
+		log.info("JSONpay = {}", JSON.toJSONString(pay));
+	}
+	
+	
 	public void testJsonPro() {
 		// {"response":0,"itemArray":[{"price":1.5,"fashion":{},
 		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
@@ -130,7 +140,7 @@ public class JsonDemo extends TestBase {
 	}
 
 	public void testToJson() {
-		JSONObject fastjson = paramToJson(new PaymentParams("merchantId", "mOutOrderId"));
+		JSONObject fastjson = paramToJson(new PaymentParams("merchantId", "mOutOrderId", null));
 		log.info("fastjson = {}", fastjson);
 		// {"mOutOrderId":"mOutOrderId","merchantId":"merchantId"}
 		Assert.assertEquals("{\"mOutOrderId\":\"mOutOrderId\",\"merchantId\":\"merchantId\"}",
@@ -166,10 +176,13 @@ public class JsonDemo extends TestBase {
 	class PaymentParams {
 		public String merchantId;
 		public String mOutOrderId;
+		@JSONField (format="yyyyMMdd HH:mm:ss")  
+		public Date date;
 
-		public PaymentParams(String merchantId, String mOutOrderId) {
+		public PaymentParams(String merchantId, String mOutOrderId, Date date) {
 			this.merchantId = merchantId;
 			this.mOutOrderId = mOutOrderId;
+			this.date = date;
 		}
 
 		public String getMerchantId() {
