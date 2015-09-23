@@ -20,6 +20,7 @@ git rebase A B 会把在 A 分支里提交的改变移到 B 分支里重放一�
 git cherry-pick 建议尽可能的使用cherry pick在各个分支间同步代码而不是merge
 git merge --no-ff myfeature 将feature 分支合并到当前分支
 	-no-ff 标记使得合并操作总是产生一次新的提交，哪怕合并操作可以快速完成
+git clean clean untracked files
 git branch -m <oldname> <newname>
 git branch -a: show all branch (remote and local)
 git checkout -b feature/portal3.0 origin/feature/portal3.0: Branch feature/portal3.0 set up to track remote branch feature/portal3.0 from origin.
@@ -46,12 +47,16 @@ git remote show origin 查看远程仓库信息
 
 git push remoteMachine localBranch:remoteBranch
 git push origin global:global
+git push --set-upstream origin develop1.0
 
 git tag -m "comment" tagName
 git push origin tagName
 git push origin --tags: 推送refs/tags/*
 git push -u origin master 将本地的master分支推送到origin主机，同时指定origin为默认主机,如果当前分支与多个主机存在追踪关系，则可以使用-u选项指定一个默认主机，这样后面就可以不加任何参数使用git push
 
+git pull <远程主机名> <远程分支名>:<本地分支名>
+git push <远程主机名> <本地分支名>:<远程分支名>
+git branch --set-upstream master origin/next 指定master分支追踪origin/next分支
 将 Current working directory 记为 (1)
 将 Index file 记为 (2)
 将 Git repository 记为 (3)
