@@ -27,6 +27,7 @@ import javax.swing.SwingUtilities;
 
 import junit.framework.Assert;
 
+import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
 import org.pu.utils.EscapeChars;
@@ -44,6 +45,16 @@ public class TestClass extends TestBase {
 
 	// TODO: take a look PropertyDescriptor
 
+	@Test
+	public void testEscape() {
+		String str = "the data might contain < or & or ! or % or ' or # etc";
+		String escapedXml3 = org.apache.commons.lang3.StringEscapeUtils.escapeXml(str);
+		String escapedXml = org.apache.commons.lang.StringEscapeUtils.escapeXml(str);
+		log.info("escapedXml3 = {}", escapedXml3);
+		log.info("escapedXml = {}", escapedXml);
+		log.info("EscapeChars.forHTML = {}", EscapeChars.forHTML(str));
+	}
+	
 	public void test() {
 		String[] array = {"a","b"};
 		mutilpleParams(array);
@@ -192,15 +203,6 @@ public class TestClass extends TestBase {
 			dql = dql.substring(0, orderByIndex);
 		}
 		log.info("orderByPart = {}", orderByPart);
-	}
-
-	public void testEscape() {
-		String str = "the data might contain & or ! or % or ' or # etc";
-		String escapedXml3 = org.apache.commons.lang3.StringEscapeUtils.escapeXml(str);
-		String escapedXml = org.apache.commons.lang.StringEscapeUtils.escapeXml(str);
-		log.info("escapedXml3 = {}", escapedXml3);
-		log.info("escapedXml = {}", escapedXml);
-		log.info("EscapeChars.forHTML = {}", EscapeChars.forHTML(str));
 	}
 
 	public void testSplit() {

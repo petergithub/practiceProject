@@ -1,12 +1,19 @@
 package demo.javabasics.demo;
 
-
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 import demo.BasicDemo;
 
@@ -14,11 +21,82 @@ import demo.BasicDemo;
  * @author Shang Pu
  * @version Date: May 14, 2012 9:57:26 AM
  */
-public class ReflectionDemo {
-	protected static final Logger logger = Logger.getLogger(ReflectionDemo.class);
+public class PractiseReflection {
+	protected static final Logger log = Logger.getLogger(PractiseReflection.class);
 	private static java.io.PrintStream out = System.out;
 
-	@org.junit.Test
+	@Test
+	/**
+	 * get all declared fields of the class
+	 */
+	public Map<String, Object> getPropertiesAllField(final Object someObject) {
+		final Map<String, Object> properties = new TreeMap<String, Object>();
+		for (Field field : someObject.getClass().getDeclaredFields()) {
+			field.setAccessible(true); // set modifier to public first.
+			Object value;
+			try {
+				value = field.get(someObject);
+				if (value != null) {
+					System.out.println(field.getName() + "=" + value);
+					properties.put(field.getName(), value);
+				}
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				log.error("Exception in PractiseReflection.getProperties()", e);
+			}
+		}
+		return properties;
+	}
+
+	/**
+	 * determine the public methods starting with get or is and then invoke it
+	 * to grab the real property values.
+	 */
+	public Map<String, Object> getPropertiesByMethod(final Object someObject) {
+		final Map<String, Object> properties = new TreeMap<String, Object>();
+		for (Method method : someObject.getClass().getDeclaredMethods()) {
+			if (Modifier.isPublic(method.getModifiers()) && method.getParameterTypes().length == 0
+					&& method.getReturnType() != void.class
+					&& (method.getName().startsWith("get") || method.getName().startsWith("is"))) {
+				Object value;
+				try {
+					value = method.invoke(someObject);
+					if (value != null) {
+						System.out.println(method.getName() + "=" + value);
+						properties.put(method.getName(), value);
+					}
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					log.error("Exception in PractiseReflection.getProperties()", e);
+				}
+			}
+		}
+		return properties;
+	}
+
+	public Map<String, Object> getNonNullProperties(final Object thingy) {
+		final Map<String, Object> nonNullProperties = new TreeMap<String, Object>();
+		try {
+			final BeanInfo beanInfo = Introspector.getBeanInfo(thingy.getClass());
+			for (final PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors()) {
+				try {
+					final Object propertyValue = descriptor.getReadMethod().invoke(thingy);
+					if (propertyValue != null) {
+						nonNullProperties.put(descriptor.getName(), propertyValue);
+					}
+				} catch (final IllegalArgumentException e) {
+					// handle this please
+				} catch (final IllegalAccessException e) {
+					// and this also
+				} catch (final InvocationTargetException e) {
+					// and this, too
+				}
+			}
+		} catch (final IntrospectionException e) {
+			// do something sensible here
+		}
+		return nonNullProperties;
+	}
+
 	public void testClassArrayReflection() {
 		out.println("");
 		out.println("   byte[] class information...");
@@ -66,18 +144,18 @@ public class ReflectionDemo {
 
 	public void testClassForName() {
 		BasicDemo test = new BasicDemo();
-		logger.info(test.getClass());
+		log.info(test.getClass());
 		String className = "com.helloworld.TestClassHelloWorld";
 		try {
 			Class<?> cl = Class.forName(className);
 			Method[] methods = cl.getDeclaredMethods();
 			for (Method m : methods) {
-				logger.info(m);
+				log.info(m);
 			}
 			BasicDemo t = (BasicDemo) cl.newInstance();
 			t.testScanner();
 		} catch (Exception e) {
-			logger.error("Exception in testClassForName()", e);
+			log.error("Exception in testClassForName()", e);
 		}
 	}
 
@@ -98,7 +176,7 @@ public class ReflectionDemo {
 			printFields(cl);
 			System.out.println();
 		} catch (ClassNotFoundException e) {
-			logger.error("Exception in testReflection()", e);
+			log.error("Exception in testReflection()", e);
 		}
 	}
 
@@ -115,7 +193,8 @@ public class ReflectionDemo {
 			// print parameter types
 			Class<?>[] paramTypes = c.getParameterTypes();
 			for (int j = 0; j < paramTypes.length; j++) {
-				if (j > 0) System.out.print(",  ");
+				if (j > 0)
+					System.out.print(",  ");
 				System.out.print(paramTypes[j].getName());
 			}
 			System.out.println(");");
@@ -137,11 +216,10 @@ public class ReflectionDemo {
 		// creating an object by getting Constructor object (with parameters)
 		// and calling
 		// newInstance (with parameters) on it
-		Constructor<ConstructorTest> constructor = ctClass
-				.getConstructor(new Class[] { String.class, String.class,
-						String.class });
-		ConstructorTest ctArgs = constructor.newInstance(new Object[] {
-				"first", "second", "third" });
+		Constructor<ConstructorTest> constructor = ctClass.getConstructor(new Class[] {
+				String.class, String.class, String.class });
+		ConstructorTest ctArgs = constructor
+				.newInstance(new Object[] { "first", "second", "third" });
 		ctArgs.setPub("created this with constructor.newInstance(new Object[] { \"first\", \"second\", \"third\" })");
 
 		System.out.println("\npub:" + ctArgs.getPub());
@@ -205,7 +283,8 @@ public class ReflectionDemo {
 			// print parameter types
 			Class<?>[] paramTypes = m.getParameterTypes();
 			for (int j = 0; j < paramTypes.length; j++) {
-				if (j > 0) System.out.print(",  ");
+				if (j > 0)
+					System.out.print(",  ");
 				System.out.print(paramTypes[j].getName());
 			}
 			System.out.println(");");
@@ -223,8 +302,7 @@ public class ReflectionDemo {
 		String str1 = (String) gs1Method.invoke(instance, new Object[] {});
 		System.out.println("getString1 returned: " + str1);
 
-		Method ss1Method = tClass.getMethod("setString1",
-				new Class[] { String.class });
+		Method ss1Method = tClass.getMethod("setString1", new Class[] { String.class });
 		System.out.println("calling setString1 with 'val2'");
 		ss1Method.invoke(instance, new Object[] { "val2" });
 
@@ -232,12 +310,10 @@ public class ReflectionDemo {
 		System.out.println("getString1 returned: " + str1);
 
 		try {
-			Method pd1Method = tClass.getMethod("getProtectedDude",
-					new Class[] {});
-			logger.info("pd1Method = " + pd1Method
-					+ " in method testClassMethod()");
+			Method pd1Method = tClass.getMethod("getProtectedDude", new Class[] {});
+			log.info("pd1Method = " + pd1Method + " in method testClassMethod()");
 		} catch (NoSuchMethodException e) {
-			logger.info("Expected NoSuchMethodException when try to call getMethod using a private or protected method");
+			log.info("Expected NoSuchMethodException when try to call getMethod using a private or protected method");
 		}
 
 		Method[] methods = tClass.getDeclaredMethods();
@@ -252,8 +328,7 @@ public class ReflectionDemo {
 		proSetMethod.invoke(instance, new Object[] { "blah" });
 
 		System.out.println("\ngetting declared method 'getProtectedDude'");
-		Method proGetMethod = tClass.getDeclaredMethod("getProtectedDude",
-				new Class[] {});
+		Method proGetMethod = tClass.getDeclaredMethod("getProtectedDude", new Class[] {});
 		System.out.println("invoking getProtectedDude");
 		String str1Declared = (String) proGetMethod.invoke(instance, new Object[] {});
 		System.out.println("getProtectedDude returned: " + str1Declared);
@@ -343,7 +418,7 @@ public class ReflectionDemo {
 			System.out.println("\nThis will throw a NoSuchFieldException");
 			Field f3 = ftClass.getField("pro");
 		} catch (Exception e) {
-			logger.info("Expected NoSuchFieldException when try to call getField() on a protected or private field ");
+			log.info("Expected NoSuchFieldException when try to call getField() on a protected or private field ");
 		}
 
 		Field f1Declared = ftClass.getDeclaredField("pub");
@@ -364,7 +439,7 @@ public class ReflectionDemo {
 			System.out.println("\nThis will throw a NoSuchFieldException");
 			Field f3Declared = ftClass.getDeclaredField("parentPub");
 		} catch (Exception e) {
-			logger.info("Expected NoSuchFieldException when try to call getDeclaredField() to get an inherited public field.");
+			log.info("Expected NoSuchFieldException when try to call getDeclaredField() to get an inherited public field.");
 		}
 
 	}

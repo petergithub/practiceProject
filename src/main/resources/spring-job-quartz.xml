@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+                http://www.springframework.org/schema/context
+                http://www.springframework.org/schema/context/spring-context.xsd"
+       default-lazy-init="true">
+
+    <context:property-placeholder ignore-unresolvable="true"
+                                  location="classpath*:/jdbc.properties" file-encoding="UTF-8"/>
+
+    <context:component-scan base-package="com.tcl.settlement.job"/>
+    
+    <!-- 线程池配置 -->
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="5"/>
+        <property name="maxPoolSize" value="10"/>
+        <property name="queueCapacity" value="25"/>
+        <property name="keepAliveSeconds" value="300"/>
+        <property name="waitForTasksToCompleteOnShutdown" value="true"/>
+    </bean>
+    
+    
+    <bean id="importPaymentTransactionOrderJob" class="com.tcl.settlement.job.ImportPaymentTransactionOrderJob"></bean>
+	<bean id="importPaymentTransactionOrderJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="importPaymentTransactionOrderJob" />
+		<property name="targetMethod" value="execute" />
+	</bean>
+	<bean id="importPaymentTransactionOrderJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail" ref="importPaymentTransactionOrderJobDetail" />
+		<!-- cronExpression example refer to org.springframework.scheduling.support.CronSequenceGenerator -->
+		<property name="cronExpression" value="0 0 1 * * ?" />
+	</bean>
+	
+</beans>

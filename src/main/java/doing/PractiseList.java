@@ -26,6 +26,17 @@ public class PractiseList extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PractiseList.class);
 
 	@Test
+	public void testProcessListParameter() {
+		List<String> list = new ArrayList<String>(Arrays.asList("1", "2", "3"));
+		processListParameter(list);
+		log.info("list = {}", list);
+	}
+
+	private void processListParameter(List<String> list) {
+		list.add("added in processListParameter");
+		log.debug("Exit. list[{}]", list);
+	}
+
 	public void testListCombineKeepOrder() {
 		List<String> first = Arrays.asList("1", "2", "3");
 		List<String> second = Arrays.asList("4", "5", "6");
@@ -52,7 +63,7 @@ public class PractiseList extends TestBase {
 				IsIterableContainingInAnyOrder.containsInAnyOrder(expected.toArray()));
 
 		List<Integer> yourList = Arrays.asList(1, 2, 3, 4);
-		//Notice: make hamcrest-all.jar before junit in classpath
+		// Notice: make hamcrest-all.jar before junit in classpath
 		assertThat(yourList, Matchers.hasItems(1, 2, 3));
 		assertThat(yourList, not(Matchers.hasItems(1, 2, 3, 4, 5)));
 	}

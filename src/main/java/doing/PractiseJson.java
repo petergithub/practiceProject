@@ -1,6 +1,7 @@
 package doing;
 
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -18,9 +19,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.JSONSerializer;
+import com.alibaba.fastjson.serializer.JavaBeanSerializer;
+import com.alibaba.fastjson.serializer.SerializeConfig;
 
-public class JsonDemo extends TestBase {
-	private static final Logger log = LoggerFactory.getLogger(JsonDemo.class);
+public class PractiseJson extends TestBase {
+	private static final Logger log = LoggerFactory.getLogger(PractiseJson.class);
 
 	/**
 	 * ["000","001"]
@@ -61,13 +65,56 @@ public class JsonDemo extends TestBase {
 		}
 	}
 
+	/**
+	 * User类有两个字段，过滤了name字段，而且把id字段重命名为uid。
+	 * http://www.oschina.net/code/snippet_12_3494
+	 */
 	@Test
+	public void testAliasRename() {
+		UserAlias user = new UserAlias();
+		user.setId(123);
+		user.setName("毛头");
+
+		SerializeConfig config = new SerializeConfig();
+		config.put(UserAlias.class,
+				new JavaBeanSerializer(UserAlias.class, Collections.singletonMap("id", "uid")));
+
+		JSONSerializer serializer = new JSONSerializer(config);
+		serializer.write(user);
+		String jsonString = serializer.toString();
+
+		Assert.assertEquals("{\"uid\":123}", jsonString);
+	}
+
+	/**
+	 * 过滤了name字段，而且把id字段重命名为uid。
+	 */
+	class UserAlias {
+		private int id;
+		private String name;
+
+		public int getId() {
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+	}
+
 	public void testJsonDate() {
 		PaymentParams pay = new PaymentParams("merchantId", "mOutOrderId", new DateTime().toDate());
 		log.info("JSONpay = {}", JSON.toJSONString(pay));
 	}
-	
-	
+
 	public void testJsonPro() {
 		// {"response":0,"itemArray":[{"price":1.5,"fashion":{},
 		// "product":{"name":"IDOL 2 MINI FlipCase CLOUDY","productId":1}}]}
@@ -176,7 +223,7 @@ public class JsonDemo extends TestBase {
 	class PaymentParams {
 		public String merchantId;
 		public String mOutOrderId;
-		@JSONField (format="yyyyMMdd HH:mm:ss")  
+		@JSONField(format = "yyyyMMdd HH:mm:ss")
 		public Date date;
 
 		public PaymentParams(String merchantId, String mOutOrderId, Date date) {
