@@ -1,5 +1,8 @@
 package doing;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
@@ -24,16 +27,36 @@ import org.slf4j.LoggerFactory;
  * @version Date: Sep 22, 2015 3:35:16 PM
  */
 
-public class PractiseJodaTime extends TestBase {
-	private static final Logger log = LoggerFactory.getLogger(PractiseJodaTime.class);
+public class PractiseDate extends TestBase {
+	private static final Logger log = LoggerFactory.getLogger(PractiseDate.class);
 	String dateFormat = "yyyy-MM-dd hh:mm:ss";
 	String dateFormatUs = "MM/dd/yyyy HH:mm:ss";
 
 	@Test
-	public void testDate() {
+	public void testDate() throws ParseException {
 		Date date = new DateTime(2015, 9, 1, 0, 0, 0).toDate();
-		log.info("date = {}", date);
+		log.info("system default format: date = {}", date);
+		date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.CHINA).parse("2015-09-02 02:00:00");
+		log.info("getDateInstance with locale: date = {}", date);
+		date = new SimpleDateFormat(dateFormat).parse("2015-09-02 02:00:00");
+		log.info("SimpleDateFormat: date = {}", date);
+		date = stringToDate("2015-09-02 02:00:00");
+		log.info("SimpleDateFormat: date = {}", date);
 	}
+	
+
+	public static Date stringToDate(String value) {
+		try {
+			log.info("stringToDate value:{}, value.lenth:{}", value, value.length());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			Date date = sdf.parse(value.trim());
+			return date;
+		} catch (ParseException e) {
+			log.error("parseDate error, value=" + value, e);
+			return null;
+		}
+	}
+	
 	public void testDateBetween() {
 		final String dateStart = "01/14/2012 09:29:58";
 		final String dateStop = "01/15/2012 10:31:48";
@@ -79,4 +102,51 @@ public class PractiseJodaTime extends TestBase {
 		log.debug("monthName[{}],frenchShortName[{}],isLeapYear[{}],rounded[{}],year2000[{}]",
 				new Object[] { monthName, frenchShortName, isLeapYear, rounded, year2000 });
 	}
+	public void testDateFormat() throws ParseException {
+        Date d = new Date();
+        String s;
+         
+        /** Date类的格式: Sat Apr 16 13:17:29 CST 2006 */
+        System.out.println(d);
+         
+        System.out.println("******************************************");  
+       
+        /** getDateInstance() */
+        /** 输出格式: 2006-4-16 */
+        s = DateFormat.getDateInstance().format(d);
+        System.out.println(s);
+       
+        /** 输出格式: 2006-4-16 */
+        s = DateFormat.getDateInstance(DateFormat.DEFAULT).format(d);
+        System.out.println(s);
+       
+        /** 输出格式: 2006年4月16日 星期六 */
+        s = DateFormat.getDateInstance(DateFormat.FULL).format(d);
+        System.out.println(s);
+       
+        /** 输出格式: 2006-4-16 */
+        s = DateFormat.getDateInstance(DateFormat.MEDIUM).format(d);
+        System.out.println(s);
+       
+        /** 输出格式: 06-4-16 */
+        s = DateFormat.getDateInstance(DateFormat.SHORT).format(d);
+        System.out.println(s);
+       
+        /** 输出格式: 2006-01-01 00:00:00 */
+        java.text.DateFormat format1 = new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        s = format1.format(new Date());
+        System.out.println(s);
+       
+        /** 输出格式: 2006-01-01 01:00:00 */
+        System.out.println((new java.text.SimpleDateFormat("yyyy-MM-dd hh:mm:ss")).format(new Date()));
+        
+
+        /** 输出格式: 2006-01-01 13:00:00 */
+        System.out.println((new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(new Date()));
+
+        /** 输出格式: 20060101000000***/
+        java.text.DateFormat format2 = new java.text.SimpleDateFormat("yyyyMMddhhmmss");
+        s = format2.format(new Date());
+        System.out.println(s);
+    }
 }

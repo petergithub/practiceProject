@@ -34,4 +34,12 @@
 		<property name="cronExpression" value="0 0 1 * * ?" />
 	</bean>
 	
+	<bean name="quartz_scheduler" lazy-init="false" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+	 			<ref bean="importPaymentTransactionOrderJobTrigger"/> 
+			</list>
+		</property>
+	</bean>
+	
 </beans>
