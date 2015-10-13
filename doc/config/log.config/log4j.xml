@@ -55,6 +55,46 @@
 			<param name="LevelMin" value="ERROR" />
 		</filter>
 	</appender>
+	
+	<logger name="org.springframework">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.springframework.jdbc">
+		<level value="DEBUG" />
+	</logger>
+	<logger name="org.springframework.aop">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.springframework.jms">
+		<level value="ERROR" />
+	</logger>
+	<logger name="org.mybatis.spring">
+		<level value="DEBUG" />
+	</logger>
+	<logger name="org.mybatis.spring.mapper">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.apache.ibatis.io">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.apache.activemq">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.quartz">
+		<level value="WARN" />
+	</logger>
+	<logger name="org.apache.log4j">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.apache.commons">
+		<level value="INFO" />
+	</logger>
+	<logger name="org.apache.zookeeper">
+		<level value="WARN" />
+	</logger>
+	<logger name="org.I0Itec">
+		<level value="WARN" />
+	</logger>
 
 	<root>
 		<priority value="INFO" />
