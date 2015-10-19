@@ -46,6 +46,17 @@ public class TestClass extends TestBase {
 	// TODO: take a look PropertyDescriptor
 
 	@Test
+	public void testMap() {
+		Map<String, Integer> stat = new HashMap<>();
+		stat.put("CREATED", 0);
+		String status = "CREATED";
+		stat.put(status, stat.get(status) + 1);
+		log.info("stat = {}", stat);
+		status = "UPDATED";
+		stat.put(status, stat.get(status) + 1);
+		log.info("stat = {}", stat);
+	}
+
 	public void testEscape() {
 		String str = "the data might contain < or & or ! or % or ' or # etc";
 		String escapedXml3 = org.apache.commons.lang3.StringEscapeUtils.escapeXml(str);
@@ -54,15 +65,15 @@ public class TestClass extends TestBase {
 		log.info("escapedXml = {}", escapedXml);
 		log.info("EscapeChars.forHTML = {}", EscapeChars.forHTML(str));
 	}
-	
+
 	public void test() {
-		String[] array = {"a","b"};
+		String[] array = { "a", "b" };
 		mutilpleParams(array);
-		mutilpleParams("aa","bb");
+		mutilpleParams("aa", "bb");
 		mutilpleParams("aaa");
 	}
-	
-	public void mutilpleParams(String... strings ) {
+
+	public void mutilpleParams(String... strings) {
 		log.info(" = {}", Arrays.asList(strings));
 	}
 

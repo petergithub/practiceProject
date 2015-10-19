@@ -79,6 +79,7 @@ mysql> USE 数据库名;
 mysql> SOURCE d:/mysql.sql;
 14、命令行修改root密码：
 mysql> UPDATE mysql.user SET password=PASSWORD('新密码') WHERE User='root';
+        update st_clearing_statement set refund_transactions = 0, trade_transactions = 83;
 mysql> FLUSH PRIVILEGES;
 15、显示use的数据库名：
 mysql> SELECT DATABASE();
@@ -136,3 +137,12 @@ grant all privileges on test_db.* to test_db@'localhost' identified by '123456';
 update mysql.user set password=old_password('123456') where user='test_db';
 4. 忘记密码
 在“my.cnf”或“my.ini”文件的“mysqld”配置段添加“skip-grant-tables”，然后重新启动mysql即可登录修改root密码。
+
+
+# Advanced SQL
+```
+SELECT 
+    COUNT( CASE WHEN `mother` >24 THEN 1 ELSE NULL END ) AS `digong`, 
+    COUNT( CASE WHEN `mother` <=24 THEN 1 ELSE NULL END ) AS `tiangong`
+FROM prince
+```
