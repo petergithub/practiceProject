@@ -23,8 +23,8 @@ import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.JavaBeanSerializer;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 
-public class PractiseJson extends TestBase {
-	private static final Logger log = LoggerFactory.getLogger(PractiseJson.class);
+public class PracticeJson extends TestBase {
+	private static final Logger log = LoggerFactory.getLogger(PracticeJson.class);
 
 	/**
 	 * ["000","001"]

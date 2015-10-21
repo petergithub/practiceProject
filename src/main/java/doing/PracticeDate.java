@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
  * @version Date: Sep 22, 2015 3:35:16 PM
  */
 
-public class PractiseDate extends TestBase {
-	private static final Logger log = LoggerFactory.getLogger(PractiseDate.class);
+public class PracticeDate extends TestBase {
+	private static final Logger log = LoggerFactory.getLogger(PracticeDate.class);
 	String dateFormat = "yyyy-MM-dd hh:mm:ss";
 	String dateFormatUs = "MM/dd/yyyy HH:mm:ss";
 

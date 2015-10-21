@@ -24,7 +24,7 @@ import org.pu.test.base.TestBase;
  * @version Date: Sep 23, 2015 10:59:39 AM
  */
 
-public class PractiseBigDecimal extends TestBase {
+public class PracticeBigDecimal extends TestBase {
 
 	public void testMathContext() {
 		System.out.println(new BigDecimal("123.4", new MathContext(4, RoundingMode.HALF_UP)));// 123.4

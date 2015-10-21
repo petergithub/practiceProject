@@ -21,8 +21,8 @@ import demo.BasicDemo;
  * @author Shang Pu
  * @version Date: May 14, 2012 9:57:26 AM
  */
-public class PractiseReflection {
-	protected static final Logger log = Logger.getLogger(PractiseReflection.class);
+public class PracticeReflection {
+	protected static final Logger log = Logger.getLogger(PracticeReflection.class);
 	private static java.io.PrintStream out = System.out;
 
 	@Test
@@ -41,7 +41,7 @@ public class PractiseReflection {
 					properties.put(field.getName(), value);
 				}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				log.error("Exception in PractiseReflection.getProperties()", e);
+				log.error("Exception in PracticeReflection.getProperties()", e);
 			}
 		}
 		return properties;
@@ -66,7 +66,7 @@ public class PractiseReflection {
 					}
 				} catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
-					log.error("Exception in PractiseReflection.getProperties()", e);
+					log.error("Exception in PracticeReflection.getProperties()", e);
 				}
 			}
 		}

@@ -22,8 +22,8 @@ import org.slf4j.LoggerFactory;
  * @version Date: Sep 23, 2015 10:59:39 AM
  */
 
-public class PractiseList extends TestBase {
-	private static final Logger log = LoggerFactory.getLogger(PractiseList.class);
+public class PracticeList extends TestBase {
+	private static final Logger log = LoggerFactory.getLogger(PracticeList.class);
 
 	@Test
 	public void testProcessListParameter() {

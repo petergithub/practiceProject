@@ -12,7 +12,7 @@ import org.pu.utils.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import doing.TestClass;
+import doing.Practice;
 
 
 /**
@@ -27,7 +27,7 @@ public class TestClassLoader extends TestBase {
 		ClassLoader context = Thread.currentThread().getContextClassLoader();
 		logger.info("context = {}", context);
 		// Thread.currentThread().setContextClassLoader(null) ;
-		ClassLoader current = TestClass.class.getClassLoader();
+		ClassLoader current = Practice.class.getClassLoader();
 		logger.info("current = {}", current);
 	}
 

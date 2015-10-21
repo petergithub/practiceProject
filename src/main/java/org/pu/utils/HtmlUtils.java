@@ -170,16 +170,19 @@ public class HtmlUtils {
 		return new URL(buf.toString());
 	}
 
-  public static String encodeURL(String url) {
-    url = url.replaceAll("\\/", "%2F");
-    url = url.replaceAll("\\?", "%3F");
-    url = url.replaceAll("\\:", "%3A");
-    url = url.replaceAll("\\&", "%26");
-    url = url.replaceAll("\\=", "%3D");
-    url = url.replaceAll("\\#", "%23");
-    url = url.replaceAll(" ", "%20");
-    return url;
-  }
+	/**
+	 * @deprecated use URLEncoder.encode(str, "UTF-8");
+	 */
+	public static String encodeURL(String url) {
+		url = url.replaceAll("\\/", "%2F");
+		url = url.replaceAll("\\?", "%3F");
+		url = url.replaceAll("\\:", "%3A");
+		url = url.replaceAll("\\&", "%26");
+		url = url.replaceAll("\\=", "%3D");
+		url = url.replaceAll("\\#", "%23");
+		url = url.replaceAll(" ", "%20");
+		return url;
+	}
 
 	/**
 	 * 移除html标签

@@ -6,7 +6,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Currency;
@@ -39,13 +41,24 @@ import org.slf4j.LoggerFactory;
  * @author Shang Pu
  * @version Date: Apr 15, 2012 11:08:53 AM
  */
-public class TestClass extends TestBase {
-	private final static Logger log = LoggerFactory.getLogger(TestClass.class);
+public class Practice extends TestBase {
+	private final static Logger log = LoggerFactory.getLogger(Practice.class);
 	String code;
 
 	// TODO: take a look PropertyDescriptor
 
 	@Test
+	public void testUrl() throws Exception {
+		String str = "queryStatisticalRecord?condition={condition:{startDate:2015-09-21 00:00,endDate:2015-10-21 00:00}}";
+//		encodeURL = queryStatisticalRecord%3Fcondition%3D%7Bcondition%3A%7BstartDate%3A2015-09-21+00%3A00%2CendDate%3A2015-10-21+00%3A00%7D%7D
+		String encodeURL = URLEncoder.encode(str, "UTF-8");
+		log.info("encodeURL = {}", encodeURL);
+		URL url = new URL("http", "testtclpay.tclclouds.com", "/settlement/" + encodeURL);
+//		URL url = new URL("http", "testtclpay.tclclouds.com", "dataDictionary/list");
+		URI uri = url.toURI();
+		log.info("url = {}", url);
+	}
+
 	public void testMap() {
 		Map<String, Integer> stat = new HashMap<>();
 		stat.put("CREATED", 0);

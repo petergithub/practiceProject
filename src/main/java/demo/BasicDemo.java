@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import doing.TestClass;
+import doing.Practice;
 
 
 /**
@@ -222,7 +222,7 @@ public class BasicDemo {
 		out.println("");
 		out.println("ClassLoader for java.lang.String: " + l);
 
-		o = new TestClass();
+		o = new Practice();
 		c = o.getClass();
 		l = c.getClassLoader();
 		out.println("");
