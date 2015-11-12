@@ -4,13 +4,96 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Scanner;
 
-public class FileIOTest {
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import org.pu.test.base.TestBase;
+import org.pu.utils.IoUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class PracticeFileIO extends TestBase {
+	private static final Logger log = LoggerFactory.getLogger(PracticeFileIO.class);
+	
 	static StringBuffer stringBufferOfData = new StringBuffer();
 	static String filename = null;
 	static Scanner sc = new Scanner(System.in);// initiliaze scanner to get user input
 
+
+	public void testTempFolder() throws IOException {
+		File temp = File.createTempFile("test", "");
+		temp.delete();
+		temp.mkdir();
+		log.info("temp.getAbsolutePath() = {}", temp.getAbsolutePath());
+	}
+
+	public void testAudio() throws IOException, LineUnavailableException,
+			UnsupportedAudioFileException {
+		URL url = new URL("http://pscode.org/media/leftright.wav");
+		Clip clip = AudioSystem.getClip();
+		// getAudioInputStream() also accepts a File or InputStream
+		AudioInputStream ais = AudioSystem.getAudioInputStream(url);
+		clip.open(ais);
+		clip.loop(Clip.LOOP_CONTINUOUSLY);
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				// A GUI element to prevent the Clip's daemon Thread
+				// from terminating at the end of the main()
+				JOptionPane.showMessageDialog(null, "Close to exit!");
+			}
+		});
+	}
+
+	public void testCreateFile() {
+		String date = "date";
+		open(date);
+		open(date);
+	}
+
+	private void open(String date) {
+		String directory = "log";
+		String prefix = "catalina.";
+		String suffix = ".log";
+		System.setProperty("catalina.base", "c:/cache");
+		// Create the directory if necessary
+		File dir = new File(directory);
+		if (!dir.isAbsolute())
+			dir = new File(System.getProperty("catalina.base"), directory);
+		dir.mkdirs();
+
+		PrintWriter writer;
+		// Open the current log file
+		try {
+			String pathname = dir.getAbsolutePath() + File.separator + prefix + date + suffix;
+			writer = new PrintWriter(new FileWriter(pathname, true), true);
+		} catch (IOException e) {
+			writer = null;
+		}
+		writer.append(date);
+		IoUtils.close(writer);
+	}
+
+	public void testFilenameFilter() throws Exception {
+		File file = new File("a");
+		String[] names = file.list(new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".java");
+			}
+		});
+		log.info("names = " + names);
+	}
+	
 	public static void main(String[] args) {
 		boolean fileRead = readFile();// call the method to read the file with the files name
 		if (fileRead) {// if the read file was successfull

@@ -35,6 +35,7 @@ public class HtmlParser {
 		NodeFilter filter = new NodeClassFilter(clazz);
 		NodeList list = parser.extractAllNodesThatMatch(filter);
 		for (int i = 0; i < list.size(); i++) {
+			@SuppressWarnings("unchecked")
 			T node = (T) list.elementAt(i);
 			System.out.println((i + 1) + ".\t" + node.toPlainTextString());
 		}
@@ -69,6 +70,7 @@ public class HtmlParser {
 		NodeFilter filter = new NodeClassFilter(clazz);
 		NodeList list = parser.extractAllNodesThatMatch(filter);
 		for (int i = 0; i < list.size(); i++) {
+			@SuppressWarnings("unchecked")
 			T node = (T) list.elementAt(i);
 			System.out.println((i + 1) + ".\t" + node.getAttribute(attr));
 		}

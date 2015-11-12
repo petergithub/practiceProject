@@ -3,6 +3,7 @@ package doing;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -32,7 +33,6 @@ public class PracticeDate extends TestBase {
 	String dateFormat = "yyyy-MM-dd hh:mm:ss";
 	String dateFormatUs = "MM/dd/yyyy HH:mm:ss";
 
-	@Test
 	public void testDate() throws ParseException {
 		Date date = new DateTime(2015, 9, 1, 0, 0, 0).toDate();
 		log.info("system default format: date = {}", date);
@@ -42,6 +42,22 @@ public class PracticeDate extends TestBase {
 		log.info("SimpleDateFormat: date = {}", date);
 		date = stringToDate("2015-09-02 02:00:00");
 		log.info("SimpleDateFormat: date = {}", date);
+		
+		long localTimeStamp = System.currentTimeMillis();
+		log.info("localDate = {}", new Date(localTimeStamp));
+		log.info("utcDate = {}", new Date(converLocalTimeToUtcTime(localTimeStamp)));
+	}
+
+	public static long getLocalToUtcDelta() {
+		Calendar local = Calendar.getInstance();
+		local.clear();
+		local.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
+		return local.getTimeInMillis();
+	}
+
+	public static long converLocalTimeToUtcTime(long timeSinceLocalEpoch) {
+		log.info("Enter converLocalTimeToUtcTime(timeSinceLocalEpoch[{}])", timeSinceLocalEpoch);
+		return timeSinceLocalEpoch + getLocalToUtcDelta();
 	}
 	
 
@@ -76,6 +92,7 @@ public class PracticeDate extends TestBase {
 		log.info("diffInMillisRevers = {}", diffInMillisRevers);
 	}
 
+	@Test
 	public void testJodaDate() {
 		DateTime dt = new DateTime(2005, 3, 26, 12, 0, 0, 0);
 		Date date = dt.toDate();
@@ -101,6 +118,9 @@ public class PracticeDate extends TestBase {
 		DateTime year2000 = dt.withYear(2000);
 		log.debug("monthName[{}],frenchShortName[{}],isLeapYear[{}],rounded[{}],year2000[{}]",
 				new Object[] { monthName, frenchShortName, isLeapYear, rounded, year2000 });
+		
+		DateTime today = new DateTime().withTimeAtStartOfDay();
+		log.info("today = {}", today);
 	}
 	public void testDateFormat() throws ParseException {
         Date d = new Date();

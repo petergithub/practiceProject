@@ -22,6 +22,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.serializer.JSONSerializer;
 import com.alibaba.fastjson.serializer.JavaBeanSerializer;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 public class PracticeJson extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeJson.class);
@@ -66,14 +67,51 @@ public class PracticeJson extends TestBase {
 	}
 
 	/**
+	 * com.alibaba.fastjson.serializer.SerializerFeature
+	 * DisableCheckSpecialChar：一个对象的字符串属性中如果有特殊字符如双引号，
+	 * 将会在转成json时带有反斜杠转移符。如果不需要转义 ，可以使用这个属性。默认为false
+	 * QuoteFieldNames———-输出key时是否使用双引号,默认为true
+	 * WriteMapNullValue——–是否输出值为null的字段,默认为false
+	 * WriteNullNumberAsZero—-数值字段如果为null,输出为0,而非null
+	 * WriteNullListAsEmpty—–List字段如果为null,输出为[],而非null
+	 * WriteNullStringAsEmpty—字符类型字段如果为null,输出为”“,而非null
+	 * WriteNullBooleanAsFalse–Boolean字段如果为null,输出为false,而非null
+	 */
+	@Test
+	public void testFeatures() {
+		SerializerFeature[] features = { SerializerFeature.WriteNullNumberAsZero,
+				SerializerFeature.WriteNullStringAsEmpty,
+				SerializerFeature.DisableCircularReferenceDetect };
+
+		UserAlias user = new UserAlias();
+		user.setId(123);
+		user.setName("name");
+		Assert.assertEquals("{\"id\":123,\"name\":\"name\"}", JSONObject.toJSONString(user));
+
+		// Write null as empty
+		user.setName(null);
+		Assert.assertEquals("{\"id\":123}", JSONObject.toJSONString(user));
+
+		// Write null as null
+		user.setId(null);
+		Assert.assertEquals("{\"id\":null,\"name\":null}",
+				JSONObject.toJSONString(user, SerializerFeature.WriteMapNullValue));
+
+		// WriteNullStringAsEmpty,WriteNullNumberAsZero
+		features = new SerializerFeature[] { SerializerFeature.WriteMapNullValue,
+				SerializerFeature.WriteNullNumberAsZero, SerializerFeature.WriteNullStringAsEmpty,
+				SerializerFeature.WriteNullListAsEmpty, SerializerFeature.WriteNullBooleanAsFalse };
+		Assert.assertEquals("{\"id\":0,\"name\":\"\"}", JSONObject.toJSONString(user, features));
+	}
+
+	/**
 	 * User类有两个字段，过滤了name字段，而且把id字段重命名为uid。
 	 * http://www.oschina.net/code/snippet_12_3494
 	 */
-	@Test
 	public void testAliasRename() {
 		UserAlias user = new UserAlias();
 		user.setId(123);
-		user.setName("毛头");
+		user.setName("name");
 
 		SerializeConfig config = new SerializeConfig();
 		config.put(UserAlias.class,
@@ -90,14 +128,14 @@ public class PracticeJson extends TestBase {
 	 * 过滤了name字段，而且把id字段重命名为uid。
 	 */
 	class UserAlias {
-		private int id;
+		private Integer id;
 		private String name;
 
-		public int getId() {
+		public Integer getId() {
 			return id;
 		}
 
-		public void setId(int id) {
+		public void setId(Integer id) {
 			this.id = id;
 		}
 
