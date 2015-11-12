@@ -29,6 +29,13 @@ public class PracticeString extends TestBase {
 		nullStr = "null";
 		assertEquals("null", nullStr);
 		log.info("nullStr = {}", nullStr);
+		
+		try {
+			byte[] bytes = null;
+			nullStr = new String(bytes);
+		} catch (NullPointerException e) {
+			log.info("Expected NullPointerException");
+		}
 	}
 	
 	public void testListString() {

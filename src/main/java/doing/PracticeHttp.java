@@ -6,9 +6,13 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.BitSet;
+
+import junit.framework.Assert;
 
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
+import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.EscapeChars;
 import org.pu.utils.IoUtils;
@@ -23,11 +27,17 @@ import org.slf4j.LoggerFactory;
 public class PracticeHttp extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeHttp.class);
 
-	public void teste() throws UnsupportedEncodingException, URIException {
-		String str = "DEMO%E6%B5%8B%E8%AF%95";
-		String decodeURL = URLDecoder.decode(str, "UTF-8");
-		log.info("decodeURL = {}", decodeURL);
-		log.info("URIUtil.decode = {}", URIUtil.decode(str));
+	@Test
+	public void testEncodeDecode() throws UnsupportedEncodingException, URIException {
+		String src = "DEMO测试";
+		String target = "DEMO%E6%B5%8B%E8%AF%95";
+
+		Assert.assertEquals(target, URLEncoder.encode(src, "UTF-8"));
+		Assert.assertEquals(src, URLDecoder.decode(target, "UTF-8"));
+		
+		Assert.assertEquals(target, URIUtil.encode(src,new BitSet()));
+		Assert.assertEquals(src, URIUtil.decode(target));
+		Assert.assertEquals("测试账号123", URIUtil.decode("%E6%B5%8B%E8%AF%95%E8%B4%A6%E5%8F%B7123"));
 	}
 
 	public void testUrl() throws Exception {
