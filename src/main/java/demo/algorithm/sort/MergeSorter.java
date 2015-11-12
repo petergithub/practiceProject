@@ -14,6 +14,7 @@ public class MergeSorter<E extends Comparable<E>> extends SortObject<E> {
 
 	public void sort(E[] array, int from, int len) {
 		if (len <= 1) return;
+		@SuppressWarnings("unchecked")
 		E[] temporary = (E[]) Array.newInstance(array[0].getClass(), len);
 		merge_sort(array, from, from + len - 1, temporary);
 	}

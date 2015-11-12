@@ -191,6 +191,7 @@ public class SortPrimitive extends TestBase {
 	/**
 	 * http://zh.wikipedia.org/wiki/快速排序#Java
 	 */
+	@SuppressWarnings("unused")
 	private static int partition(int[] array, int left, int right) {
 		int index = left;
 //		 index = left + new Random().nextInt(right-left+1);

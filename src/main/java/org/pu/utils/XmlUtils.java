@@ -202,6 +202,7 @@ public class XmlUtils extends IoUtils {
 		try {
 			Element root = getRootElement(filePath);
 			if (XmlUtils.isExist(root, xpath)) {
+				@SuppressWarnings("unchecked")
 				List<Element> list = (List<Element>) XPath.selectNodes(root, xpath);
 				for (Element e : list) {
 					handler.handle(e);

@@ -20,6 +20,7 @@ import org.mockito.Mockito;
  * http://gojko.net/2009/10/23/mockito-in-six-easy-examples/
  * @version Date: Nov 20, 2014 3:01:28 PM
  */
+@SuppressWarnings("unchecked")
 public class MockitoTest {
 	
 	/**

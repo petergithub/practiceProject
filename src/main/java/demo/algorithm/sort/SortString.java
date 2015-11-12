@@ -126,12 +126,12 @@ public class SortString extends TestBase {
 	}
 
 	// works for c between 'a' and 'z' - lower case letters
-	private static int charToInt(char c) {
+	public static int charToInt(char c) {
 		return c - 95;
 	}
 
 	// works for 0<=i<=25
-	private static char intToChar(int i) {
+	public static char intToChar(int i) {
 		return (char) (i + 95);
 	}
 }

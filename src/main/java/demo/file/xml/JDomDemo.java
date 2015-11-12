@@ -35,6 +35,7 @@ public class JDomDemo {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void parserXml(String fileName) {
 		SAXBuilder builder = new SAXBuilder(false);
 		try {

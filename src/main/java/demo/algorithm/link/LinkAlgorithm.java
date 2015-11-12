@@ -42,6 +42,7 @@ public class LinkAlgorithm {
 	 * </pre>
 	 */
 	//FIXME
+	@SuppressWarnings("unchecked")
 	public <E> LinkedList<E> reverse(LinkedList<E> src) {
 		LinkedList<E> dest = null;
 		LinkedList<E> tmp;

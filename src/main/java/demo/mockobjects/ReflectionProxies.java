@@ -71,6 +71,7 @@ public class ReflectionProxies {
 		// methods to configure proxy return values; use Builder pattern
 
 		// assertions that particular methods were called
+		@SuppressWarnings("unchecked")
 		public <T> T toStub(Class<T> klassToBeProxied) {
 			return (T) Proxy.newProxyInstance(this.getClass().getClassLoader(),
 					new Class[] { klassToBeProxied }, this);

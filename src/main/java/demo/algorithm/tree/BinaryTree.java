@@ -229,12 +229,10 @@ public class BinaryTree {
 	private class TreeNode {
 		private int key = 0;
 		private String data = null;
+		@SuppressWarnings("unused")
 		private boolean isVisited = false;
 		private TreeNode leftChild = null;
 		private TreeNode rightChild = null;
-
-		public TreeNode() {
-		}
 
 		/**
 		 * @param key 层序编码

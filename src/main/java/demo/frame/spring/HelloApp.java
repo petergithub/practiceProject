@@ -12,5 +12,6 @@ public class HelloApp {
 				.getBean("greetingService");
 
 		greetingService.sayGreeting();
+		((ClassPathXmlApplicationContext)factory).close();
 	}
 }

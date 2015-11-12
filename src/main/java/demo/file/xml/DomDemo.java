@@ -136,6 +136,7 @@ public class DomDemo {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void parserXmlDom4j(String fileName) {
 		File inputXml = new File(fileName);
 		SAXReader saxReader = new SAXReader();
