@@ -24,7 +24,7 @@
 		<freemarker.version>2.3.19</freemarker.version>
 		<spring.version>3.2.1.RELEASE</spring.version>
 		<aspectj.version>1.6.12</aspectj.version>
-		<slf4j.version>1.6.4</slf4j.version>
+		<slf4j.version>1.7.5</slf4j.version>
 		<log4j.version>1.2.16</log4j.version>
 		<junit.version>4.10</junit.version>
 		<jdk.version>1.8</jdk.version>
