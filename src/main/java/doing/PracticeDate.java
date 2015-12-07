@@ -43,7 +43,17 @@ public class PracticeDate extends TestBase {
 	String dateFormatUs = "MM/dd/yyyy HH:mm:ss";
 	String dateFormat_ISO_8601Z = "yyyy-MM-dd'T'HH:mm:ssZ";
 	String dateFormat_ISO_8601z = "yyyy-MM-dd'T'HH:mm:ssz";
+	
 
+	public static void main(String[] args){
+		TimeZone t = TimeZone.getDefault();
+		log.info("t[{}]", t);
+		System.out.println(new Date());
+		TimeZone timeZone = Calendar.getInstance().getTimeZone();
+		System.out.println(timeZone.getDisplayName(false, TimeZone.SHORT)); 
+	}
+
+	@Test
 	public void testDate() throws ParseException {
 		// 20060102150405
 		DateTime dt = new DateTime(2006, 1, 2, 15, 4, 5);
@@ -147,7 +157,6 @@ public class PracticeDate extends TestBase {
 		log.info("diffInMillisRevers = {}", diffInMillisRevers);
 	}
 
-	@Test
 	public void testJodaDate() {
 		DateTime dt = new DateTime(2006, 1, 2, 15, 4, 5);
 		Date date = dt.toDate();
