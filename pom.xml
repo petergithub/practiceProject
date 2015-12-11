@@ -43,7 +43,8 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty</artifactId> <!-- Use 'netty-all' for 4.0 or above -->
-			<version>4.0.33</version>
+			<!-- <version>4.0.19.Final</version> -->
+				<version>3.7.0.Final</version>
 			<scope>compile</scope>
 		</dependency>
 		<!--Redis -->
