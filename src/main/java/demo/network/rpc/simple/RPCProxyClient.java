@@ -14,7 +14,7 @@ import java.lang.reflect.Proxy;
  * 消费方首先从RPCProxyClient获得服务提供方的接口
  * ，当执行helloWorldService.sayHello(“test”)方法时就会调用invoke方法
  * 
- * @author Shang Pu
+ * @author 占利军
  * @version Date：Dec 10, 2015 4:13:28 PM
  * @param <T>
  */
