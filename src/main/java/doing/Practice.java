@@ -31,17 +31,74 @@ public class Practice extends TestBase {
 		Assert.assertFalse(isEmpty);
 	}
 
+	/**
+	 * The type of the Expression must be char, byte, short, int, Character,
+	 * Byte, Short, Integer, String, or an enum type (§8.9), or a compile-time
+	 * error occurs.
+	 * The switch Statement 
+	 * http://docs.oracle.com/javase/specs/jls/se7/html/jls-14.html#jls-14.11
+	 * 
+	 * <a href=
+	 * "http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.28"
+	 * >Constant Expressions/a>
+	 */
 	@Test
+	public void testSwitch() {
+		final String inCase = "str";
+		String str = "str";
+		switch (str) {
+		case inCase:
+			log.info("str[{}]", str);
+			break;
+		default:
+			log.info("nothing");
+		}
+
+		final int three = 3;
+		@SuppressWarnings("unused")
+		final Integer four = 4;
+		Integer i = new Integer(1) + new Integer(2);
+		switch (i) {
+		// four cannot be used here because final static Integer not considered
+		// a constant when runtime:
+		//
+		// The case in the switch statements should be constants at compile
+		// time. The command
+		//
+		// final int b=2
+		//
+		// assigns the value of 2 to b, right at the compile time. But the
+		// following command assigns the value of 2 to b at Runtime.
+		//
+		// final int b;
+		// b = 2;
+		//
+		// Thus, the compiler complains, when it can't find a constant in one of
+		// the cases of the switch statement.
+
+		// http://stackoverflow.com/questions/16255270/final-variable-case-in-switch-statement/16255479#16255479
+		case three:
+			System.out.println("three");
+			break;
+		case 4:// four
+			System.out.println("three");
+			break;
+		default:
+			System.out.println("other");
+			break;
+		}
+	}
+
 	public void testMap() {
 		Map<String, Integer> stat = new HashMap<>();
 		stat.put("CREATED", 0);
 		String status = "CREATED";
 		stat.put(status, stat.get(status) + 1);
 		log.info("stat = {}", stat);
-//		status = "UPDATED";
-//		stat.put(status, stat.get(status) + 1);
+		// status = "UPDATED";
+		// stat.put(status, stat.get(status) + 1);
 		log.info("stat = {}", stat);
-		
+
 		stat.clear();
 		log.info("stat = {}", stat);
 	}
@@ -104,18 +161,6 @@ public class Practice extends TestBase {
 		Assert.assertTrue(oneInit.equals(1));
 		Assert.assertTrue(oneInit.equals(oneInitAnother));
 		Assert.assertFalse(oneInit == oneInitAnother);// object compare
-	}
-
-	public void testSwitch() {
-		Integer i = new Integer(1) + new Integer(2);
-		switch (i) {
-		case 3:
-			System.out.println("three");
-			break;
-		default:
-			System.out.println("other");
-			break;
-		}
 	}
 
 	public void testWait() throws InterruptedException {
