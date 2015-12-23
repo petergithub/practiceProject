@@ -21,7 +21,51 @@ import org.slf4j.LoggerFactory;
 public class PracticeString extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeString.class);
 
+	/**
+	 * trim方法一般用来去除空格，但是根据JDK API的说明，该方法并不仅仅是去除空格，它能够去除从编码’\u0000′ 至 ‘ ′ 的所有字符。
+	 * 回车换行也在这20个字符之中
+	 */
 	@Test
+	public void trimString() {
+		Character[] chars = new Character[20];
+		chars[0] = '\u0000';
+		chars[1] = '\u0001';
+		chars[2] = '\u0002';
+		chars[3] = '\u0003';
+		chars[4] = '\u0004';
+		chars[5] = '\u0005';
+		chars[6] = '\u0006';
+		chars[7] = '\u0007';
+		chars[8] = '\u0008';
+		chars[9] = '\u0009';
+		chars[10] = '\u0010';
+		chars[11] = '\u0012';
+		chars[12] = '\u0013';
+		chars[13] = '\u0014';
+		chars[14] = '\u0015';
+		chars[15] = '\u0016';
+		chars[16] = '\u0017';
+		chars[17] = '\u0018';
+		chars[18] = '\u0019';
+		chars[19] = '\u0020';
+		List<Character> charList = Arrays.asList(chars);
+		log.info("charList[{}]", charList);
+
+		for (int i = 0; i < chars.length; i++) {
+			System.out.print("(" + i + ")" + chars[i] + "    ");
+			if (i != 0 && i % 5 == 0) {
+				System.out.println();
+			}
+		}
+
+		char[] charsTrim = { 'a', 'b', 'c', '\r', '\n' };
+		System.out.println(charsTrim.length);
+		String str = new String(charsTrim);
+		System.out.println(str.length());
+		String newStr = str.trim();
+		System.out.println(newStr.length());
+	}
+
 	public void testNullString() {
 		String nullStr = null;
 		Assert.assertNull(nullStr);
@@ -29,7 +73,7 @@ public class PracticeString extends TestBase {
 		nullStr = "null";
 		assertEquals("null", nullStr);
 		log.info("nullStr = {}", nullStr);
-		
+
 		try {
 			byte[] bytes = null;
 			nullStr = new String(bytes);
@@ -37,11 +81,12 @@ public class PracticeString extends TestBase {
 			log.info("Expected NullPointerException");
 		}
 	}
-	
+
 	public void testListString() {
 		List<String> gpseqnum = Arrays.asList("a", "c", "b");
 		log.info("gpseqnum = {}", gpseqnum);
-		if (gpseqnum.size() == 0) return;
+		if (gpseqnum.size() == 0)
+			return;
 		String gpseqnumQuery = "'";
 		for (String s : gpseqnum) {
 			gpseqnumQuery = gpseqnumQuery + s.trim() + "','";
