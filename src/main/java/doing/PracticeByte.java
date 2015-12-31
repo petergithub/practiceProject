@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * http://www.tutorialspoint.com/java/java_basic_operators.htm
- * 
+ * Assume integer variable A holds 10 and variable B holds 20, then:
  * <pre>
  * SR.NO 	Operator and Description
  * 

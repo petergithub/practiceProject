@@ -4,15 +4,12 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import sun.misc.BASE64Decoder;
-
 /**
  * Created by peng.wu on 2015/6/4. desc: java 中 AES 加密 Cipher.getInstance("AES")
  * = Cipher.getInstance("AES/ECB/PKCS5Padding")
  *
  * 本算法采用能和大多数语言如PHP等互通的方案
  */
-@SuppressWarnings("restriction")
 public class EncryptAES {
 
 	public static String PASSWORD = "AES7654321!#@tcl";
@@ -40,7 +37,7 @@ public class EncryptAES {
 
 			cipher.init(Cipher.ENCRYPT_MODE, keyspec, ivspec);
 			byte[] encrypted = cipher.doFinal(plaintext);
-			return new sun.misc.BASE64Encoder().encode(encrypted);
+			return new BASE64Encoder().encode(encrypted);
 
 		} catch (Exception e) {
 			return null;
