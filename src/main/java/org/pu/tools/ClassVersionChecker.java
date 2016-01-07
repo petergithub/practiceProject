@@ -14,9 +14,10 @@ import java.util.Map;
  * 46       0           1.2
  * 47       0           1.3
  * 48       0           1.4
- * 49       0           1.5
- * 50       0           1.6
- * 51       0           1.7
+ * 49       0           5.0
+ * 50       0           6.0
+ * 51       0           7
+ * 52       0           8
  * </pre>
  * another way is javap -verbose <classfilename>
  * 
