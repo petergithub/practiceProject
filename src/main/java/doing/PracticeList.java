@@ -12,7 +12,6 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
-import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,34 @@ import org.slf4j.LoggerFactory;
 public class PracticeList extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeList.class);
 
-	@Test
+	/**
+	 * <pre>
+	 * java.util.ConcurrentModificationException
+	 * at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:901)
+	 * at java.util.ArrayList$Itr.next(ArrayList.java:851)
+	 * at doing.PracticeList.testRemoveListException(PracticeList.java:32)
+	 * </pre>
+	 */
+//	@Test(expected = ConcurrentModificationException.class)
+	public void testRemoveListException() {
+		List<String> list = new ArrayList<String>(Arrays.asList("1", "2", "3"));
+
+		for (String str : list) {
+			list.remove(str);
+		}
+		log.info("list[{}]", list);
+	}
+
+	public void testRemoveList() {
+		List<String> first = new ArrayList<String>(Arrays.asList("1", "2", "3"));
+		List<String> second = new ArrayList<String>(Arrays.asList("1", "2", "3"));
+
+		for (String str : first) {
+			second.remove(str);
+		}
+		log.info("second[{}]", second);
+	}
+
 	public void testProcessListParameter() {
 		List<String> list = new ArrayList<String>(Arrays.asList("1", "2", "3"));
 		processListParameter(list);
