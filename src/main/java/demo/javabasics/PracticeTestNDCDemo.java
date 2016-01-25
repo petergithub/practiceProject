@@ -17,14 +17,14 @@ import org.apache.log4j.NDC;
  * 这样的话即使在多用户并发的情况下（如servlet和dubbo service）也容易根据某一关键字（如订单号、ip）来定位出完整的业务链。
  * 另外除了NDC外还有一个工具类--MDC–也适用于这一场景，使用方式和NDC差不多，仍沿用上述示例，仅需部分改动：
  * 
- * @author <a href='http://confluence.lab.tclclouds.com/pages/viewpage.action?pageId=2854204'>log4j
+ * @author <a href='https://www.evernote.com/Home.action#n=50f79df9-353d-4a77-9aa5-790763b1aac6&ses=4&sh=2&sds=5&'>log4j
  *         的一个实用工具类--NDC–可在每个日志前自动加上一个tag--介绍</href>
  */
-public class NDCDemo {
-	private static final Logger logger = Logger.getLogger(NDCDemo.class);
+public class PracticeTestNDCDemo {
+	private static final Logger logger = Logger.getLogger(PracticeTestNDCDemo.class);
 
 	public static void main(String[] args) {
-		NDCDemo app = new NDCDemo();
+		PracticeTestNDCDemo app = new PracticeTestNDCDemo();
 		app.testNdc(System.currentTimeMillis());
 		app.testMdc(12345);
 	}
