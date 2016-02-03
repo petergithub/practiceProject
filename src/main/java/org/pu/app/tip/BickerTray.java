@@ -22,7 +22,6 @@ import javax.swing.JFrame;
 
 import org.pu.utils.DateUtils;
 import org.pu.utils.IoUtils;
-import org.pu.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,13 +99,26 @@ public class BickerTray extends JFrame {
 				}
 				// 闪动消息的空白时间
 				trayIcon.setImage(new ImageIcon("").getImage());
-				Utils.sleep(500);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					log.error("InterruptedException in BickerTray.bicker()", e);
+				}
 				// 闪动消息的提示图片
 				trayIcon.setImage(image);
-				Utils.sleep(500);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					log.error("InterruptedException in BickerTray.bicker()", e);
+				}
 			} else { // 无消息或是消息已经打开过
 				trayIcon.setImage(image);
-				getNewMsgFlag = Utils.sleep(interval);
+				try {
+					Thread.sleep(interval);
+				} catch (InterruptedException e) {
+					log.error("InterruptedException in BickerTray.bicker()", e);
+				}
+				getNewMsgFlag = true;
 			}
 		}
 	}

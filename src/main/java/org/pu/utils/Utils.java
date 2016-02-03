@@ -317,7 +317,7 @@ public class Utils {
 	 * <p>
 	 * return false if throw exception
 	 */
-	public static boolean sleep(long millis) {
+	private static boolean sleep(long millis) {
 		try {
 			Thread.sleep(millis);
 			return true;

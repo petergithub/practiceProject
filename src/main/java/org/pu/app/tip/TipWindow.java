@@ -21,7 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.pu.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -31,6 +32,8 @@ import org.pu.utils.Utils;
  * @version Date: Feb 3, 2013 3:38:01 PM
  */
 public class TipWindow extends JDialog {
+	private static final Logger log = LoggerFactory.getLogger(TipWindow.class);
+	
 	private static final long serialVersionUID = 1L;
 	private int x, y;
 	private int width, height;
@@ -108,7 +111,11 @@ public class TipWindow extends JDialog {
 	public void popup() {
 		for (int i = 0; i <= height; i += 10) {
 			this.setLocation(x, y - i);
-			Utils.sleep(5);
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				log.error("InterruptedException in TipWindow.popup()", e);
+			}
 		}
 		// Utils.sleep(3000);
 		// close();
@@ -117,7 +124,11 @@ public class TipWindow extends JDialog {
 	private void close() {
 		for (int i = 0; i <= height; i += 10) {
 			setLocation(x, y - height + i);
-			Utils.sleep(5);
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				log.error("InterruptedException in TipWindow.close()", e);
+			}
 		}
 		dispose();
 	}

@@ -205,7 +205,11 @@ public class HttpUtils {
 		ImageIcon icon = new ImageIcon(image.getAbsolutePath());
 		if (MediaTracker.ERRORED == icon.getImageLoadStatus()) {
 			log.info("Image is broken, reload again.");
-			Utils.sleep(1000 / validation.getTimes());
+			try {
+				Thread.sleep(1000 / validation.getTimes());
+			} catch (InterruptedException e) {
+				log.error("InterruptedException in HttpUtils.getRandCodeOcr()", e);
+			}
 			return getRandCodeOcr(httpClient, url, validation);
 		}
 		String result = "";
