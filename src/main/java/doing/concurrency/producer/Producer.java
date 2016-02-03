@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo.threads.example;
+﻿package doing.concurrency.producer;
 
 public class Producer extends Thread {
 	private String name;

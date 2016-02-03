@@ -1,4 +1,4 @@
-package demo.javabasics.demo.threads;
+package doing.concurrency.threads;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;

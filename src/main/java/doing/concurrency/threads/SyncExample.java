@@ -1,4 +1,4 @@
-package demo.javabasics.demo.threads;
+package doing.concurrency.threads;
 
 /**
  * testSyncClass

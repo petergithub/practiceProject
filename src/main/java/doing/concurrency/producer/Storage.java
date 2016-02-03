@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo.threads.example;
+﻿package doing.concurrency.producer;
 
 import org.apache.log4j.Logger;
 
