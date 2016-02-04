@@ -1,5 +1,9 @@
 package doing.concurrency.oracle;
 
+/**
+ * http://docs.oracle.com/javase/tutorial/essential/concurrency/QandE/questions.html
+ * @version Date：Feb 4, 2016 2:59:54 PM
+ */
 public class BadThreads {
 
 	static String message;
@@ -20,7 +24,7 @@ public class BadThreads {
 
 		(new CorrectorThread()).start();
 		message = "Mares do not eat oats.";
-//		Thread.sleep(2000);
+		Thread.sleep(2000);
 		// Key statement 2:
 		System.out.println(message);
 	}
