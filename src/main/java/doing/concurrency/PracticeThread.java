@@ -1,79 +1,76 @@
 package doing.concurrency;
 
-import org.pu.test.base.TestBase;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import junit.framework.Assert;
 
 /**
- * http://docs.oracle.com/javase/tutorial/essential/concurrency/simple.html
+ * http://uule.iteye.com/blog/1101994
+ * thread.Join把指定的线程加入到当前线程，可以将两个交替执行的线程合并为顺序执行的线程。比如在线程B中调用了线程A的Join()方法，
+ * 直到线程A执行完毕后，才会继续执行线程B。
  * 
- * @version Date: Jan 31, 2016 4:15:58 PM
+ * t.join(); //使调用线程 t 在此之前执行完毕。
+ * 
+ * t.join(1000); //等待 t 线程，等待时间是1000毫秒
+ * 
+ * @version Date：Jan 31, 2016 4:37:44 PM
  */
-public class PracticeThread extends TestBase {
+public class PracticeThread implements Runnable {
+	private static final Logger log = LoggerFactory.getLogger(PracticeThread.class);
 
-	// Display a message, preceded by
-	// the name of the current thread
-	static void threadMessage(String message) {
-		String threadName = Thread.currentThread().getName();
-		System.out.format("%s: %s%n", threadName, message);
-	}
-
-	private static class MessageLoop implements Runnable {
-		public void run() {
-			String importantInfo[] = { "Mares eat oats", "Does eat oats", "Little lambs eat ivy",
-					"A kid will eat ivy too" };
+	public void testWaitWithSynchronized() {
+		PracticeThread thread = new PracticeThread();
+		synchronized (thread) {
 			try {
-				for (int i = 0; i < importantInfo.length; i++) {
-					// Pause for 4 seconds
-					Thread.sleep(4000);
-					// Print a message
-					threadMessage(importantInfo[i]);
-				}
+				thread.wait();
 			} catch (InterruptedException e) {
-				threadMessage("I wasn't done!");
+				log.info("wait is interrupted in PracticeThread.testWait()", e);
 			}
 		}
 	}
 
-	public static void main(String args[]) throws InterruptedException {
+	@Test (expected=IllegalMonitorStateException.class)
+	public void testWaitWithoutSynchronized() {
+		PracticeThread thread = new PracticeThread();
+		try {
+			thread.wait();
+		} catch (InterruptedException e) {
+			log.info("wait is interrupted in PracticeThread.testWait()", e);
+		}
+	}
 
-		// Delay, in milliseconds before we interrupt MessageLoop thread
-		// (default one hour).
-		long patience = 1000 * 60 * 60;
-		patience = 4000;
+	public static int count = 0;
 
-		// If command line argument
-		// present, gives patience
-		// in seconds.
-		if (args.length > 0) {
-			try {
-				patience = Long.parseLong(args[0]) * 1000;
-			} catch (NumberFormatException e) {
-				System.err.println("Argument must be an integer.");
-				System.exit(1);
-			}
+	public void run() {
+		for (int index = 0; index < 5; index++) {
+			count = count + 1;
+		}
+	}
+
+	@Test
+	public void testWithJoin() {
+		count = 0;
+		Thread thread = new Thread(new PracticeThread());
+		thread.start();
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			log.error("InterruptedException in PracticeJoin.testJoin()", e);
 		}
 
-		threadMessage("Starting MessageLoop thread");
-		long startTime = System.currentTimeMillis();
-		Thread t = new Thread(new MessageLoop());
-		t.start();
+		// wait for thread end with join method
+		Assert.assertEquals(5, count);
+	}
 
-		threadMessage("Waiting for MessageLoop thread to finish");
-		// loop until MessageLoop
-		// thread exits
-		while (t.isAlive()) {
-			threadMessage("Still waiting...");
-			// Wait maximum of 1 second
-			// for MessageLoop thread
-			// to finish.
-			t.join(1000);
-			if (((System.currentTimeMillis() - startTime) > patience) && t.isAlive()) {
-				threadMessage("Tired of waiting!");
-				t.interrupt();
-				// Shouldn't be long now
-				// -- wait indefinitely
-				t.join();
-			}
-		}
-		threadMessage("Finally!");
+	@Test
+	public void testWithoutJoin() {
+		count = 0;
+		Thread thread = new Thread(new PracticeThread());
+		thread.start();
+
+		// execute this before thread ends
+		Assert.assertEquals(0, count);
 	}
 }

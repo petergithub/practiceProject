@@ -1,4 +1,4 @@
-package doing.concurrency;
+package doing.concurrency.oracle;
 
 import java.util.Random;
 import java.util.concurrent.locks.Lock;
