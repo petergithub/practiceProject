@@ -1,4 +1,4 @@
-package doing.future.jdk;
+package doing.concurrency.future.jdk;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

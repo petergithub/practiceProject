@@ -1,4 +1,4 @@
-package doing.future.java;
+package doing.concurrency.future.java;
 
 public class Client {
 	public Data request(final String string) {

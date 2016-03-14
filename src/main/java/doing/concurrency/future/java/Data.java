@@ -1,4 +1,4 @@
-package doing.future.java;
+package doing.concurrency.future.java;
 
 public interface Data {
 	String getResult() throws InterruptedException;

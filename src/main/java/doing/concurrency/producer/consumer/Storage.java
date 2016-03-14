@@ -1,4 +1,4 @@
-﻿package doing.concurrency.producer;
+﻿package doing.concurrency.producer.consumer;
 
 import org.apache.log4j.Logger;
 
@@ -9,17 +9,6 @@ public class Storage {
 	protected static final Logger logger = Logger.getLogger(Storage.class);
 	private int count;
 	private int size;
-	
-	public static void main(String arg[]) {
-		Storage storage = new Storage(5);
-		Producer p1 = new Producer("Producer1", storage);
-		Producer p2 = new Producer("Producer2", storage);
-		Consumer c1 = new Consumer("Consumer1", storage);
-
-		p1.start();
-		p2.start();
-		c1.start();
-	}
 
 	public Storage(int size) {
 		this.size = size;

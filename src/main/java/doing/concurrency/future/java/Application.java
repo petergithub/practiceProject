@@ -1,4 +1,4 @@
-package doing.future.java;
+package doing.concurrency.future.java;
 
 public class Application {
 	public static void main(String[] args) throws InterruptedException {

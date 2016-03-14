@@ -1,4 +1,4 @@
-package doing.future.java;
+package doing.concurrency.future.java;
 
 //FutureData是Future模式的关键，它实际上是真实数据RealData的代理，封装了获取RealData的等待过程  
 public class FutureData implements Data {
