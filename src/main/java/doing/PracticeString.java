@@ -6,13 +6,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import junit.framework.Assert;
 
 /**
  * @version Date: Jan 14, 2014 6:45:48 PM
@@ -21,11 +21,20 @@ import org.slf4j.LoggerFactory;
 public class PracticeString extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeString.class);
 
+
+	@Test
+	public void testIndexEmptyString() {
+		Assert.assertEquals(true, "abc".startsWith(""));
+		Assert.assertEquals(true, "abc".startsWith("a"));
+		Assert.assertEquals(0, "abc".indexOf(""));
+		Assert.assertEquals(0, "abc".indexOf("a"));
+		Assert.assertEquals(-1, "abc".indexOf("d"));
+	}
+	
 	/**
 	 * trim方法一般用来去除空格，但是根据JDK API的说明，该方法并不仅仅是去除空格，它能够去除从编码’\u0000′ 至 ‘ ′ 的所有字符。
 	 * 回车换行也在这20个字符之中
 	 */
-	@Test
 	public void trimString() {
 		Character[] chars = new Character[20];
 		chars[0] = '\u0000';
