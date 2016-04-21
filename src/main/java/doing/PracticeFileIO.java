@@ -2,12 +2,16 @@ package doing;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 import javax.sound.sampled.AudioInputStream;
@@ -18,6 +22,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.io.FileUtils;
 import org.pu.test.base.TestBase;
 import org.pu.utils.IoUtils;
 import org.slf4j.Logger;
@@ -26,11 +31,38 @@ import org.slf4j.LoggerFactory;
 public class PracticeFileIO extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeFileIO.class);
 	
-	static StringBuffer stringBufferOfData = new StringBuffer();
-	static String filename = null;
-	static Scanner sc = new Scanner(System.in);// initiliaze scanner to get user input
+	private static StringBuffer stringBufferOfData = new StringBuffer();
+	private static String filename = null;
+	private static Scanner sc = new Scanner(System.in);// initialize scanner to get user input
+	private String pathname = "testing.txt";
+	
+	
+	public void fileToArrayOfBytes() throws IOException {
+		//jdk7
+		Path path = Paths.get(pathname);
+		byte[] dataJdk7 = Files.readAllBytes(path);
+		log.info("dataJdk7[{}]", dataJdk7);
+		
+		//ApacheFileUtil
+		File file = new File(pathname);
+		byte[] dataApacheFileUtil = FileUtils.readFileToByteArray(file);
+		log.info("dataApacheFileUtil[{}]", dataApacheFileUtil);
 
+		// jdk6
+		FileInputStream fileInputStream = null;
+		byte[] bFile = new byte[(int) file.length()];
+			// convert file into array of bytes
+			fileInputStream = new FileInputStream(file);
+			fileInputStream.read(bFile);
+			fileInputStream.close();
 
+			for (int i = 0; i < bFile.length; i++) {
+				System.out.print((char) bFile[i]);
+			}
+
+			System.out.println("Done");
+	}
+	
 	public void testTempFolder() throws IOException {
 		File temp = File.createTempFile("test", "");
 		temp.delete();

@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
@@ -23,6 +26,37 @@ public class PracticeString extends TestBase {
 
 
 	@Test
+	public void testSubstring0() {
+		String ip = "193.126.233.67, 193.126.233.67";
+		// 多次反向代理后会有多个IP值，第一个为真实IP。
+		int index = ip.indexOf(',');
+		if (index != -1) {
+			String ip0 =  ip.substring(0, index);
+			log.info("ip0[{}]", ip0);
+		} else {
+			log.info("ip[{}]", ip);
+		}
+	}
+	
+	public static String getIpAddr(HttpServletRequest request) {
+		String ip = request.getHeader("X-Real-IP");
+		if (!StringUtils.isBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+			return ip;
+		}
+		ip = request.getHeader("X-Forwarded-For");
+		if (!StringUtils.isBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
+			// 多次反向代理后会有多个IP值，第一个为真实IP。
+			int index = ip.indexOf(',');
+			if (index != -1) {
+				return ip.substring(0, index);
+			} else {
+				return ip;
+			}
+		} else {
+			return request.getRemoteAddr();
+		}
+	}
+	
 	public void testIndexEmptyString() {
 		Assert.assertEquals(true, "abc".startsWith(""));
 		Assert.assertEquals(true, "abc".startsWith("a"));
