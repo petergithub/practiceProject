@@ -29,8 +29,7 @@ public class RSSReader {
 		String fileInfo = "";
 		String[] content = new String[2];
 		try {
-//			String path = "http://amrndhl235:9000/gdms/content.txt";
-			String path = "http://ecf.pfizer.com/sites/DocumentManagementBusinessSupport/BLSME/_layouts/listfeed.aspx?List=%7B91037AE9-5855-4E59-9618-D22F8CB2AB66%7D&Source=http%3A%2F%2Fecf%2Epfizer%2Ecom%2Fsites%2FDocumentManagementBusinessSupport%2FBLSME%2Fdefault%2Easpx";
+			String path = "http://hostname:9000/ontent.txt";
 			String _path = URLDecoder.decode(path, "utf-8");
 			URL url = new URL(_path);
 			Scanner scanner = new Scanner(url.openStream());
@@ -53,8 +52,7 @@ public class RSSReader {
 		try {
 			List<String> content = new ArrayList<String>();
 			DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-//			String url = "http://ecf.pfizer.com/sites/DocumentManagementBusinessSupport/BLSME/_layouts/listfeed.aspx?List=%7B91037AE9-5855-4E59-9618-D22F8CB2AB66%7D&Source=http%3A%2F%2Fecf%2Epfizer%2Ecom%2Fsites%2FDocumentManagementBusinessSupport%2FBLSME%2Fdefault%2Easpx";
-			String url = "http://ecf.pfizer.com/sites/DocumentManagementBusinessSupport/BLSME/Lists/Announcements";
+			String url = "url";
 			InputStream openStream = new URL(url).openStream();
 			String html = IOUtils.toString(openStream);
 			log.info("html = {}", html);
@@ -114,8 +112,7 @@ public class RSSReader {
 			// reader.setURL(new URL("http://www.tullyrankin.com/feed/rss"));
 			reader.setURL(new URL("http://feeds2.feedburner.com/programthink"));
 			reader
-					.setURL(new URL(
-							"http://ecf.pfizer.com/sites/DocumentManagementBusinessSupport/BLSME/_layouts/listfeed.aspx?List=%7B91037AE9-5855-4E59-9618-D22F8CB2AB66%7D&Source=http%3A%2F%2Fecf%2Epfizer%2Ecom%2Fsites%2FDocumentManagementBusinessSupport%2FBLSME%2Fdefault%2Easpx"));
+					.setURL(new URL("url"));
 			reader.writeFeed();
 		} catch (Exception e) {
 			e.printStackTrace();

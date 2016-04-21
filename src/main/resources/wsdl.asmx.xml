@@ -1757,10 +1757,10 @@
   </wsdl:binding>
   <wsdl:service name="Lists">
     <wsdl:port name="ListsSoap" binding="tns:ListsSoap">
-      <soap:address location="http://ecf.pfizer.com/sites/DocumentManagementBusinessSupport/BLSME/_vti_bin/Lists.asmx" />
+      <soap:address location="url" />
     </wsdl:port>
     <wsdl:port name="ListsSoap12" binding="tns:ListsSoap12">
-      <soap12:address location="http://ecf.pfizer.com/sites/DocumentManagementBusinessSupport/BLSME/_vti_bin/Lists.asmx" />
+      <soap12:address location="url" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

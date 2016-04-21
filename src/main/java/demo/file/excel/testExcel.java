@@ -157,7 +157,7 @@ public class testExcel {
 	public void testPoiReadExcelXlsFile() {
 		try {
 			FileInputStream fileInputStream = new FileInputStream(
-					"C:\\sp\\Doing\\0GDMS4.7\\02 Requirements\\language_iso.xls");
+					"C:\\language_iso.xls");
 			HSSFWorkbook book = new HSSFWorkbook(fileInputStream);
 			HSSFSheet sheet = book.getSheet("POI Worksheet");
 			HSSFRow row1 = sheet.getRow(0);
@@ -183,7 +183,7 @@ public class testExcel {
 		List<String> sheetsList = new ArrayList<String>();
 		try {
 			FileInputStream fileInputStream = new FileInputStream(
-					"C:\\sp\\Doing\\0Downstream Interfaces\\GDMS Attribute mapping.xls");
+					"C:\\Attribute mapping.xls");
 			HSSFWorkbook book = new HSSFWorkbook(fileInputStream);
 			int size = book.getNumberOfSheets();
 			for (int i = 0; i < size; i++) {
@@ -199,10 +199,10 @@ public class testExcel {
 	public void testPoiReadExcelXlsxFile() {
 		try {
 			FileInputStream fileInputStream = new FileInputStream(
-					"C:\\sp\\Doing\\0GDMS4.7\\02 Requirements\\language_iso.xlsx");
+					"C:\\language_iso.xlsx");
 			XSSFWorkbook book = new XSSFWorkbook(fileInputStream);
 			XSSFSheet sheet = book.getSheet("Sheet1");
-			String dql = "insert into dm_dbo.gtc_xm_languages (language_key,language_text,applicable_to_pim,active_flag,language_abbv,language_iso,source) values(''{0}'', ''{1}'', ''{2}'',''{3}'', ''{4}'', ''{5}'', ''{6}'')\r\ngo";
+			String dql = "insert into dm_dbo.languages (language_key,language_text,applicable_to_pim,active_flag,language_abbv,language_iso,source) values(''{0}'', ''{1}'', ''{2}'',''{3}'', ''{4}'', ''{5}'', ''{6}'')\r\ngo";
 			int rowCount = sheet.getLastRowNum();
 			for (int i = 1; i <= rowCount; i++) {
 				XSSFRow row = sheet.getRow(i);

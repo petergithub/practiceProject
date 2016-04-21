@@ -1,5 +1,5 @@
 #
-#  GDMS Build Automation for BOFS and WAR
+#  PROJECT Build Automation for BOFS and WAR
 # 
 #  USES:   Apache ANT 1.6.5
 #

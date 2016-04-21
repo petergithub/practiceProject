@@ -23,15 +23,15 @@
 //import com.google.common.collect.Lists;
 //
 ///**
-// * @author Shang Pu
+// * @author 
 // * @version Date: Oct 31, 2013 5:54:08 PM
 // * @see http
 // *      ://blog.ashwani.co.in/blog/2013-07-28/connect-and-access-sharepoint-webservice-from-java/
 // */
 //public class SharePointReader {
-//	private static String username = "srvgbl-gdmsuser";
-//	private static String password = "Pf85134699";
-//	private static String BasesharepointUrl = "http://ecf.pfizer.com/sites/DocumentManagementBusinessSupport/BLSME";
+//	private static String username = "username";
+//	private static String password = "password";
+//	private static String BasesharepointUrl = "url";
 //
 //	private static ListsSoap listsoapstub;
 //	private static final Logger log = LoggerFactory.getLogger(SharePointReader.class);

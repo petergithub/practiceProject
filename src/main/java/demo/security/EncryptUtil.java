@@ -23,11 +23,11 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.pu.utils.IoUtils;
+
+import junit.framework.Assert;
 
 
 /**
@@ -74,8 +74,8 @@ public class EncryptUtil {
 
 	@Test
 	public void testAES() throws Exception {
-		String str = "pfizer07";
-		String key = "pfizer0123456789"; // 16 character
+		String str = "password07";
+		String key = "password0123456789"; // 16 character
 		String aesenc = encrypt(Algorithm.AES, str, key);
 		logger.info("str = " + str + " after encrypt with AES is: " + aesenc);
 		String decrypt = decrypt(Algorithm.AES, aesenc, key);

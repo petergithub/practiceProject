@@ -206,8 +206,8 @@ public class PracticeString extends TestBase {
 	}
 
 	public void testStringa() {
-		String src = "http://gdms5dev.pfizer.com/gdms/index.jsp";
-		String target = "http://gdms5dev.pfizer.com/gdms/drl/objectId/";
+		String src = "http://hostname/project/index.jsp";
+		String target = "http://hostname/project/drl/objectId/";
 		String str = src.substring(0, src.indexOf("index.jsp")) + "drl/objectId/";
 		log.info("str = {}", str);
 		Assert.assertEquals(target, str);

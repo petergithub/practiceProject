@@ -28,17 +28,7 @@ public class CompareFiles {
 
 	public static void main(String args[]) {
 		logger.info("CompareFiles start ...");
-		// String argus[] = {"C:\\compareA", "C:\\compareB", "C:\\"};
-		// String argus[] = { "C:\\backupgtc25May2011_prd",
-		// "C:\\backupgtc25May2011_prd.bak", "C:\\"
-		// };
-		// String argus[] = { "C:\\gtcconfigfiles_gdmsd05_13Jun",
-		// "C:\\backupgtc25May2011_prd.bak",
-		// "C:\\" };
-		String argus[] = { "C:\\backupgtc25May2011_prd.bak", "C:\\gtcconfigfiles_gdmsd05_13Jun", "C:\\" };
-		// String argus[] = { "C:\\backupgtc25May2011_prd",
-		// "C:\\gtcconfigfiles_gdmsd05_13Jun",
-		// "C:\\" };
+		String argus[] = {"C:\\compareA", "C:\\compareB", "C:\\"};
 		String fileA = argus[0];
 		String fileB = argus[1];
 		String result = argus[2] + "results.txt";

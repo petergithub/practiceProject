@@ -4,7 +4,7 @@ shutdown() {
 	echo "shutdown"
 	~/peter/tom-cat-6.0.18/bin/shutdown.sh > /dev/null
 	
-#	cp $PP/bak/web.xml ../webapps/gdms/WEB-INF/web.xml
+#	cp $PP/bak/web.xml ../webapps/project/WEB-INF/web.xml
 	echo sleep $SLEEPSECS
 	sleep $SLEEPSECS
 }
@@ -24,15 +24,15 @@ if [ $# -lt 1 ]; then
 	tail -f ~/peter/tom-cat-6.0.18/logs/catalina.out
 elif [ $1 = jpda ];then 
 	shutdown
-	JAVA_OPTS="$JAVA_OPTS -Ddfc.development.bof.registry_file=/app/dmfdev08/peter/tom-cat-6.0.18/gdms/WEB-INF/classes/bof_registry_file.properties" 
+	JAVA_OPTS="$JAVA_OPTS -Ddfc.development.bof.registry_file=/app/username/peter/tom-cat-6.0.18/project/WEB-INF/classes/bof_registry_file.properties" 
         export JAVA_OPTS
 	echo "startup in debug"
 	../bin/catalina.sh jpda start
 	tail -f ../logs/catalina.out
 elif [ $1 = jpdavm ];then 
 	shutdown 
-	JAVA_OPTS="$JAVA_OPTS -Ddfc.development.bof.registry_file=/app/dmfdev08/peter/tom-cat-6.0.18/gdms/WEB-INF/classes/bof_registry_file.properties"
-	JAVA_OPTS="$JAVA_OPTS -Djava.rmi.server.hostname=amrndhl235 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=true  -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.password.file=./bak/jmxremote.password  -Dcom.sun.management.jmxremote.access.file=./bak/jmxremote.access" 	
+	JAVA_OPTS="$JAVA_OPTS -Ddfc.development.bof.registry_file=/app/username/peter/tom-cat-6.0.18/project/WEB-INF/classes/bof_registry_file.properties"
+	JAVA_OPTS="$JAVA_OPTS -Djava.rmi.server.hostname=hostname -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=5000 -Dcom.sun.management.jmxremote.authenticate=true  -Dcom.sun.management.jmxremote.ssl=false  -Dcom.sun.management.jmxremote.password.file=./bak/jmxremote.password  -Dcom.sun.management.jmxremote.access.file=./bak/jmxremote.access" 	
     export JAVA_OPTS
 	echo "startup in debug"
 	../bin/catalina.sh jpda start
@@ -47,7 +47,7 @@ elif [ $1 = 235 ];then
 	./startup.sh
 	tail -f ../logs/catalina.out
 elif [ $1 = jms ];then
-	cd /app/dmfdev08/share/jboss4.2.0_gdms/server/
+	cd /app/username/share/jboss4.2.0_project/server/
 	./stopMethodServer.sh
         sleep $SLEEPSECS
 
@@ -62,7 +62,7 @@ elif [ $1 = jms ];then
 	done
 	echo "shutdow complete"
 
-	cd /app/dmfdev08/share/jboss4.2.0_gdms/server/
+	cd /app/username/share/jboss4.2.0_project/server/
 	echo "restart jms"
 	if [ $# -gt 1 ];then
 		if [ $2 = jpda ];then

@@ -195,10 +195,10 @@ public class JdbcUtils {
 
 	public void testLdapConn() {
 		Connection conn;
-		String url = "jdbc:oracle:thin:@ldap://oid1.pfizer.com:389/mdatadev,cn=OracleContext,dc=pfizer,dc=com "
-				+ "ldap://oid2.pfizer.com:389/mdatadev,cn=OracleContext,dc=pfizer,dc=com "
-				+ "ldap://oid3.pfizer.com:389/mdatadev,cn=OracleContext,dc=pfizer,dc=com";
-		conn = getConnection(url, "gdmscomp", "dev#1234", "oracle.jdbc.driver.OracleDriver");
+		String url = "jdbc:oracle:thin:@ldap://hostname1:389/mdatadev,cn=OracleContext,dc=company,dc=com "
+				+ "ldap://hostname2:389/mdatadev,cn=OracleContext,dc=company,dc=com "
+				+ "ldap://hostname3:389/mdatadev,cn=OracleContext,dc=company,dc=com";
+		conn = getConnection(url, "docbasecomp", "dev#1234", "oracle.jdbc.driver.OracleDriver");
 		displayDbProperties(conn);
 		close(conn);
 	}
@@ -207,17 +207,17 @@ public class JdbcUtils {
 	public void testTnsConn() throws SQLException {
 		String path = "C:\\Oracle\\Ora92\\network\\ADMIN\\";
 		System.setProperty("oracle.net.tns_admin", path);
-		// MDATADEV=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=AMRNDHL616.PFIZER.COM)(PORT=1557)))(CONNECT_DATA=(SID=MDATADEV)))
+		// MDATADEV=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=hostname)(PORT=1557)))(CONNECT_DATA=(SID=MDATADEV)))
 //		String url = "jdbc:oracle:thin:@MDATADEV";
 		String url = "jdbc:oracle:thin:@MDATADEV";
-		Connection conn = getConnection(url, "GDMSCOMP", "dev#1234", "oracle.jdbc.driver.OracleDriver");
+		Connection conn = getConnection(url, "projectCOMP", "password", "oracle.jdbc.driver.OracleDriver");
 		displayDbProperties(conn);
 		close(conn);
 	}
 
 	public void testGetDirectConn() throws SQLException {
-		String url = "jdbc:oracle:thin:@AMRNDHS212.PFIZER.COM:1623:gdmsp2";
-		Connection conn = getConnection(url, "gdms", "pfizer07", "oracle.jdbc.driver.OracleDriver");
+		String url = "jdbc:oracle:thin:@hostname:1623:projectp2";
+		Connection conn = getConnection(url, "project", "company07", "oracle.jdbc.driver.OracleDriver");
 		displayDbProperties(conn);
 		close(conn);
 	}

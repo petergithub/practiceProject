@@ -34,15 +34,15 @@ del /f /s /q "C:\ProgramFiles\Apache\apache-tomcat-5.5.20\temp\*.*"
 RMDIR /s /q "C:\ProgramFiles\Apache\Tomcat5.5\bin\documentum"
 RMDIR /s /q "C:\ProgramFiles\Apache\Tomcat5.5\work"
 
-echo clean Eclipse3.6Workspace gdmsr4p5
-#del /f /s /q "C:\Shang\Work\Eclipse3.6Workspace\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\work\*.*"
-del /f /s /q "C:\Shang\Work\Eclipse3.6Workspace\gdms\gdmsr4p5\work\*.*"
+echo clean Eclipse3.6Workspace projectr4p5
+#del /f /s /q "%WORK%\Eclipse3.6Workspace\.metadata\.plugins\org.eclipse.wst.server.core\tmp0\work\*.*"
+del /f /s /q "%WORK%\Eclipse3.6Workspace\project\projectr4p5\work\*.*"
 
 echo clean Documentum
 del /f /s /q "C:\Documentum\cache\*.*"
-del /f /s /q "C:\Documents and Settings\shangp01\Documentum\*.*"
+del /f /s /q "%APPPATH%\Documentum\*.*"
 RMDIR /s /q "C:\Documentum\cache"
-RMDIR /s /q "C:\Documents and Settings\shangp01\Documentum\*.*"
+RMDIR /s /q "%APPPATH%\Documentum\*.*"
 
 echo clean Samson
 del /f /s /q "C:\ProgramFiles\Samson\dmcl"
@@ -60,7 +60,7 @@ echo. & pause
 # restart program Dropbox
 ############################################
 taskkill /im dropbox.exe /f
-start "" "C:\Documents and Settings\shangp01\Application Data\Dropbox\bin\Dropbox.exe"
+start "" "%APPPATH%\Application Data\Dropbox\bin\Dropbox.exe"
 
 
 ############################################
@@ -143,26 +143,26 @@ REM	 5.index：设置的DNS的顺序号。
 # copy folder exclude some files and compress it with jar or 7zip command
 ############################################
 @echo on
-@copy gdms folder for deploy it on 235 server.
+@copy project folder for deploy it on 235 server.
 
-echo Copy gdms and classes to current folder
+echo Copy project and classes to current folder
 rmdir /s /q classes
-rmdir /s /q gdms
-del gdms.zip
+rmdir /s /q project
+del project.zip
 del classes.zip
 
-echo C:\Shang\Work\Eclipse3.6Workspace\gdms\gdmsr4p6\gdms\src > list_of_exclusions.txt
-xcopy C:\Shang\Work\Eclipse3.6Workspace\gdms\gdmsr4p6\gdms gdms /E/I/K /EXCLUDE:list_of_exclusions.txt
+echo %WORK%\Eclipse3.6Workspace\project\projectr4p6\project\src > list_of_exclusions.txt
+xcopy %WORK%\Eclipse3.6Workspace\project\projectr4p6\project project /E/I/K /EXCLUDE:list_of_exclusions.txt
 del list_of_exclusions.txt
-xcopy C:\Shang\Work\Eclipse3.6Workspace\gdms\gdmsr4p6\WEB-INF\classes classes /E/I/K
+xcopy %WORK%\Eclipse3.6Workspace\project\projectr4p6\WEB-INF\classes classes /E/I/K
 
-jar cvfM gdms.zip gdms
+jar cvfM project.zip project
 jar cvfM classes.zip classes
 
 REM "C:\Program Files"\7-Zip\7z a -tzip classes.zip classes
 
 echo copy files to remote server
-%putty%/pscp -pw 1dmf2013! gdms.zip classes.zip dmfdev08@amrndhl235:peter/tom-cat-6.0.18/sbin/
+%putty%/pscp -pw 1dmf2013! project.zip classes.zip username@hostname:peter/tom-cat-6.0.18/sbin/
 
 echo. & pause
 
@@ -205,19 +205,19 @@ echo running time:  %diffM_% Minutes %diffS_% Second
 ############################################
 pscp.exe -pw pwd filename username@host:directory/subdirectory
 
-export CATALINA_HOME=/app/dmfdev08/peter/tom-cat-6.0.18;
+export CATALINA_HOME=/app/username/peter/tom-cat-6.0.18;
 export CATALINA_BASE=$CATALINA_HOME;
-export JAVA_HOME=/app/dmfdev08/share/java/1.5.0_12/;
-export DOCUMENTUM=/app/dmfdev08;
-export DOCUMENTUM_SHARED=/app/dmfdev08/share;
+export JAVA_HOME=/app/username/share/java/1.5.0_12/;
+export DOCUMENTUM=/app/username;
+export DOCUMENTUM_SHARED=/app/username/share;
 export PATH=$JAVA_HOME/bin:$PATH;
-export PP=/app/dmfdev08/peter/tom-cat-6.0.18/sbin/;
+export PP=/app/username/peter/tom-cat-6.0.18/sbin/;
 cd $PP
 plink -pw pwd username@host ls;ls
 plink -pw pwd username@host -m local_script.sh
 plink -i %putty%/privateKey.ppk
-plink -i %putty%/putty.ppk dmfdev08@amrndhl235 export JAVA_HOME=/app/dmfdev08/share/java/1.5.0_12/;export PP=/app/dmfdev08/peter/tom-cat-6.0.18/sbin/;cd $PP;./restart.sh
-plink -i %putty%/putty.ppk dmfdev08@amrndhl235 cd ~/dev/artifactChangeTool; ./run.sh c
+plink -i %putty%/putty.ppk username@hostname export JAVA_HOME=/app/username/share/java/1.5.0_12/;export PP=/app/username/peter/tom-cat-6.0.18/sbin/;cd $PP;./restart.sh
+plink -i %putty%/putty.ppk username@hostname cd ~/dev/artifactChangeTool; ./run.sh c
 
 Windows的控制台会把两个双引号之间的字符串作为一个参数传递给被执行的程序，而不会把双引号也传递给程序
 所以错误命令C:\>plink 192.168.6.200 date "+%F %T"

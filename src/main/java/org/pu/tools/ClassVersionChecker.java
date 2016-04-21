@@ -34,11 +34,8 @@ public class ClassVersionChecker {
 	}
 	
 	public static void main(String[] args) throws IOException {
-//		args = new String[] { "C:/sp/work/eclipseWorkspace/gdms/gdmsr5/webapp/WEB-INF/classes/com/generiscorp/cara/web/dctm/common/server/content/DownloadServletG.class" };
 		args = new String[] { "C:/cache/Alert.class" };
-		args = new String[] { "C:/cache/GdmsSecurityLinkProcessor.class" };
 		args = new String[] { "C:/cache/SplExportServlet.class" };
-		args = new String[] { "C:/cache/GTCBusinessObject.class" };
 		for (int i = 0; i < args.length; i++)
 			checkClassVersion(args[i]);
 	}
