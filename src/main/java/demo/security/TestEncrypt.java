@@ -17,11 +17,12 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 public class TestEncrypt {
 	protected static final Logger logger = Logger.getLogger(TestEncrypt.class);
 
-	@org.junit.Test
+	@Test
 	public void testKeyLength() throws UnsupportedEncodingException {
 		logLanguageLength("中文");
 		logLanguageLength("en");

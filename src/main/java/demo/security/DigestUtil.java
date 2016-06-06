@@ -11,6 +11,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Hex;
+import org.junit.Test;
 import org.pu.utils.Base64Coder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +20,15 @@ import org.slf4j.LoggerFactory;
 /**
 //import sun.misc.BASE64Encoder;
  * MD5 and SHA
+ * 
+ * TODO incorrect util
  */
 public class DigestUtil {
 	private static final Logger log = LoggerFactory.getLogger(DigestUtil.class);
 
-	@org.junit.Test
+	@Test
 	public void testDigest() throws Exception {
-		String str = "0123456789";
+		String str = "password";
 		log.info("str = " + str + " after digest with MD5 is: "
 				+ digestWithMd5(str));
 		log.info("str = " + str + " after digest with SHA is: "
@@ -94,6 +97,9 @@ public class DigestUtil {
 		md.update(strBytes);
 		// 完成哈希计算，得到result
 		byte[] resultBytes = md.digest();
+		
+		String md5string = new String(resultBytes, "utf8");
+		log.debug("md5string[{}]", md5string);
 		BASE64Encoder encoder = new BASE64Encoder();
 		// 加密后的字符串
 		String digest = encoder.encode(resultBytes);
