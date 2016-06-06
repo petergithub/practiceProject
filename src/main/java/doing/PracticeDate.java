@@ -9,8 +9,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.helpers.ISO8601DateFormat;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -27,6 +25,8 @@ import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import junit.framework.Assert;
 
 /**
  * @author Shang Pu
@@ -54,6 +54,12 @@ public class PracticeDate extends TestBase {
 	}
 
 	@Test
+	public void parseLongToDate() throws ParseException {
+		Date date = new Date(1464593775057l);
+		log.info("date[{}]", date);
+	}
+	
+	
 	public void testDate() throws ParseException {
 		// 20060102150405
 		DateTime dt = new DateTime(2006, 1, 2, 15, 4, 5);
