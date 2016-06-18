@@ -24,6 +24,17 @@ import demo.BasicDemo;
 public class PracticeReflection {
 	protected static final Logger log = Logger.getLogger(PracticeReflection.class);
 	private static java.io.PrintStream out = System.out;
+	
+	
+	public static void setFinalStatic(Class<?> clazz, String fieldName, Object newValue)
+			throws NoSuchFieldException, IllegalAccessException {
+		Field field = clazz.getDeclaredField(fieldName);
+		field.setAccessible(true);
+		Field modifiers = field.getClass().getDeclaredField("modifiers");
+		modifiers.setAccessible(true);
+		modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+		field.set(null, newValue);
+	}
 
 	@Test
 	/**
@@ -401,34 +412,34 @@ public class PracticeReflection {
 	 */
 	@SuppressWarnings("unused")
 	public void testClassField() throws Exception {
-		FieldTest ft = new FieldTest();
-		Class<?> ftClass = ft.getClass();
+		FieldTest fieldTestInstance = new FieldTest();
+		Class<?> fieldTestClass = fieldTestInstance.getClass();
 
-		Field f1 = ftClass.getField("pub");
-		f1.set(ft, "reflecting on life");
-		String str1 = (String) f1.get(ft);
+		Field field1 = fieldTestClass.getField("pub");
+		field1.set(fieldTestInstance, "reflecting on life");
+		String str1 = (String) field1.get(fieldTestInstance);
 		System.out.println("pub field: " + str1);
 
-		Field f2 = ftClass.getField("parentPub");
-		f2.set(ft, "again");
-		String str2 = (String) f2.get(ft);
+		Field f2 = fieldTestClass.getField("parentPub");
+		f2.set(fieldTestInstance, "again");
+		String str2 = (String) f2.get(fieldTestInstance);
 		System.out.println("\nparentPub field: " + str2);
 
 		try {
 			System.out.println("\nThis will throw a NoSuchFieldException");
-			Field f3 = ftClass.getField("pro");
+			Field f3 = fieldTestClass.getField("pro");
 		} catch (Exception e) {
 			log.info("Expected NoSuchFieldException when try to call getField() on a protected or private field ");
 		}
 
-		Field f1Declared = ftClass.getDeclaredField("pub");
-		f1Declared.set(ft, "this is public");
-		String str1Declared = (String) f1Declared.get(ft);
+		Field f1Declared = fieldTestClass.getDeclaredField("pub");
+		f1Declared.set(fieldTestInstance, "this is public");
+		String str1Declared = (String) f1Declared.get(fieldTestInstance);
 		System.out.println("pub field: " + str1Declared);
 
-		Field f2Declared = ftClass.getDeclaredField("pro");
-		f2Declared.set(ft, "this is protected");
-		String str2Declared = (String) f2Declared.get(ft);
+		Field f2Declared = fieldTestClass.getDeclaredField("pro");
+		f2Declared.set(fieldTestInstance, "this is protected");
+		String str2Declared = (String) f2Declared.get(fieldTestInstance);
 		System.out.println("\npro field: " + str2Declared);
 
 		// Field f4Declared = ftClass.getDeclaredField("pri");
@@ -437,7 +448,7 @@ public class PracticeReflection {
 		// System.out.println("\npro field: " + str4Declared);
 		try {
 			System.out.println("\nThis will throw a NoSuchFieldException");
-			Field f3Declared = ftClass.getDeclaredField("parentPub");
+			Field f3Declared = fieldTestClass.getDeclaredField("parentPub");
 		} catch (Exception e) {
 			log.info("Expected NoSuchFieldException when try to call getDeclaredField() to get an inherited public field.");
 		}
