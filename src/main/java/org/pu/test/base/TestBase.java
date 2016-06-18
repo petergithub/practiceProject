@@ -9,6 +9,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Properties;
 
+import org.apache.commons.beanutils.BeanToPropertyValueTransformer;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -91,6 +93,26 @@ public class TestBase {
 		Collection<String> list1 = new ArrayList<String>();
 		Collection<String> list2 = new ArrayList<String>();
 		Assert.assertTrue(ListUtils.isEqualList(list1, list2));
+	}
+	
+	
+	/**
+	 * https://www.javacodegeeks.com/2011/01/10-tips-proper-application-logging.html
+	 * usage: log.debug("Returning user ids: {}", collect(users, "id"));
+	 * 
+	 * It is a much better idea to log, for example, only ids of domain objects 
+	 * (or even only size of the collection). But making a collection of ids 
+	 * when having a collection of objects having getId() method is unbelievably 
+	 * difficult and cumbersome in Java.
+	 * 
+	 * in Java we can emulate it using the Commons Beanutils library:
+	 * 
+	 * @param collection
+	 * @param propertyName
+	 * @return
+	 */
+	public static Collection<?> collect(Collection<?> collection, String propertyName) {
+	    return CollectionUtils.collect(collection, new BeanToPropertyValueTransformer(propertyName));
 	}
 
 	protected void printCollection(Collection<?> c) {

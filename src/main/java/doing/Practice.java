@@ -2,6 +2,7 @@ package doing;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import org.pu.test.base.TestBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bean.User;
 import junit.framework.Assert;
 
 /**
@@ -24,11 +26,28 @@ public class Practice extends TestBase {
 	private final static Logger log = LoggerFactory.getLogger(Practice.class);
 	String code;
 
+	public static void main(String[] args) {
+		// print where java class is loaded from
+        ClassLoader loader = Test.class.getClassLoader();
+        System.out.println(loader.getResource("org/slf4j/spi/LocationAwareLogger.class"));
+    }
+	
 	// TODO: take a look PropertyDescriptor
 	public void testStringUtil() {
 		Integer arg0 = new Integer(1);
 		boolean isEmpty = org.springframework.util.StringUtils.isEmpty(arg0);
 		Assert.assertFalse(isEmpty);
+	}
+	
+	@Test
+	public void testCollect() {
+		List<User> users = new ArrayList<>();
+		for (int i = 0; i< 4; i++) {
+			users.add(new User(Long.valueOf(i), "name" + i, i+1));
+		}
+		
+		log.debug("Returning user ids: {}", collect(users, "id"));
+		log.debug("Returning user names: {}", collect(users, "name"));
 	}
 
 	/**
