@@ -3,12 +3,16 @@ package demo.security;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
+
+import junit.framework.Assert;
 
 public class MD5Util {
 
 	private static Logger logger = Logger.getLogger(MD5Util.class);
 
+	
 	/**
 	 * @description 加密的算法
 	 * @param plain
@@ -76,7 +80,13 @@ public class MD5Util {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(md5("password"));
+		String plain = "password";
+		System.out.println(md5(plain));
+
+		String str = DigestUtils.md5Hex(plain.getBytes());
+		System.out.println(str);
+		
+		Assert.assertEquals(str, md5(plain));
 	}
 
 }
