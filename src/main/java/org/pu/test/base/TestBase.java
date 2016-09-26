@@ -14,6 +14,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.pu.utils.DateUtils;
 import org.pu.utils.IoUtils;
 
@@ -148,7 +149,7 @@ public class TestBase {
 		log.debug("array = {}", sb);
 	}
 
-	// @Test
+	@Test
 	public void testSlf4j() {
 		long startTime = Calendar.getInstance().getTimeInMillis();
 		String msg = "{0} log {0} and message {1}";
@@ -158,9 +159,10 @@ public class TestBase {
 		log.debug("debug 1={} 2={} 3={}", new Object[] { "v1", "v2", "v3" });
 		log.info("info msg = {}", msg);
 		log.warn("warn");
-		// log.error("error Exception {}.", "object instance", new
-		// Exception("This is a test exception."));
-		// log.fatal("fatal");//not fatal level in slf4j
+		log.error("Exception {} {} {}", new Object[] {"object", "instance", new Exception("This is a test exception.")});
+		log.error("Exception {} {} {}", "object", "instance", new Exception("This is a test exception."));
+		log.error("Exception {} {}", "object", "instance", new Exception("This is a test exception."));
+//		 log.fatal("fatal");//not fatal level in slf4j
 		
 		long endTime = Calendar.getInstance().getTimeInMillis();
 		long time = endTime - startTime;
