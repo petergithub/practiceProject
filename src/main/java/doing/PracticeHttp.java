@@ -1,5 +1,6 @@
 package doing;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -23,6 +24,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
@@ -37,6 +41,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import junit.framework.Assert;
+import okhttp3.FormBody;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 /**
  * @author Shang Pu
@@ -46,7 +58,132 @@ import junit.framework.Assert;
 public class PracticeHttp extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeHttp.class);
 
+	OkHttpClient client = new OkHttpClient.Builder().build();
+	@Test
+	public void testOkHttpGet() throws IOException {
+		// OkHttpClient clientWith30sTimeout = client.newBuilder()
+		// .readTimeout(30, TimeUnit.SECONDS)
+		// .build();
+		// Response response = clientWith30sTimeout.newCall(request).execute();
+		OkHttpClient client = new OkHttpClient.Builder().build();
+		String url = "http://www.baidu.com";
+		Request build = new Request.Builder().url(url).build();
+		Response response = client.newCall(build).execute();
+		System.out.println(response);
+	}
+	
+	@Test
+	public void testPostForm() throws IOException {
+	    FormBody formBody = new FormBody.Builder()
+	            .add("search", "biezhihua")
+	            .build();
 
+	    Request request = new Request.Builder()
+	            .url("https://en.wikipedia.org/w/index.php")
+	            .post(formBody)
+	            .build();
+
+	    Response response = client.newCall(request)
+	            .execute();
+
+	    if (!response.isSuccessful()) {
+	        throw new IOException("Unexcepted code " + response);
+	    }
+
+	    System.out.println(response.body().string());
+	}
+
+	/**
+	 * 	上传表单
+	 */
+	@Test
+	public void testOkHttpPostMultipart() throws IOException {
+	    String urlPrd = "https://login.tclclouds.com/account/uploadpic?test=okhttp&token=8d2efe1a30df0d4bef1c48222607d836&username=pu.shang%40tcl.com&clientId=51347980&channel=web";
+	    String urlTst = "https://logintest.tclclouds.com/account/uploadpic?test=okhttp&token=7000cc1c9109ed275344c9f34806c274&username=pu.shang%40tcl.com&clientId=51347980&channel=web";
+
+	    String file403 = "/home/pu/doing/code/c4ahe3olY6.jpg";
+	    String upload403 = "/home/pu/doing/code/upload403.png";
+	    String success = "/home/pu/doing/code/uploadSuccess.png";
+	    
+	    String url = urlPrd;
+//	    url = urlTst;
+	    String pathname = file403;
+//	    pathname = success;
+	    
+//	    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE, boundary, Charset.forName("UTF-8"));
+//	    FileBody fileBody = new FileBody(file);
+//	    entity.addPart("device_backup[database_dump]", fileBody);
+
+//	    MediaType MEDIA_TYPE_PNG = MediaType.parse("application/octet-stream");
+	    MediaType MEDIA_TYPE_PNG = MediaType.parse("image/png");
+	    RequestBody requestBody = new MultipartBody.Builder()
+	            .setType(MultipartBody.FORM)
+//	            .addFormDataPart("token", "8d2efe1a30df0d4bef1c48222607d836")
+//	            .addFormDataPart("username", "pu.shang@tcl.com")
+//	            .addFormDataPart("clientId", "clientId")
+//	            .addFormDataPart("channel", "channel")
+//	            .addFormDataPart("file", "c4ahe3olY6.jpg", RequestBody.create(MEDIA_TYPE_PNG, new File(pathname)))
+//	            .addPart(Headers.of("Content-Disposition", "form-data; name=\"file\""), RequestBody.create(MEDIA_TYPE_PNG, new File(pathname)))
+//	            .addPart(Headers.of("Content-Disposition", "form-data; name=\"file\"", "Content-Transfer-Encoding", "binary"), RequestBody.create(MEDIA_TYPE_PNG, new File(pathname)))
+//	            "Content-Type", "application/octet-stream", 
+	            
+	            // get file bytes from request.getParameters(), Spring failed to get the file
+//	            .addPart(Headers.of("Content-Disposition", "form-data; name=\"file\""), RequestBody.create(MEDIA_TYPE_PNG, new File(pathname)))  
+	            
+	            .addPart(Headers.of("Content-Disposition", "form-data; name=\"file\"", "Content-Transfer-Encoding", "binary"), RequestBody.create(MEDIA_TYPE_PNG, new File(pathname)))
+	            .build();
+
+		Request request = new Request.Builder()
+				// .header("Authorization", "Client-ID " + IMGUR_CLIENT_ID)
+				.url(url)
+				.post(requestBody)
+				.build();
+
+		Response response = client.newCall(request).execute();
+
+	    log.info("request[{}]", request);
+	    log.info("response[{}]", response);
+	    if (!response.isSuccessful()) {
+	       log.error("response.isSuccessful() ");
+	    }
+
+	    System.out.println(response.body().string());
+	}
+
+	
+	@Test
+	public void testHttpClientPostMultipart() throws ClientProtocolException, IOException {
+	    String url = "https://login.tclclouds.com/account/uploadpic?test=httpclient4&token=8d2efe1a30df0d4bef1c48222607d836&username=pu.shang%40tcl.com&clientId=51347980&channel=web";
+
+	    String file403 = "/home/pu/doing/code/c4ahe3olY6.jpg";
+	    String success = "/home/pu/doing/code/uploadSuccess.png";
+	    
+	    String pathname = file403;
+	    FileBody fileBody = new FileBody(new File(pathname));
+	    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+	    
+	    //403
+//	    builder.setMode(HttpMultipartMode.STRICT);
+	    
+	    //success
+	    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+	    
+	    builder.addPart("file", fileBody);
+	    HttpEntity entity = builder.build();
+	    
+		HttpPost post = new HttpPost(url);
+		post.setEntity(entity);
+
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		HttpResponse response = httpClient.execute(post);
+
+		HttpEntity entity2 = response.getEntity();
+		String result = EntityUtils.toString(entity2, StandardCharsets.UTF_8);
+		log.debug("result[{}]", result);
+	}
+
+
+	
 	@Test
 	public void updateUserInfo() throws ClientProtocolException, IOException {
 		HttpPost post = new HttpPost("https://example.com/account/updateuserinfo");
@@ -58,7 +195,7 @@ public class PracticeHttp extends TestBase {
 		post.addHeader("Content-Type", "application/x-www-form-urlencoded");
 		post.setParams(params);
 
-//		DefaultHttpClient httpClient = new DefaultHttpClient();
+		// DefaultHttpClient httpClient = new DefaultHttpClient();
 		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpResponse response = httpClient.execute(post);
 
@@ -74,7 +211,7 @@ public class PracticeHttp extends TestBase {
 	@Test
 	public void updateUserInfoStandard() throws ClientProtocolException, IOException {
 		HttpPost post = new HttpPost("https://example.com/account/updateuserinfo");
-		List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
 		nvps.add(new BasicNameValuePair("username", "pu.shang@tcl.com"));
 		nvps.add(new BasicNameValuePair("nickname", "测试昵称updateUserInfoStandard"));
 		nvps.add(new BasicNameValuePair("clientId", "51347980"));
@@ -87,7 +224,7 @@ public class PracticeHttp extends TestBase {
 
 		getResponseResult(response);
 	}
-	
+
 	private void getResponseResult(HttpResponse response)
 			throws IOException, UnsupportedEncodingException {
 		// Get hold of the response entity
@@ -127,8 +264,8 @@ public class PracticeHttp extends TestBase {
 
 		Assert.assertEquals(target, URLEncoder.encode(src, "UTF-8"));
 		Assert.assertEquals(src, URLDecoder.decode(target, "UTF-8"));
-		
-		Assert.assertEquals(target, URIUtil.encode(src,new BitSet()));
+
+		Assert.assertEquals(target, URIUtil.encode(src, new BitSet()));
 		Assert.assertEquals(src, URIUtil.decode(target));
 		Assert.assertEquals("测试账号123", URIUtil.decode("%E6%B5%8B%E8%AF%95%E8%B4%A6%E5%8F%B7123"));
 	}
