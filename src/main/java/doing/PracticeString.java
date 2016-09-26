@@ -2,9 +2,14 @@ package doing;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,20 +29,72 @@ import junit.framework.Assert;
 public class PracticeString extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeString.class);
 
-
 	@Test
+	public void testEmoji() throws Exception {
+		String content = "test \uD83D\uDE01 test😁"; //一个 emoji 表情
+		System.out.println(content);
+
+		String filterContent = emojiFilter(content);
+		System.out.println(filterContent);
+
+		String emojiStr = emojiRecovery(filterContent);
+		System.out.println(emojiStr);
+		
+		content = "test \\xF0\\x9F\\x8D\\x80";
+		System.out.println(content);
+	}
+
+	private static String emojiFilter(String str) {
+		String patternString = "([\\x{10000}-\\x{10ffff}\ud800-\udfff])";
+
+		Pattern pattern = Pattern.compile(patternString);
+		Matcher matcher = pattern.matcher(str);
+
+		StringBuffer sb = new StringBuffer();
+		while (matcher.find()) {
+			try {
+				matcher.appendReplacement(sb,
+						"[[EMOJI:" + URLEncoder.encode(matcher.group(1), "UTF-8") + "]]");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+		matcher.appendTail(sb);
+
+		return sb.toString();
+	}
+
+	private static String emojiRecovery(String str) {
+		String patternString = "\\[\\[EMOJI:(.*?)\\]\\]";
+
+		Pattern pattern = Pattern.compile(patternString);
+		Matcher matcher = pattern.matcher(str);
+
+		StringBuffer sb = new StringBuffer();
+		while (matcher.find()) {
+			try {
+				matcher.appendReplacement(sb, URLDecoder.decode(matcher.group(1), "UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+		}
+		matcher.appendTail(sb);
+
+		return sb.toString();
+	}
+
 	public void testSubstring0() {
 		String ip = "193.126.233.67, 193.126.233.67";
 		// 多次反向代理后会有多个IP值，第一个为真实IP。
 		int index = ip.indexOf(',');
 		if (index != -1) {
-			String ip0 =  ip.substring(0, index);
+			String ip0 = ip.substring(0, index);
 			log.info("ip0[{}]", ip0);
 		} else {
 			log.info("ip[{}]", ip);
 		}
 	}
-	
+
 	public static String getIpAddr(HttpServletRequest request) {
 		String ip = request.getHeader("X-Real-IP");
 		if (!StringUtils.isBlank(ip) && !"unknown".equalsIgnoreCase(ip)) {
@@ -56,7 +113,7 @@ public class PracticeString extends TestBase {
 			return request.getRemoteAddr();
 		}
 	}
-	
+
 	public void testIndexEmptyString() {
 		Assert.assertEquals(true, "abc".startsWith(""));
 		Assert.assertEquals(true, "abc".startsWith("a"));
@@ -64,7 +121,7 @@ public class PracticeString extends TestBase {
 		Assert.assertEquals(0, "abc".indexOf("a"));
 		Assert.assertEquals(-1, "abc".indexOf("d"));
 	}
-	
+
 	/**
 	 * trim方法一般用来去除空格，但是根据JDK API的说明，该方法并不仅仅是去除空格，它能够去除从编码’\u0000′ 至 ‘ ′ 的所有字符。
 	 * 回车换行也在这20个字符之中
@@ -198,7 +255,8 @@ public class PracticeString extends TestBase {
 				attrValue = attrValues;
 				attrValues = null;
 			}
-			if (!((attrValue.equalsIgnoreCase("null")) || (attrValue.equalsIgnoreCase("nulldate")))) {
+			if (!((attrValue.equalsIgnoreCase("null"))
+					|| (attrValue.equalsIgnoreCase("nulldate")))) {
 				appendVal = "append,id,attrName," + attrValue;
 			}
 			log.info("appendVal = {}", appendVal);
@@ -223,19 +281,15 @@ public class PracticeString extends TestBase {
 		String docType = "pfe_sop";
 
 		String r_object_id = "10101";
-		String dql = new StringBuilder("select r_object_id from ")
-				.append(docType)
-				.append(" (all) where r_object_id='")
-				.append(r_object_id)
+		String dql = new StringBuilder("select r_object_id from ").append(docType)
+				.append(" (all) where r_object_id='").append(r_object_id)
 				.append("' and pfe_xm_p_effective_date is not nulldate and Date(now)>=pfe_xm_p_effective_date and r_lock_owner is nullstring and xm_status = 'Approved' and r_policy_id = (select r_object_id from dm_policy where object_name = 'pfe_l_lifecycle_1')")
 				.toString();
 		log.info("dql = {}", dql);
 
 		docType = "gtc_xm_prescribing_info";
-		String dqlLc4 = new StringBuilder("select r_object_id from ")
-				.append(docType)
-				.append(" (all) where r_object_id='")
-				.append(r_object_id)
+		String dqlLc4 = new StringBuilder("select r_object_id from ").append(docType)
+				.append(" (all) where r_object_id='").append(r_object_id)
 				.append("' and pfe_xm_p_effective_date is not nulldate and Date(now)>=pfe_xm_p_effective_date and r_lock_owner is nullstring and r_policy_id = (select r_object_id from dm_policy where object_name = 'pfe_l_lifecycle_4') and xm_status='Internally Approved' and (ha_submission_status in ('No Notification/Submission Required','Not Subject to Regulation','HA Notify') or (ha_submission_status = 'HA Submission' and ha_response = 'HA Approved'))")
 				.toString();
 
@@ -248,11 +302,9 @@ public class PracticeString extends TestBase {
 		List<String> collection = Arrays.asList("pfe_sop", "gtc_xm_prescribing_info");
 		for (Iterator<String> iterator = collection.iterator(); iterator.hasNext();) {
 			String docType = (String) iterator.next();
-			String queryStr = new StringBuilder("select r_object_id from ")
-					.append(docType)
+			String queryStr = new StringBuilder("select r_object_id from ").append(docType)
 					.append(" (all) where Date(now)>=pfe_xm_p_effective_date and pfe_xm_p_effective_date is not nulldate and r_lock_owner is nullstring and ((r_policy_id = '")
-					.append(lifecycle1_id)
-					.append("' and xm_status='Approved') or (r_policy_id = '")
+					.append(lifecycle1_id).append("' and xm_status='Approved') or (r_policy_id = '")
 
 					// c. make effective:
 					// i. Submission Status is “No Notification/Submission
