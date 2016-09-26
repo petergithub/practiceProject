@@ -24,13 +24,21 @@ package demo.designpattern.creational;
  * </pre>
  */
 public class Singleton {
-	private static Singleton instance = new Singleton();
+	private static volatile Singleton singleton = null;
 
 	private Singleton() {
 	}
 
-	public static Singleton getInstance() {
-		return instance;
+	//双重检查锁
+	public static Singleton getSingleton() {
+		if (singleton == null) {
+			synchronized (Singleton.class) {
+				if (singleton == null) {
+					singleton = new Singleton();
+				}
+			}
+		}
+		return singleton;
 	}
 }
 
@@ -52,6 +60,7 @@ public class Singleton {
 // }
 
 // 第二种(懒汉，线程安全，加上synchronized):
+// 第一次引用该类的时候就创建对象实例，而不管实际是否需要创建
 // 这种写法能够在多线程中很好的工作，而且看起来它也具备很好的lazy loading，
 //但是遗憾的是，效率很低，99%情况下不需要同步。
 
