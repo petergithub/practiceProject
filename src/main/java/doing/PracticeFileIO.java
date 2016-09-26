@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,6 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.IoUtils;
 import org.slf4j.Logger;
@@ -35,7 +37,27 @@ public class PracticeFileIO extends TestBase {
 	private static String filename = null;
 	private static Scanner sc = new Scanner(System.in);// initialize scanner to get user input
 	private String pathname = "testing.txt";
-	
+
+	@Test
+	public void randomAccessFileTwoSteps() throws Exception {
+		String filePath = "/tmp/test";
+		RandomAccessFile oSavedFile = new RandomAccessFile(filePath, "rw");
+		File file = new File("/home/pu/doing/code/awkTime.log");
+		
+		// 1. write 0 to 1000
+		long pos = 0; // 定位文件指针到 nPos 位置
+		oSavedFile.seek(pos);
+		byte[] fileBlock = IoUtils.readInputStream(new FileInputStream(file));
+		oSavedFile.write(fileBlock, (int)pos, 1000);
+		oSavedFile.close();
+		
+		// 2. write 1000 to the end
+		pos = 1000; // 定位文件指针到 nPos 位置
+		oSavedFile = new RandomAccessFile(filePath, "rw");
+		oSavedFile.seek(pos);
+		oSavedFile.write(fileBlock, 1000, fileBlock.length - 1000);
+		oSavedFile.close();
+	}
 	
 	public void fileToArrayOfBytes() throws IOException {
 		//jdk7
