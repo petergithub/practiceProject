@@ -1,4 +1,6 @@
-This is a tool box and test project
+This is a tool box and practice project
+
+`mkdir -p src/{main,test}/{java,resources}`
 
 http://localhost:8080/index.html
 http://localhost:8080/servlet/ModernServlet
