@@ -27,6 +27,7 @@ public class PracticeMail {
 
 		// Sending email from host
 		String host = "smtp.163.com";
+		String port = "25";
 		// Recipient's email ID needs to be mentioned.
 		String user = "user@163.com";
 		String pwd = "password";
@@ -41,11 +42,10 @@ public class PracticeMail {
 		Properties props = System.getProperties();
 
 		// Setup mail server
-		props.setProperty("mail.smtp.host", host);
+		props.put("mail.smtp.host", host);
+		props.put("mail.smtp.port", port);
 		props.put("mail.smtp.auth", "true");
 //		props.put("mail.smtp.starttls.enable", "true");
-		props.put("mail.smtp.host", host);
-		props.put("mail.smtp.port", "25");
 
 		Authenticator auth = new Authenticator() {
 			 public PasswordAuthentication getPasswordAuthentication() {
