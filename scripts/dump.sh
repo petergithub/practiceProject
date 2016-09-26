@@ -1,10 +1,13 @@
 #!/bin/bash
 
+# Dump useful info for analysis later: jstack, jinfo, jstat, jmap, lsof, netstat, iostat, mpstat, vmstat, free, sar, uptime
+# dump.sh PID or dump.sh ProjectName
+
 PROJECT_NAME=$1
 DEPLOY_DIR=`pwd`
 LOGS_DIR=log
 if [ $# -lt 1 ]; then
-    echo "ERROR: Required one parameter! Usage: dump.sh PID/ProjectName"
+    echo "ERROR: Required one parameter! Usage: dump.sh PID or dump.sh ProjectName"
     exit 1
 fi
 
