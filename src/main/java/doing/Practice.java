@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.pu.test.base.TestBase;
@@ -24,28 +25,99 @@ import junit.framework.Assert;
  */
 public class Practice extends TestBase {
 	private final static Logger log = LoggerFactory.getLogger(Practice.class);
-	String code;
+	
+	@Test
+	public void stackTrace() {
+		int num = getLineNumber();
+		log.info("num: {}", num);
+		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		printArray(stackTrace);
+
+		String fullClassName = stackTrace[2].getClassName();
+		log.info("fullClassName: {}", fullClassName);
+		String className = fullClassName.substring(fullClassName.lastIndexOf(".") + 1);
+		log.info("className: {}", className);
+		String methodName = stackTrace[2].getMethodName();
+		int lineNumber = stackTrace[2].getLineNumber();
+
+		log.info("methodName: {} lineNumber: {}", methodName, lineNumber);
+	}
+
+	/**
+	 * Get the current line number.
+	 * 
+	 * @return int - Current line number.
+	 */
+	public static int getLineNumber() {
+		return Thread.currentThread().getStackTrace()[2].getLineNumber();
+	}
+
+	@Test
+	public void testEquals() {
+		@SuppressWarnings("unused")
+		int sid = 0;
+		Assert.assertEquals(10, (sid = 10));
+		Assert.assertEquals(1, (sid = 1));
+		Assert.assertEquals(-10, (sid = -10));
+		Assert.assertEquals(-1, (sid = -1));
+	}
+
+	@Test
+	public void testTimeUnit() {
+		long daySeconds = TimeUnit.SECONDS.convert(1, TimeUnit.DAYS);
+		Assert.assertEquals(86400, daySeconds);
+		
+		long seconds = TimeUnit.SECONDS.convert(1, TimeUnit.HOURS);
+		Assert.assertEquals(3600, seconds);
+		
+		long minutes = TimeUnit.MINUTES.convert(1, TimeUnit.HOURS);
+		Assert.assertEquals(60, minutes);
+	}
 
 	public static void main(String[] args) {
 		// print where java class is loaded from
-        ClassLoader loader = Test.class.getClassLoader();
-        System.out.println(loader.getResource("org/slf4j/spi/LocationAwareLogger.class"));
-    }
-	
+		ClassLoader loader = Test.class.getClassLoader();
+		System.out.println(loader.getResource("org/slf4j/spi/LocationAwareLogger.class"));
+
+		int x = 4;
+		cInt(x);
+		System.out.println(x);
+
+		Integer y = new Integer(4);
+		cInt(y);
+		System.out.println(y);
+
+		String z = new String("4");
+		cStringObj(z);
+		System.out.println(z);
+	}
+
+	public static void cInt(int x) {
+		x = 3;
+	}
+
+	public static void cIntegerObj(Integer y) {
+		y = new Integer(3);
+	}
+
+	public static void cStringObj(String y) {
+		y = new String("3");
+	}
+
 	// TODO: take a look PropertyDescriptor
 	public void testStringUtil() {
 		Integer arg0 = new Integer(1);
 		boolean isEmpty = org.springframework.util.StringUtils.isEmpty(arg0);
 		Assert.assertFalse(isEmpty);
 	}
-	
+
 	@Test
 	public void testCollect() {
 		List<User> users = new ArrayList<>();
-		for (int i = 0; i< 4; i++) {
-			users.add(new User(Long.valueOf(i), "name" + i, i+1));
+		for (int i = 0; i < 4; i++) {
+			users.add(new User(Long.valueOf(i), "name" + i, i + 1));
 		}
-		
+
 		log.debug("Returning user ids: {}", collect(users, "id"));
 		log.debug("Returning user names: {}", collect(users, "name"));
 	}
@@ -53,8 +125,7 @@ public class Practice extends TestBase {
 	/**
 	 * The type of the Expression must be char, byte, short, int, Character,
 	 * Byte, Short, Integer, String, or an enum type (§8.9), or a compile-time
-	 * error occurs.
-	 * The switch Statement 
+	 * error occurs. The switch Statement
 	 * http://docs.oracle.com/javase/specs/jls/se7/html/jls-14.html#jls-14.11
 	 * 
 	 * <a href=
