@@ -40,22 +40,23 @@ public class PracticeFileIO extends TestBase {
 
 	@Test
 	public void randomAccessFileTwoSteps() throws Exception {
-		String filePath = "/tmp/test";
+		String filePath = "/home/pu/doing/code/clear.png.2";
 		RandomAccessFile oSavedFile = new RandomAccessFile(filePath, "rw");
-		File file = new File("/home/pu/doing/code/awkTime.log");
-		
-		// 1. write 0 to 1000
-		long pos = 0; // 定位文件指针到 nPos 位置
-		oSavedFile.seek(pos);
+		File file = new File("/home/pu/doing/code/clear.png");
 		byte[] fileBlock = IoUtils.readInputStream(new FileInputStream(file));
-		oSavedFile.write(fileBlock, (int)pos, 1000);
+		int firstPartLength = 1000;
+		
+		// 1. write 0 to firstPartLength
+		long pos = 0; // 定位文件指针到 pos 位置
+		oSavedFile.seek(pos);
+		oSavedFile.write(fileBlock, (int)pos, firstPartLength);
 		oSavedFile.close();
 		
-		// 2. write 1000 to the end
-		pos = 1000; // 定位文件指针到 nPos 位置
+		// 2. write firstPartLength to the end
+		pos = firstPartLength; // 定位文件指针到 pos 位置
 		oSavedFile = new RandomAccessFile(filePath, "rw");
 		oSavedFile.seek(pos);
-		oSavedFile.write(fileBlock, 1000, fileBlock.length - 1000);
+		oSavedFile.write(fileBlock, firstPartLength, fileBlock.length - firstPartLength);
 		oSavedFile.close();
 	}
 	
