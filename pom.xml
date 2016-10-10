@@ -518,15 +518,20 @@
 		<outputDirectory>src/main/webapp/WEB-INF/classes</outputDirectory>
 		<testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
 		<plugins>
-	        <!-- we want JDK 1.6 source and binary compatiblility -->
-	        <plugin>
-	            <groupId>org.apache.maven.plugins</groupId>
-	            <artifactId>maven-compiler-plugin</artifactId>
-	            <configuration>
-	                <source>${jdk.version}</source>
-	                <target>${jdk.version}</target>
-	            </configuration>
-	        </plugin>
+			<!-- we want JDK 1.6 source and binary compatiblility -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+					<!-- 有一些冷门的jar包，自己又比较懒，不想上传上nexus，就直接放web项目中的/WEB-INF/lib目录了，
+					构建的时候，在编译期出错，因为无法依赖那些jar包，此时用maven的compile插件指定该目录为额外的库目录即可 -->
+					<compilerArguments>
+						<extdirs>src\main\webapp\WEB-INF\lib</extdirs>
+					</compilerArguments>
+				</configuration>
+			</plugin>
 		</plugins>
 		<resources>
 			<!-- <resource>
