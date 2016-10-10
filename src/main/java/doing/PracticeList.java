@@ -12,6 +12,7 @@ import java.util.List;
 import org.hamcrest.Matchers;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
+import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ public class PracticeList extends TestBase {
 		log.info("list[{}]", list);
 	}
 
+	@Test
 	public void testRemoveList() {
 		List<String> first = new ArrayList<String>(Arrays.asList("1", "2", "3"));
 		List<String> second = new ArrayList<String>(Arrays.asList("1", "2", "3"));
@@ -50,6 +52,38 @@ public class PracticeList extends TestBase {
 			second.remove(str);
 		}
 		log.info("second[{}]", second);
+		
+		List<String> list = new ArrayList<>();
+		list.add("java");
+		list.add("aaa");
+		list.add("java");
+		list.add("java");
+		list.add("aaa");
+		log.info("list[{}]", list);
+		
+		// remove the first java
+//		list.remove("java"); 
+		
+		//error
+//		list.removeAll("java"); 
+		
+		// remove all java correctly
+//		for (int i = list.size() -1 ; i>=0 ; i--) {
+//			if ("java".equals(list.get(i))) {
+//				list.remove("java");
+//			}
+//		}
+
+		// left one java
+		for (int i = 0 ; i < list.size() ; i++) {
+			if ("java".equals(list.get(i))) {
+				list.remove("java");
+			}
+		}
+		
+		log.info("list[{}]", list);
+		
+		
 	}
 
 	public void testProcessListParameter() {
