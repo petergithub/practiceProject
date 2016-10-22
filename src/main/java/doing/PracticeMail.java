@@ -28,15 +28,16 @@ public class PracticeMail {
 		// Sending email from host
 		String host = "smtp.163.com";
 		String port = "25";
+		
+		String user = "";
+		String pwd = "";
+		// Sender's email ID needs to be mentioned
+		String from = "no-reply@tclalcatelstore.net";
 		// Recipient's email ID needs to be mentioned.
-		String user = "user@163.com";
-		String pwd = "password";
-		String to = user;
+		String to = "user@163.com";
+		
 		String subject = "Test email Subject";
 		String messageText = "Message";
-
-		// Sender's email ID needs to be mentioned
-		String from = user;
 
 		// Get system properties
 		Properties props = System.getProperties();
