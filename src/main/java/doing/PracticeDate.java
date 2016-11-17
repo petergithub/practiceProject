@@ -43,7 +43,7 @@ public class PracticeDate extends TestBase {
 	String dateFormatUs = "MM/dd/yyyy HH:mm:ss";
 	String dateFormat_ISO_8601Z = "yyyy-MM-dd'T'HH:mm:ssZ";
 	String dateFormat_ISO_8601z = "yyyy-MM-dd'T'HH:mm:ssz";
-	
+	String datePattern = "EEE MMM d HH:mm:ss zzz yyyy"; //Thu Jun 18 20:56:02 EDT 2009
 
 	public static void main(String[] args){
 		TimeZone t = TimeZone.getDefault();
@@ -53,6 +53,15 @@ public class PracticeDate extends TestBase {
 		System.out.println(timeZone.getDisplayName(false, TimeZone.SHORT)); 
 	}
 
+	@Test
+	public void parseStringToDate() throws ParseException {
+		String strDate = "Thu Jun 18 20:56:02 EDT 2009";
+		SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
+		Date dateStr = formatter.parse(strDate);
+		String formattedDate = formatter.format(dateStr);
+		log.info("formattedDate: {}", formattedDate);
+	}
+	
 	@Test
 	public void parseLongToDate() throws ParseException {
 		Date date = new Date(1464593775057l);
