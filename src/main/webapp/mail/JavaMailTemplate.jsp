@@ -22,7 +22,7 @@
     	request.setCharacterEncoding("gb2312");
     	
     	String mailserver = "10.10.10.6";
-    	String from = "pu.shang@doublebridge.com.cn";
+    	String from = "username@example.com";
     	String to = request.getParameter("To");
     	String subject = "Welcome to Google";
     	String name = request.getParameter("Name");

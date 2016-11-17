@@ -35,7 +35,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-
 import com.sun.mail.pop3.POP3Store;
 
 import freemarker.template.Configuration;
@@ -90,8 +89,8 @@ public class EmailTest {
 
 	public void testSendMail() {
 		String smtpHost = "10.10.10.6";
-		String userToAddr = "pu.shang@doublebridge.com.cn";
-		String userCcAddr = "pu.shang@doublebridge.com.cn";
+		String userToAddr = "username@example.com";
+		String userCcAddr = "username@example.com";
 		String userFromAddr = "me@here.there.everywhere";
 		String subject = "Email from Java";
 		String message = "This is an email from Java";
@@ -103,7 +102,7 @@ public class EmailTest {
 	public void testReceiveMail() {
 		String mailPop3Host = "10.10.10.6";
 		String mailStoreType = "pop3";
-		String mailUser = "pu.shang@doublebridge.com.cn";
+		String mailUser = "username@example.com";
 		String mailPassword = "p";
 
 		receiveMail(mailPop3Host, mailStoreType, mailUser, mailPassword);

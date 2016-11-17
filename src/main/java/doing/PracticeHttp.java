@@ -98,8 +98,8 @@ public class PracticeHttp extends TestBase {
 	 */
 	@Test
 	public void testOkHttpPostMultipart() throws IOException {
-	    String urlPrd = "https://login.tclclouds.com/account/uploadpic?test=okhttp&token=8d2efe1a30df0d4bef1c48222607d836&username=pu.shang%40tcl.com&clientId=51347980&channel=web";
-	    String urlTst = "https://logintest.tclclouds.com/account/uploadpic?test=okhttp&token=7000cc1c9109ed275344c9f34806c274&username=pu.shang%40tcl.com&clientId=51347980&channel=web";
+	    String urlPrd = "https://example.com/account/uploadpic?test=okhttp&token=8d2efe1a30df0d4bef1c48222607d836&username=username%40tcl.com&clientId=51347980&channel=web";
+	    String urlTst = "https://example.com/account/uploadpic?test=okhttp&token=7000cc1c9109ed275344c9f34806c274&username=username%40tcl.com&clientId=51347980&channel=web";
 
 	    String file403 = "/home/pu/doing/code/c4ahe3olY6.jpg";
 	    String upload403 = "/home/pu/doing/code/upload403.png";
@@ -119,7 +119,7 @@ public class PracticeHttp extends TestBase {
 	    RequestBody requestBody = new MultipartBody.Builder()
 	            .setType(MultipartBody.FORM)
 //	            .addFormDataPart("token", "8d2efe1a30df0d4bef1c48222607d836")
-//	            .addFormDataPart("username", "pu.shang@tcl.com")
+//	            .addFormDataPart("username", "username")
 //	            .addFormDataPart("clientId", "clientId")
 //	            .addFormDataPart("channel", "channel")
 //	            .addFormDataPart("file", "c4ahe3olY6.jpg", RequestBody.create(MEDIA_TYPE_PNG, new File(pathname)))
@@ -153,7 +153,7 @@ public class PracticeHttp extends TestBase {
 	
 	@Test
 	public void testHttpClientPostMultipart() throws ClientProtocolException, IOException {
-	    String url = "https://login.tclclouds.com/account/uploadpic?test=httpclient4&token=8d2efe1a30df0d4bef1c48222607d836&username=pu.shang%40tcl.com&clientId=51347980&channel=web";
+	    String url = "https://example.com/account/uploadpic?test=httpclient4&token=8d2efe1a30df0d4bef1c48222607d836&username=username%40tcl.com&clientId=51347980&channel=web";
 
 	    String file403 = "/home/pu/doing/code/c4ahe3olY6.jpg";
 	    String success = "/home/pu/doing/code/uploadSuccess.png";
@@ -188,7 +188,7 @@ public class PracticeHttp extends TestBase {
 	public void updateUserInfo() throws ClientProtocolException, IOException {
 		HttpPost post = new HttpPost("https://example.com/account/updateuserinfo");
 		HttpParams params = new BasicHttpParams();
-		params.setParameter("username", "pu.shang@tcl.com");
+		params.setParameter("username", "username");
 		params.setParameter("nickname", "测试昵称");
 		params.setParameter("clientId", "51347980");
 		params.setParameter("token", "69b6fb6fffac7df0b251d8a11fe21735");
@@ -212,7 +212,7 @@ public class PracticeHttp extends TestBase {
 	public void updateUserInfoStandard() throws ClientProtocolException, IOException {
 		HttpPost post = new HttpPost("https://example.com/account/updateuserinfo");
 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-		nvps.add(new BasicNameValuePair("username", "pu.shang@tcl.com"));
+		nvps.add(new BasicNameValuePair("username", "username"));
 		nvps.add(new BasicNameValuePair("nickname", "测试昵称updateUserInfoStandard"));
 		nvps.add(new BasicNameValuePair("clientId", "51347980"));
 		nvps.add(new BasicNameValuePair("token", "69b6fb6fffac7df0b251d8a11fe21735"));
