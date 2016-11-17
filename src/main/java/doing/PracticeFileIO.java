@@ -40,9 +40,9 @@ public class PracticeFileIO extends TestBase {
 
 	@Test
 	public void randomAccessFileTwoSteps() throws Exception {
-		String filePath = "/home/pu/doing/code/clear.png.2";
+		String filePath = "~/doing/code/clear.png.2";
 		RandomAccessFile oSavedFile = new RandomAccessFile(filePath, "rw");
-		File file = new File("/home/pu/doing/code/clear.png");
+		File file = new File("~/doing/code/clear.png");
 		byte[] fileBlock = IoUtils.readInputStream(new FileInputStream(file));
 		int firstPartLength = 1000;
 		

@@ -101,9 +101,9 @@ public class PracticeHttp extends TestBase {
 	    String urlPrd = "https://example.com/account/uploadpic?test=okhttp&token=8d2efe1a30df0d4bef1c48222607d836&username=username%40tcl.com&clientId=51347980&channel=web";
 	    String urlTst = "https://example.com/account/uploadpic?test=okhttp&token=7000cc1c9109ed275344c9f34806c274&username=username%40tcl.com&clientId=51347980&channel=web";
 
-	    String file403 = "/home/pu/doing/code/c4ahe3olY6.jpg";
-	    String upload403 = "/home/pu/doing/code/upload403.png";
-	    String success = "/home/pu/doing/code/uploadSuccess.png";
+	    String file403 = "~/doing/code/c4ahe3olY6.jpg";
+	    String upload403 = "~/doing/code/upload403.png";
+	    String success = "~/doing/code/uploadSuccess.png";
 	    
 	    String url = urlPrd;
 //	    url = urlTst;
@@ -155,8 +155,8 @@ public class PracticeHttp extends TestBase {
 	public void testHttpClientPostMultipart() throws ClientProtocolException, IOException {
 	    String url = "https://example.com/account/uploadpic?test=httpclient4&token=8d2efe1a30df0d4bef1c48222607d836&username=username%40tcl.com&clientId=51347980&channel=web";
 
-	    String file403 = "/home/pu/doing/code/c4ahe3olY6.jpg";
-	    String success = "/home/pu/doing/code/uploadSuccess.png";
+	    String file403 = "~/doing/code/c4ahe3olY6.jpg";
+	    String success = "~/doing/code/uploadSuccess.png";
 	    
 	    String pathname = file403;
 	    FileBody fileBody = new FileBody(new File(pathname));
