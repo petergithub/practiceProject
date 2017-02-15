@@ -1,11 +1,11 @@
 package doing;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
-
-import junit.framework.Assert;
 
 import org.joda.time.DateTime;
 import org.json.JSONException;
@@ -24,9 +24,41 @@ import com.alibaba.fastjson.serializer.JavaBeanSerializer;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
+import junit.framework.Assert;
+
+/**
+ * [{ },{ }]是 json array 的序列化值 json 格式的字符串组成的逗号隔开的字符串
+ * @author Shang Pu
+ * @version Date：Jan 18, 2017 11:21:25 AM
+ */
 public class PracticeJson extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeJson.class);
 
+	@Test
+	public void testJsonArrayWithObject() {
+		String result = "[\"000\",\"001\"]";
+		log.info("result = {}", result);
+		PaymentParams item1 = new PaymentParams("merchantId1", "orderId1", null);
+		PaymentParams item2 = new PaymentParams("merchantId2", "orderId2", null);
+
+		JSONArray jsonArrayFast = new JSONArray();
+		jsonArrayFast.add(0, item1);
+		jsonArrayFast.add(1, item2);
+		String jsonArrayList = jsonArrayFast.toJSONString();
+		
+		//[{"merchantId":"merchantId1","orderId":"orderId1"},{"merchantId":"merchantId2","orderId":"orderId2"}]
+		log.info("jsonArrayList: {}", jsonArrayList);
+		
+		List<PaymentParams> list = new ArrayList<>();
+		list.add(item1);
+		list.add(item2);
+		//[{"merchantId":"merchantId1","orderId":"orderId1"},{"merchantId":"merchantId2","orderId":"orderId2"}]
+		String javaListJsonString = JSON.toJSONString(list);
+		log.info("List json string = {}", javaListJsonString);
+		
+		Assert.assertEquals(jsonArrayList, javaListJsonString);
+	}
+	
 	/**
 	 * ["000","001"]
 	 */
@@ -149,7 +181,7 @@ public class PracticeJson extends TestBase {
 	}
 
 	public void testJsonDate() {
-		PaymentParams pay = new PaymentParams("merchantId", "mOutOrderId", new DateTime().toDate());
+		PaymentParams pay = new PaymentParams("merchantId", "orderId", new DateTime().toDate());
 		log.info("JSONpay = {}", JSON.toJSONString(pay));
 	}
 
@@ -225,10 +257,10 @@ public class PracticeJson extends TestBase {
 	}
 
 	public void testToJson() {
-		JSONObject fastjson = paramToJson(new PaymentParams("merchantId", "mOutOrderId", null));
+		JSONObject fastjson = paramToJson(new PaymentParams("merchantId", "orderId", null));
 		log.info("fastjson = {}", fastjson);
-		// {"mOutOrderId":"mOutOrderId","merchantId":"merchantId"}
-		Assert.assertEquals("{\"mOutOrderId\":\"mOutOrderId\",\"merchantId\":\"merchantId\"}",
+		// {"orderId":"orderId","merchantId":"merchantId"}
+		Assert.assertEquals("{\"orderId\":\"orderId\",\"merchantId\":\"merchantId\"}",
 				fastjson.toJSONString());
 	}
 
@@ -260,13 +292,13 @@ public class PracticeJson extends TestBase {
 
 	class PaymentParams {
 		public String merchantId;
-		public String mOutOrderId;
+		public String orderId;
 		@JSONField(format = "yyyyMMdd HH:mm:ss")
 		public Date date;
 
-		public PaymentParams(String merchantId, String mOutOrderId, Date date) {
+		public PaymentParams(String merchantId, String orderId, Date date) {
 			this.merchantId = merchantId;
-			this.mOutOrderId = mOutOrderId;
+			this.orderId = orderId;
 			this.date = date;
 		}
 
@@ -278,12 +310,12 @@ public class PracticeJson extends TestBase {
 			this.merchantId = merchantId;
 		}
 
-		public String getmOutOrderId() {
-			return mOutOrderId;
+		public String getOrderId() {
+			return orderId;
 		}
 
-		public void setmOutOrderId(String mOutOrderId) {
-			this.mOutOrderId = mOutOrderId;
+		public void setOrderId(String orderId) {
+			this.orderId = orderId;
 		}
 	}
 }

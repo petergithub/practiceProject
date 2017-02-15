@@ -26,9 +26,25 @@ import org.pu.test.base.TestBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import demo.security.MD5Util;
 import junit.framework.Assert;
 
 /**
+ * Refer to java.text.SimpleDateFormat
+ * <p>
+ * "yyyy.MM.dd G 'at' HH:mm:ss z" 2001.07.04 AD at 12:08:56 PDT
+ * <p>
+ * "yyyyy.MMMMM.dd GGG hh:mm aaa" 02001.July.04 AD 12:08 PM
+ * <p>
+ * "EEE, d MMM yyyy HH:mm:ss Z" Wed, 4 Jul 2001 12:08:56 -0700
+ * <p>
+ * "yyyy-MM-dd'T'HH:mm:ss.SSSZ" 2001-07-04T12:08:56.235-0700
+ * <p>
+ * "yyyy-MM-dd'T'HH:mm:ss.SSSXXX" 2001-07-04T12:08:56.235-07:00
+ * <p>
+ * "YYYY-'W'ww-u" 2001-W27-3
+ * <p>
+ * 
  * @author Shang Pu
  * @version Date: Sep 22, 2015 3:35:16 PM
  * 
@@ -39,12 +55,13 @@ import junit.framework.Assert;
 
 public class PracticeDate extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeDate.class);
-	String dateFormat = "yyyy-MM-dd hh:mm:ss";
+	String dateFormat = "yyyy-MM-dd hh:mm:ss"; // 2006-01-02 15:04:05
 	String dateFormatUs = "MM/dd/yyyy HH:mm:ss";
-	String dateFormat_ISO_8601Z = "yyyy-MM-dd'T'HH:mm:ssZ";
-	String dateFormat_ISO_8601z = "yyyy-MM-dd'T'HH:mm:ssz";
-	String datePattern = "EEE MMM d HH:mm:ss zzz yyyy"; //Thu Jun 18 20:56:02 EDT 2009
-
+	String dateFormat_ISO_8601Z = "yyyy-MM-dd'T'HH:mm:ssZ"; // 2006-01-02T07:04:05+0000
+	String dateFormat_ISO_8601z = "yyyy-MM-dd'T'HH:mm:ssz"; // 2006-01-02T07:04:05UTC
+	String datePattern = "EEE MMM d HH:mm:ss zzz yyyy"; // Thu Jun 18 20:56:02 EDT 2009
+	//YYYY-MM-DDThh:mm:ss.sTZD (eg 1997-07-16T19:20:30.45+01:00)
+	
 	public static void main(String[] args){
 		TimeZone t = TimeZone.getDefault();
 		log.info("t[{}]", t);
@@ -54,6 +71,15 @@ public class PracticeDate extends TestBase {
 	}
 
 	@Test
+	public void date() throws ParseException {
+		log.info("System.currentTimeMillis(): {}", System.currentTimeMillis());
+		int hour = (int) (System.currentTimeMillis() / (1000*60*60)) ;
+		log.info("hour:{}", hour);
+		
+		String md5 = MD5Util.md5("account" + hour);
+		log.info("md5:{}", md5);
+		
+	}
 	public void parseStringToDate() throws ParseException {
 		String strDate = "Thu Jun 18 20:56:02 EDT 2009";
 		SimpleDateFormat formatter = new SimpleDateFormat(datePattern);
