@@ -9,7 +9,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -58,35 +57,6 @@ import freemarker.template.TemplateException;
 public class EmailTest {
 	private final static Logger log = LoggerFactory.getLogger(EmailTest.class);
 	
-	public void parseMsgFile() {
-		com.auxilii.msgparser.MsgParser msgp = new com.auxilii.msgparser.MsgParser();
-		com.auxilii.msgparser.Message msg = null;
-		try {
-			String msgFile = "mail.msg";
-			msg = msgp.parseMsg(msgFile);
-
-			// The resulting msg object contains all necessary information
-			// (e.g., from, to, subject).
-			String fromEmail = msg.getFromEmail();
-			String fromName = msg.getFromName();
-			String subject = msg.getSubject();
-			log.info("fromEmail=" + fromEmail + "fromName=" + fromName
-					+ "subject=" + subject);
-
-			// Attachments are stored in Attachment objects.
-			List<com.auxilii.msgparser.attachment.Attachment> atts = msg
-					.getAttachments();
-			for (com.auxilii.msgparser.attachment.Attachment att : atts) {
-				// do something with attachment
-				log.info(att.toString());
-			}
-		} catch (UnsupportedOperationException e) {
-			log.error("UnsupportedOperationException in testMsgPaser()", e);
-		} catch (IOException e) {
-			log.error("IOException in testMsgPaser()", e);
-		}
-	}
-
 	public void testSendMail() {
 		String smtpHost = "10.10.10.6";
 		String userToAddr = "username@example.com";
@@ -286,4 +256,34 @@ public class EmailTest {
 			e.printStackTrace();
 		}
 	}
+	
+	/*public void parseMsgFile() {
+		com.auxilii.msgparser.MsgParser msgp = new com.auxilii.msgparser.MsgParser();
+		com.auxilii.msgparser.Message msg = null;
+		try {
+			String msgFile = "mail.msg";
+			msg = msgp.parseMsg(msgFile);
+
+			// The resulting msg object contains all necessary information
+			// (e.g., from, to, subject).
+			String fromEmail = msg.getFromEmail();
+			String fromName = msg.getFromName();
+			String subject = msg.getSubject();
+			log.info("fromEmail=" + fromEmail + "fromName=" + fromName
+					+ "subject=" + subject);
+
+			// Attachments are stored in Attachment objects.
+			List<com.auxilii.msgparser.attachment.Attachment> atts = msg
+					.getAttachments();
+			for (com.auxilii.msgparser.attachment.Attachment att : atts) {
+				// do something with attachment
+				log.info(att.toString());
+			}
+		} catch (UnsupportedOperationException e) {
+			log.error("UnsupportedOperationException in testMsgPaser()", e);
+		} catch (IOException e) {
+			log.error("IOException in testMsgPaser()", e);
+		}
+	}*/
+
 }

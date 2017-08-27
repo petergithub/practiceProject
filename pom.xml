@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>test</groupId>
-	<artifactId>testProject</artifactId>
+	<artifactId>practiceProject</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.9.12</version>
+      <version>6.9.13.6</version>
       <scope>test</scope>
     </dependency>
 	
@@ -55,13 +55,13 @@
 			<artifactId>httpmime</artifactId>
 			<version>4.3.3</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
 			<version>4.0.19.Final</version>
 		</dependency>
-		
+
 		<!--Redis -->
 		<dependency>
 			<groupId>redis.clients</groupId>
@@ -101,7 +101,7 @@
 			<artifactId>jxl</artifactId>
 			<version>${jxl.version}</version>
 		</dependency> -->
-		<dependency>
+<!-- 		<dependency>
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>${itext.version}</version>
@@ -110,7 +110,7 @@
 			<groupId>com.lowagie</groupId>
 			<artifactId>itextasian</artifactId>
 			<version>1.0</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.freemarker</groupId>
 			<artifactId>freemarker</artifactId>
@@ -121,11 +121,11 @@
 			<artifactId>utils</artifactId>
 			<version>1.07.00</version>
 		</dependency>
-		<dependency>
+<!-- 		<dependency>
 			<groupId>com.auxilii.msgparser</groupId>
 			<artifactId>msgparser</artifactId>
-			<version>1.10</version>
-		</dependency>
+			<version>1.15</version>
+		</dependency> -->
 		<!-- Office Documents end -->
 
 		<!-- XML begin -->
@@ -429,19 +429,19 @@
 			<artifactId>org-swinglabs-swingx</artifactId>
 			<version>1.6-201002241238</version>
 		</dependency>
-		<dependency>
+<!-- 		<dependency>
 			<groupId>com.sun.media</groupId>
 			<artifactId>jai_imageio</artifactId>
 			<version>1.1</version>
-		</dependency>
-		
+		</dependency> -->
+
 		<!-- QR code generator -->
         <dependency>
             <groupId>net.glxn.qrgen</groupId>
             <artifactId>javase</artifactId>
             <version>2.0</version>
         </dependency>
-            
+
 		<!-- GENERAL UTILS end -->
 
 		<!-- LOGGING begin -->
@@ -519,7 +519,7 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>${servlet.version}</version>
-			<!-- the jar is "provided" by the container and thus should not be included 
+			<!-- the jar is "provided" by the container and thus should not be included
 				in the war -->
 			<scope>provided</scope>
 		</dependency>
@@ -578,9 +578,9 @@
 			<id>dev</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
-			</activation>  
+			</activation>
 			<properties>
-				<cargo.containerId>tomcat6x</cargo.containerId>  
+				<cargo.containerId>tomcat6x</cargo.containerId>
 				<cargo.catalina.home>D:\ProgramFiles\apache-tomcat\apache-tomcat-6.0.36</cargo.catalina.home>
 				<cargo.servlet.port>8080</cargo.servlet.port>
 				<log.dir>c:/cache</log.dir>
@@ -592,7 +592,7 @@
 		<profile>
 			<id>test</id>
 			<properties>
-				<cargo.containerId>tomcat7x</cargo.containerId>  
+				<cargo.containerId>tomcat7x</cargo.containerId>
 				<cargo.catalina.home>/data/aot/tomcat/apache-tomcat-test</cargo.catalina.home>
 				<cargo.servlet.port>9690</cargo.servlet.port>
 				<log.dir>/data/aot/project/test/inner-service/logs</log.dir>

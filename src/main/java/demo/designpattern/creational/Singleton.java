@@ -1,6 +1,8 @@
 package demo.designpattern.creational;
 
 /**
+ * <a href="http://www.jianshu.com/p/eb30a388c5fc">聊一聊Java的单例</a>
+ * 
  * 第三种(饿汉):方式Singleton
  * 这种方式基于classloder机制避免了多线程的同步问题，不过，instance在类装载时就实例化，
  * 虽然导致类装载的原因有很多种，在单例模式中大多数都是调用getInstance方法，

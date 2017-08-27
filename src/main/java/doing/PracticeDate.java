@@ -198,6 +198,7 @@ public class PracticeDate extends TestBase {
 		log.info("diffInMillisRevers = {}", diffInMillisRevers);
 	}
 
+	@Test
 	public void testJodaDate() {
 		DateTime dt = new DateTime(2006, 1, 2, 15, 4, 5);
 		Date date = dt.toDate();
@@ -241,6 +242,9 @@ public class PracticeDate extends TestBase {
 		dt = new DateTime();
 		DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
 		log.info("ISODateTimeFormat = {}", fmt.print(dt));
+		
+		DateTime daysAgo = today.minusDays(35);
+		log.info("daysAgo: {}", daysAgo);
 	}
 
 	public void testDateFormat() throws ParseException {
