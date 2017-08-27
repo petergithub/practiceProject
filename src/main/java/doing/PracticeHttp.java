@@ -1,11 +1,14 @@
 package doing;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -58,7 +61,51 @@ import okhttp3.Response;
 public class PracticeHttp extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeHttp.class);
 
-	OkHttpClient client = new OkHttpClient.Builder().build();
+	private final String USER_AGENT = "Mozilla/5.0";
+	OkHttpClient client = new OkHttpClient.Builder().build();	
+
+	@Test
+	public void testDownload() throws Exception {
+		String urlString = "http://dl.cc.tclclouds.com/swift/v1/fzl_container/spaceplus/db/residual_dir_hf_en_20170328141154.db.7z";
+		String filename = "/home/pu/doing/httpDown.7z.part2";
+		download(urlString, filename);
+	}
+	
+	  /** 
+	   * 下载文件到本地 
+	   *  
+	   * @param urlString 
+	   *          被下载的文件地址 
+	   * @param filename 
+	   *          本地文件名 
+	   * @throws Exception 
+	   *           各种异常 
+	   */  
+	  public static void download(String urlString, String filename) throws Exception {  
+	    // 构造URL  
+	    URL url = new URL(urlString);  
+	    // 打开连接  
+	    URLConnection con = url.openConnection();
+//	    con.setRequestProperty("Range", "bytes=0-99");
+//	    con.setRequestProperty("Range", "bytes=100-");
+	    con.setRequestProperty("Range", "bytes=0-644431");
+	    // 输入流  
+	    InputStream is = con.getInputStream();  
+	    // 1K的数据缓冲  
+	    byte[] bs = new byte[1024];  
+	    // 读取到的数据长度  
+	    int len;  
+	    // 输出的文件流  
+	    OutputStream os = new FileOutputStream(filename);  
+	    // 开始读取  
+	    while ((len = is.read(bs)) != -1) {  
+	      os.write(bs, 0, len);  
+	    }  
+	    // 完毕，关闭所有链接  
+	    os.close();  
+	    is.close();  
+	  }  
+	
 	@Test
 	public void testOkHttpGet() throws IOException {
 		// OkHttpClient clientWith30sTimeout = client.newBuilder()
