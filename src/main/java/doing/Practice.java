@@ -1,5 +1,12 @@
 package doing;
 
+import com.alibaba.fastjson.JSONObject;
+
+import org.junit.Test;
+import org.pu.test.base.TestBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,20 +18,228 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-import org.pu.test.base.TestBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import bean.User;
 import junit.framework.Assert;
 
 /**
  * @author Shang Pu
- * @version Date: Apr 15, 2012 11:08:53 AM
  */
 public class Practice extends TestBase {
 	private final static Logger log = LoggerFactory.getLogger(Practice.class);
+
+	/**
+	 * 按位与，两1得1，遇0得0
+	 * 
+	 * 按位或，两0得0，遇1得1
+	 * 
+	 * 按位异或，不同得1，相同得0
+	 * 
+	 * <a href=
+	 * "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html">Bitwise
+	 * and Bit Shift Operators</a>
+	 * 
+	 * The unary bitwise complement operator "~" inverts a bit pattern;
+	 * 
+	 * The bitwise & operator performs a bitwise AND operation.
+	 * 
+	 * The bitwise | operator performs a bitwise inclusive OR operation.
+	 * 
+	 * The bitwise ^ operator performs a bitwise exclusive OR operation.
+	 * 
+	 * 
+	 * https://www.cnblogs.com/dongpo888/archive/2011/07/13/2105001.html
+	 * 
+	 * m<<n 即在数字没有溢出的前提下，对于正数和负数，左移n位都相当于m乘以2的n次方.
+	 * 
+	 * m>>n 即相当于m除以2的n次方，得到的为整数时，即为结果。如果结果为小数，此时会出现两种情况：
+	 * 
+	 * (1)如果m为正数，得到的商会无条件 的舍弃小数位；
+	 * 
+	 * (2)如果m为负数，舍弃小数部分，然后把整数部分加+1得到位移后的值。
+	 */
+	@Test
+	public void bitwise() {
+		/* 1 = 001 */
+		/* 2 = 010 */
+		/* 3 = 011 */
+		/* 4 = 100 */
+		/* 5 = 101 */
+		/* 6 = 110 */
+		/* 7 = 111 */
+		Assert.assertEquals(5 | 3, 7);
+
+		Assert.assertEquals(3 & 1, 1);
+		Assert.assertEquals(3 & 2, 2);
+		Assert.assertEquals(3 & 4, 0);
+
+		Assert.assertEquals(5 & 1, 1);
+		Assert.assertEquals(5 & 4, 4);
+		Assert.assertEquals(5 & 2, 0);
+
+		Assert.assertEquals(7 & 1, 1);
+		Assert.assertEquals(7 & 2, 2);
+		Assert.assertEquals(7 & 4, 4);
+
+		/* 60 = 0011 1100 */
+		/* 13 = 0000 1101 */
+		Assert.assertEquals(60 & 13, 12); /* 12 = 0000 1100 */
+		Assert.assertEquals(60 | 13, 61); /* 61 = 0011 1101 */
+		Assert.assertEquals(60 ^ 13, 49); /* 49 = 0011 0001 */
+		Assert.assertEquals(~60, -61); /*-61 = 1100 0011 */
+		Assert.assertEquals(60 << 2, 240); /* 240 = 1111 0000 */
+		Assert.assertEquals(60 >> 2, 15); /* 15 = 1111 */
+		Assert.assertEquals(60 >>> 2, 15); /* 15 = 0000 1111 */
+	}
+
+	@Test
+	public void practiceSensitive() {
+		List<String> list = new ArrayList<>();
+		list.add("微信");
+		list.add("我微信准备删除账号");
+		list.add("我准备删除账号");
+		Map<String, Object> sensitiveWordMap = initSensitiveWord(list);
+
+		checkSensitiveWord("加我微信教你减肥", sensitiveWordMap);
+	}
+
+	public int checkSensitiveWord(String word, Map<String, Object> sensitiveWordMap) {
+		log.debug("Enter checkSensitiveWord word: {} sensitiveWordMap: {}", word, sensitiveWordMap);
+		int count = word.codePointCount(0, word.length());
+		int matchFlag = 0;
+		Map<String, Object> nowMap = sensitiveWordMap;
+		for (int i = 0; i < count; i++) {
+			String key = new String(Character.toChars(word.codePointAt(i))).toLowerCase();
+			log.debug("敏感词key " + key);
+			nowMap = (Map<String, Object>) nowMap.get(key);
+			log.debug("敏感词key库 " + JSONObject.toJSONString(nowMap));
+			if (nowMap != null) {
+				matchFlag++;
+				if ("y".equals((String) nowMap.get("isEnd"))) { //如果为最后一个匹配规则,结束循环，返回匹配标识数  
+					log.debug("敏感词匹配成功 " + word + "匹配度 " + matchFlag);
+					break;
+				}
+			} else {
+				if (matchFlag >= 1) {
+					// i = i - matchFlag;
+					i--;
+				}
+				nowMap = sensitiveWordMap;
+				matchFlag = 0;
+			}
+		}
+		if (matchFlag < 2) {
+			matchFlag = 0;
+			System.out.println(word + " is good");
+		} else {
+			System.out.println(word + " is not allowed");
+		}
+		log.debug("Exit checkSensitiveWord matchFlag: {} nowMap: {}", matchFlag, nowMap);
+		return matchFlag;
+	}
+
+
+	public Map<String, Object> initSensitiveWord(List<String> wList) {
+		log.debug("Enter initSensitiveWord wList: {} wList: {}", wList, wList);
+		Map<String, Object> sensitiveWordMap = new HashMap<String, Object>(wList.size());
+		Map<String, Object> temMap = null;
+		Map<String, Object> nowMap = null;
+		for (String w : wList) {
+			nowMap = sensitiveWordMap;
+			int count = w.codePointCount(0, w.length());
+			for (int i = 0; i < count; i++) {
+				String key = new String(Character.toChars(w.codePointAt(i)));
+				Object res = nowMap.get(key);
+				if (res == null) {
+					temMap = new HashMap<String, Object>();
+					temMap.put("isEnd", "n");
+					nowMap.put(key, temMap);
+					nowMap = temMap;
+				} else {
+					nowMap = (Map<String, Object>) res;
+				}
+				if (i == count - 1) {
+					temMap.put("isEnd", "y");
+				}
+			}
+		}
+		log.debug("Exit initSensitiveWord sensitiveWordMap: {} nowMap: {}", sensitiveWordMap, nowMap);
+		return sensitiveWordMap;
+	}
+
+	@Test
+	public void practiceBoolean() {
+		boolean needLoopback = false;
+		Assert.assertFalse(needLoopback);
+		needLoopback |= true;
+		Assert.assertTrue(needLoopback);
+	}
+
+	@Test
+	public void practiceMap() {
+		String word = "微信,分析";
+		log.info("list: {}", splitString(word));
+		word = "微信，分析";
+		log.info("list: {}", splitString(word));
+	}
+
+	private List<String> splitString(String word) {
+		int count = word.codePointCount(0, word.length());
+		List<String> list = new ArrayList<>();
+		for (int i = 0; i < count; i++) {
+			String key = new String(Character.toChars(word.codePointAt(i))).toLowerCase();
+			list.add(key);
+		}
+		return list;
+	}
+
+	/**
+	 * Set Default Locale 
+	 * 1. jvm arguments
+	 * java -Duser.country=US -Duser.language=en
+	 * java -Duser.country=CN -Duser.language=zh
+	 * 
+	 * 2. setDefault(Locale aLocale)
+	 */
+	@Test
+	public void locale() {
+		log.info("user.country: {}", System.getProperty("user.country"));
+		log.info("user.region: {}", System.getProperty("user.region"));
+		log.info("defaultLocale: {}", Locale.getDefault());
+
+		Locale.setDefault(Locale.CANADA);
+		log.info("defaultLocale: {}", Locale.getDefault());
+
+		Locale aLocale = Locale.JAPAN;
+		System.out.println("Locale: " + aLocale);
+		System.out.println("ISO 2 letter: " + aLocale.getLanguage());
+		System.out.println("ISO 3 letter: " + aLocale.getISO3Language());
+	}
+
+	public void exeCurrency() throws IOException {
+		Currency currency = Currency.getInstance("CNY");
+		Assert.assertEquals("CNY", currency.getCurrencyCode());
+		Assert.assertEquals("CNY", currency.getSymbol());
+		Assert.assertEquals("￥", currency.getSymbol(Locale.CHINA));
+		Assert.assertEquals("Chinese Yuan", currency.getDisplayName(Locale.US));
+		Assert.assertEquals("Chinese Yuan", currency.getDisplayName(Locale.CHINESE));
+		Assert.assertEquals("人民币", currency.getDisplayName(Locale.CHINA));
+
+		currency = Currency.getInstance(Locale.US);
+		Assert.assertEquals("USD", currency.getCurrencyCode());
+		Assert.assertEquals("$", currency.getSymbol());
+		Assert.assertEquals("$", currency.getSymbol(Locale.US));
+
+		currency = Currency.getInstance(Locale.FRANCE);
+		Assert.assertEquals("EUR", currency.getCurrencyCode());
+		Assert.assertEquals("EUR", currency.getSymbol());
+		Assert.assertEquals("€", currency.getSymbol(Locale.FRANCE));
+
+		Locale locale = new Locale("Chinese");
+		log.info("locale = {}", locale);
+		log.info("locale.getCountry() = {}", locale.getCountry());
+		log.info("locale.getDisplayCountry() = {}", locale.getDisplayCountry());
+		log.info("locale.getDisplayLanguage() = {}", locale.getDisplayLanguage());
+	}
 	
 	@Test
 	public void stackTrace() {
@@ -122,6 +337,44 @@ public class Practice extends TestBase {
 		log.debug("Returning user names: {}", collect(users, "name"));
 	}
 
+	@Test
+	public void switch2() {
+		int key = 1;
+		final int one = 1, two = 2, three = 3;
+		switch (key) {
+		case 0:
+			log.info("case 0");
+			break;
+		case one:
+		case three:
+			log.info("case 1 or 3");
+			break;
+		case two:
+			log.info("case 2");
+			break;
+		default:
+			log.info("case default");
+			break;
+		}
+
+		String keyString = "string1";
+		final String stringOne = "string1", stringTwo = "string2";
+		switch (keyString) {
+		case "string0":
+			log.info("case string0");
+			break;
+		case stringOne:
+			log.info("case string1");
+			break;
+		case stringTwo:
+			log.info("case string2");
+			break;
+		default:
+			log.info("case default");
+			break;
+		}
+	}
+
 	/**
 	 * The type of the Expression must be char, byte, short, int, Character,
 	 * Byte, Short, Integer, String, or an enum type (§8.9), or a compile-time
@@ -133,7 +386,7 @@ public class Practice extends TestBase {
 	 * >Constant Expressions/a>
 	 */
 	@Test
-	public void testSwitch() {
+	public void switch1() {
 		final String inCase = "str";
 		String str = "str";
 		switch (str) {
@@ -202,32 +455,6 @@ public class Practice extends TestBase {
 
 	public void mutilpleParams(String... strings) {
 		log.info(" = {}", Arrays.asList(strings));
-	}
-
-	public void exeCurrency() throws IOException {
-		Currency currency = Currency.getInstance("CNY");
-		Assert.assertEquals("CNY", currency.getCurrencyCode());
-		Assert.assertEquals("CNY", currency.getSymbol());
-		Assert.assertEquals("￥", currency.getSymbol(Locale.CHINA));
-		Assert.assertEquals("Chinese Yuan", currency.getDisplayName(Locale.US));
-		Assert.assertEquals("Chinese Yuan", currency.getDisplayName(Locale.CHINESE));
-		Assert.assertEquals("人民币", currency.getDisplayName(Locale.CHINA));
-
-		currency = Currency.getInstance(Locale.US);
-		Assert.assertEquals("USD", currency.getCurrencyCode());
-		Assert.assertEquals("$", currency.getSymbol());
-		Assert.assertEquals("$", currency.getSymbol(Locale.US));
-
-		currency = Currency.getInstance(Locale.FRANCE);
-		Assert.assertEquals("EUR", currency.getCurrencyCode());
-		Assert.assertEquals("EUR", currency.getSymbol());
-		Assert.assertEquals("€", currency.getSymbol(Locale.FRANCE));
-
-		Locale locale = new Locale("Chinese");
-		log.info("locale = {}", locale);
-		log.info("locale.getCountry() = {}", locale.getCountry());
-		log.info("locale.getDisplayCountry() = {}", locale.getDisplayCountry());
-		log.info("locale.getDisplayLanguage() = {}", locale.getDisplayLanguage());
 	}
 
 	public void execommand() throws IOException {

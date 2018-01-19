@@ -68,10 +68,12 @@ public class PracticeQrCode extends TestBase {
 
 		// get QR file from text using defaults
 		File file = QRCode.from("Hello World").file();
+		System.out.println("file " + file.getPath());
 
 		// get QR stream from text using defaults
 		ByteArrayOutputStream stream = QRCode.from("Hello World").stream();
-
+		System.out.println("stream.size() " + stream.size());
+		
 		// override the image type to be JPG
 		QRCode.from("Hello World").to(ImageType.JPG).file();
 		QRCode.from("Hello World").to(ImageType.JPG).stream();

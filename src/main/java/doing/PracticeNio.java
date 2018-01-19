@@ -170,12 +170,13 @@ public class PracticeNio extends TestBase {
 			// 还可以用于取消通道的注册
 			SelectionKey key = ssc.register(selector, SelectionKey.OP_ACCEPT);
 
-			System.out.println("Going to listen on " + ports[i]);
+			System.out.println("Going to listen on " + ports[i] + " with key " + key);
 		}
 
 		while (true) {
 			// 返回所发生的事件的数量
 			int num = selector.select();
+			System.out.println("num " + num);
 
 			Set<SelectionKey> selectedKeys = selector.selectedKeys();
 			Iterator<SelectionKey> it = selectedKeys.iterator();
@@ -193,7 +194,7 @@ public class PracticeNio extends TestBase {
 					SelectionKey newKey = sc.register(selector, SelectionKey.OP_READ);
 					it.remove();
 
-					System.out.println("Got connection from " + sc);
+					System.out.println("Got connection from " + sc + " with newKey " + newKey);
 				} else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
 					// Read the data
 					SocketChannel sc = (SocketChannel) key.channel();

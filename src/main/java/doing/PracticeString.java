@@ -2,6 +2,15 @@ package doing;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.commons.lang3.StringUtils;
+import org.junit.Test;
+import org.pu.test.base.TestBase;
+import org.pu.utils.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -10,15 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.pu.test.base.TestBase;
-import org.pu.utils.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import junit.framework.Assert;
 
@@ -31,7 +31,7 @@ public class PracticeString extends TestBase {
 
 	@Test
 	public void testEmoji() throws Exception {
-		String content = "test \uD83D\uDE01 test😁"; //一个 emoji 表情
+		String content = "test \uD83D\uDE01 test😁test"; // 一个 emoji 表情
 		System.out.println(content);
 
 		String filterContent = emojiFilter(content);
@@ -114,6 +114,7 @@ public class PracticeString extends TestBase {
 		}
 	}
 
+	@Test
 	public void testIndexEmptyString() {
 		Assert.assertEquals(true, "abc".startsWith(""));
 		Assert.assertEquals(true, "abc".startsWith("a"));
@@ -195,6 +196,7 @@ public class PracticeString extends TestBase {
 		log.info("gpseqnumQuery = {}", gpseqnumQuery);
 	}
 
+	@Test
 	public void testSplitLengthString() {
 		String[] array = ", ".split(",");
 		Assert.assertEquals(2, array.length);
@@ -203,6 +205,12 @@ public class PracticeString extends TestBase {
 
 		String[] array2 = ",".split(",");
 		Assert.assertEquals(0, array2.length);
+
+		// 使用索引访问用 String的 split方法得到的数组时，需做最后一个分隔符后有无
+		// 内容的检查，否则会有抛 IndexOutOfBoundsException的风险
+		// 预期大于 3，结果是 3
+		String[] array3 = "a,b,c,,".split(",");
+		Assert.assertEquals(3, array3.length);
 	}
 
 	public void testSplitEscapeString() {
@@ -219,6 +227,26 @@ public class PracticeString extends TestBase {
 		Assert.assertEquals("a", splitWithoutEscape[1]);
 		Assert.assertEquals("|", splitWithoutEscape[2]);
 		Assert.assertEquals("c", splitWithoutEscape[3]);
+	}
+
+	@Test
+	public void testSplitUnknownCharacter() {
+		String attrValues = "5 mg�10 mg�20 mg�40 mg";
+		String appendVal = "";
+		while (attrValues != null) {
+			String attrValue;
+			if (attrValues.indexOf(Constants.VALUE_DELIMITER) >= 0) {
+				attrValue = attrValues.substring(0, attrValues.indexOf(Constants.VALUE_DELIMITER));
+				attrValues = attrValues.substring(attrValues.indexOf(Constants.VALUE_DELIMITER) + 1);
+			} else {
+				attrValue = attrValues;
+				attrValues = null;
+			}
+			if (!((attrValue.equalsIgnoreCase("null")) || (attrValue.equalsIgnoreCase("nulldate")))) {
+				appendVal = "append,id,attrName," + attrValue;
+			}
+			log.info("appendVal = {}", appendVal);
+		}
 	}
 
 	public void testSubstring() {
@@ -240,27 +268,6 @@ public class PracticeString extends TestBase {
 			dql = dql.substring(0, orderByIndex);
 		}
 		log.info("orderByPart = {}", orderByPart);
-	}
-
-	public void testSplit() {
-		String attrValues = "5 mg�10 mg�20 mg�40 mg";
-		String appendVal = "";
-		while (attrValues != null) {
-			String attrValue;
-			if (attrValues.indexOf(Constants.VALUE_DELIMITER) >= 0) {
-				attrValue = attrValues.substring(0, attrValues.indexOf(Constants.VALUE_DELIMITER));
-				attrValues = attrValues
-						.substring(attrValues.indexOf(Constants.VALUE_DELIMITER) + 1);
-			} else {
-				attrValue = attrValues;
-				attrValues = null;
-			}
-			if (!((attrValue.equalsIgnoreCase("null"))
-					|| (attrValue.equalsIgnoreCase("nulldate")))) {
-				appendVal = "append,id,attrName," + attrValue;
-			}
-			log.info("appendVal = {}", appendVal);
-		}
 	}
 
 	public void testStringa() {
