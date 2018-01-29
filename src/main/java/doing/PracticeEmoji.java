@@ -27,14 +27,17 @@ public class PracticeEmoji extends TestBase {
 
     @Test
     public void testEmoji() throws Exception {
+        final String SMILE = "😁"; // \uD83D\uDE01  \xF0\x9F\x98\x81
         String content = "test \uD83D\uDE01 test😁test"; // 一个 emoji 表情
-        System.out.println(content);
+        String emojiContent = "test 😁 test😁test";
+        Assert.assertEquals(emojiContent, content);
 
         String filterContent = emojiFilter(content);
-        System.out.println(filterContent);
-
-        String emojiStr = emojiRecovery(filterContent);
-        System.out.println(emojiStr);
+        Assert.assertEquals("test [[EMOJI:%F0%9F%98%81]] test[[EMOJI:%F0%9F%98%81]]test", filterContent);
+        Assert.assertEquals(emojiContent, emojiRecovery(filterContent));
+        
+        byte[] bytes = new byte[] { (byte) 0xf0, (byte) 0x9f, (byte) 0x98, (byte) 0x81 };
+        Assert.assertEquals(SMILE, new String(bytes, "UTF-8"));
     }
 
     @Test
