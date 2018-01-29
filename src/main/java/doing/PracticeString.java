@@ -11,14 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import junit.framework.Assert;
 
@@ -28,60 +23,6 @@ import junit.framework.Assert;
  */
 public class PracticeString extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeString.class);
-
-	@Test
-	public void testEmoji() throws Exception {
-		String content = "test \uD83D\uDE01 test😁test"; // 一个 emoji 表情
-		System.out.println(content);
-
-		String filterContent = emojiFilter(content);
-		System.out.println(filterContent);
-
-		String emojiStr = emojiRecovery(filterContent);
-		System.out.println(emojiStr);
-		
-		content = "test \\xF0\\x9F\\x8D\\x80";
-		System.out.println(content);
-	}
-
-	private static String emojiFilter(String str) {
-		String patternString = "([\\x{10000}-\\x{10ffff}\ud800-\udfff])";
-
-		Pattern pattern = Pattern.compile(patternString);
-		Matcher matcher = pattern.matcher(str);
-
-		StringBuffer sb = new StringBuffer();
-		while (matcher.find()) {
-			try {
-				matcher.appendReplacement(sb,
-						"[[EMOJI:" + URLEncoder.encode(matcher.group(1), "UTF-8") + "]]");
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		}
-		matcher.appendTail(sb);
-
-		return sb.toString();
-	}
-
-	private static String emojiRecovery(String str) {
-		String patternString = "\\[\\[EMOJI:(.*?)\\]\\]";
-
-		Pattern pattern = Pattern.compile(patternString);
-		Matcher matcher = pattern.matcher(str);
-
-		StringBuffer sb = new StringBuffer();
-		while (matcher.find()) {
-			try {
-				matcher.appendReplacement(sb, URLDecoder.decode(matcher.group(1), "UTF-8"));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-		}
-		matcher.appendTail(sb);
-
-		return sb.toString();
-	}
 
 	public void testSubstring0() {
 		String ip = "193.126.233.67, 193.126.233.67";
@@ -127,6 +68,7 @@ public class PracticeString extends TestBase {
 	 * trim方法一般用来去除空格，但是根据JDK API的说明，该方法并不仅仅是去除空格，它能够去除从编码’\u0000′ 至 ‘ ′ 的所有字符。
 	 * 回车换行也在这20个字符之中
 	 */
+	@Test
 	public void trimString() {
 		Character[] chars = new Character[20];
 		chars[0] = '\u0000';

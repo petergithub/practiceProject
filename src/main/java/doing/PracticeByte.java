@@ -1,10 +1,10 @@
 package doing;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import junit.framework.Assert;
 
 /**
  * http://www.tutorialspoint.com/java/java_basic_operators.htm
@@ -67,32 +67,69 @@ import org.slf4j.LoggerFactory;
 public class PracticeByte {
 	private static final Logger log = LoggerFactory.getLogger(PracticeByte.class);
 
-	public static void main(String args[]) {
-		int a = 60; /* 60 = 0011 1100 */
-		int b = 13; /* 13 = 0000 1101 */
-		int c = 0;
+    /**
+     * 按位与，两1得1，遇0得0
+     * 
+     * 按位或，两0得0，遇1得1
+     * 
+     * 按位异或，不同得1，相同得0
+     * 
+     * <a href=
+     * "https://docs.oracle.com/javase/tutorial/java/nutsandbolts/op3.html">Bitwise
+     * and Bit Shift Operators</a>
+     * 
+     * The unary bitwise complement operator "~" inverts a bit pattern;
+     * 
+     * The bitwise & operator performs a bitwise AND operation.
+     * 
+     * The bitwise | operator performs a bitwise inclusive OR operation.
+     * 
+     * The bitwise ^ operator performs a bitwise exclusive OR operation.
+     * 
+     * 
+     * https://www.cnblogs.com/dongpo888/archive/2011/07/13/2105001.html
+     * 
+     * m<<n 即在数字没有溢出的前提下，对于正数和负数，左移n位都相当于m乘以2的n次方.
+     * 
+     * m>>n 即相当于m除以2的n次方，得到的为整数时，即为结果。如果结果为小数，此时会出现两种情况：
+     * 
+     * (1)如果m为正数，得到的商会无条件 的舍弃小数位；
+     * 
+     * (2)如果m为负数，舍弃小数部分，然后把整数部分加+1得到位移后的值。
+     */
+    @Test
+    public void bitwise() {
+        /* 1 = 001 */
+        /* 2 = 010 */
+        /* 3 = 011 */
+        /* 4 = 100 */
+        /* 5 = 101 */
+        /* 6 = 110 */
+        /* 7 = 111 */
+        Assert.assertEquals(5 | 3, 7);
 
-		c = a & b; /* 12 = 0000 1100 */
-		System.out.println("a & b = " + c);
+        Assert.assertEquals(3 & 1, 1);
+        Assert.assertEquals(3 & 2, 2);
+        Assert.assertEquals(3 & 4, 0);
 
-		c = a | b; /* 61 = 0011 1101 */
-		System.out.println("a | b = " + c);
+        Assert.assertEquals(5 & 1, 1);
+        Assert.assertEquals(5 & 4, 4);
+        Assert.assertEquals(5 & 2, 0);
 
-		c = a ^ b; /* 49 = 0011 0001 */
-		System.out.println("a ^ b = " + c);
+        Assert.assertEquals(7 & 1, 1);
+        Assert.assertEquals(7 & 2, 2);
+        Assert.assertEquals(7 & 4, 4);
 
-		c = ~a; /*-61 = 1100 0011 */
-		System.out.println("~a = " + c);
-
-		c = a << 2; /* 240 = 1111 0000 */
-		System.out.println("a << 2 = " + c);
-
-		c = a >> 2; /* 215 = 1111 */
-		System.out.println("a >> 2  = " + c);
-
-		c = a >>> 2; /* 215 = 0000 1111 */
-		System.out.println("a >>> 2 = " + c);
-	}
+        /* 60 = 0011 1100 */
+        /* 13 = 0000 1101 */
+        Assert.assertEquals(60 & 13, 12); /* 12 = 0000 1100 */
+        Assert.assertEquals(60 | 13, 61); /* 61 = 0011 1101 */
+        Assert.assertEquals(60 ^ 13, 49); /* 49 = 0011 0001 */
+        Assert.assertEquals(~60, -61); /*-61 = 1100 0011 */
+        Assert.assertEquals(60 << 2, 240); /* 240 = 1111 0000 */
+        Assert.assertEquals(60 >> 2, 15); /* 15 = 1111 */
+        Assert.assertEquals(60 >>> 2, 15); /* 15 = 0000 1111 */
+    }
 
 	@Test
 	public void testByteOR() {
