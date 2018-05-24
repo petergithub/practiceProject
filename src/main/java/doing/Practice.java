@@ -1,6 +1,14 @@
 package doing;
 
 import com.alibaba.fastjson.JSONObject;
+import com.maxmind.geoip2.DatabaseReader;
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
+import com.maxmind.geoip2.record.Country;
+import com.maxmind.geoip2.record.Location;
+import com.maxmind.geoip2.record.Postal;
+import com.maxmind.geoip2.record.Subdivision;
 
 import org.junit.Test;
 import org.pu.test.base.TestBase;
@@ -9,6 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
@@ -27,6 +37,77 @@ import junit.framework.Assert;
 public class Practice extends TestBase {
 	private final static Logger log = LoggerFactory.getLogger(Practice.class);
 
+	@Test
+	public void maxMemory() {
+	    long MaxDirectMemorySize = Runtime.getRuntime().maxMemory();
+	    log.info("MaxDirectMemorySize: {}", MaxDirectMemorySize);
+	    
+	    //Direct Memory是受GC控制的
+	    //这段代码的执行会在堆外占用1k的内存，Java堆内只会占用一个对象的指针引用的大小，堆外的这1k的空间只有当bb对象被回收时，才会被回收，
+	    // 这里会发现一个明显的不对称现象，就是堆外可能占用了很多，而堆内没占用多少，导致还没触发GC，
+	    // 那就很容易出现Direct Memory造成物理内存耗光。
+	    ByteBuffer bb = ByteBuffer.allocateDirect(1024);
+	}
+	
+    @Test
+    public void logException() {
+        log.error("Exception in Practice.logException() para1: {} para2: {} para3: {}", 1,2,3, new Exception("test exception"));
+    }
+    
+	@Test
+	public void test() {
+	    Assert.assertFalse(diffAbs(1.6D, 0.1D) > 1.5);
+	}
+
+    public static Double diffAbs(Double foo, Double bar) {
+        return Math.abs(foo - bar);
+    }
+	
+    @Test
+    public void practiceGeoIP() throws IOException, GeoIp2Exception {
+     // A File object pointing to your GeoIP2 or GeoLite2 database
+        String cityDb = "/data/GeoLite2-City/GeoLite2-City.mmdb";
+        
+        String path = Practice.class.getClassLoader().getResource("log4j.dtd").getPath();
+        log.info("path: {}", path);
+        File pathFile = new File(path);
+        log.info("pathFile: {}", pathFile);
+        
+        File database = new File(cityDb);
+
+        // This creates the DatabaseReader object. To improve performance, reuse
+        // the object across lookups. The object is thread-safe.
+        DatabaseReader reader = new DatabaseReader.Builder(database).build();
+
+        InetAddress ipAddress = InetAddress.getByName("47.91.92.62");
+
+        // Replace "city" with the appropriate method for your database, e.g.,
+        // "country".
+//        CountryResponse countryResponse = reader.country(ipAddress);
+//        log.info("countryResponse: {}", countryResponse);
+        
+        CityResponse response = reader.city(ipAddress);
+
+        Country country = response.getCountry();
+        System.out.println(country.getIsoCode());            // 'US'
+        System.out.println(country.getName());               // 'United States'
+        System.out.println(country.getNames().get("zh-CN")); // '美国'
+
+        Subdivision subdivision = response.getMostSpecificSubdivision();
+        System.out.println(subdivision.getName());    // 'Minnesota'
+        System.out.println(subdivision.getIsoCode()); // 'MN'
+
+        City city = response.getCity();
+        System.out.println(city.getName()); // 'Minneapolis'
+
+        Postal postal = response.getPostal();
+        System.out.println(postal.getCode()); // '55455'
+
+        Location location = response.getLocation();
+        System.out.println(location.getLatitude());  // 44.9733
+        System.out.println(location.getLongitude()); // -93.2323
+    }
+    
 	@Test
 	public void practiceSensitive() {
 		List<String> list = new ArrayList<>();
@@ -226,6 +307,8 @@ public class Practice extends TestBase {
 	}
 
 	public static void main(String[] args) {
+	    long MaxDirectMemorySize = Runtime.getRuntime().maxMemory();
+	    System.out.println("MaxDirectMemorySize: " + MaxDirectMemorySize);
 		// print where java class is loaded from
 		ClassLoader loader = Test.class.getClassLoader();
 		System.out.println(loader.getResource("org/slf4j/spi/LocationAwareLogger.class"));
@@ -431,11 +514,6 @@ public class Practice extends TestBase {
 		log.info("path = {}", getClass().getResource("/").getPath());
 
 		getClass().getResourceAsStream("");
-	}
-
-	public void testEncode() {
-		String code = System.getProperty("sun.io.unicode.encoding");
-		log.info("code = {}", code);
 	}
 
 	public void testRename() {
