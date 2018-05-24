@@ -1,30 +1,43 @@
 package doing;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-
 import org.apache.log4j.helpers.ISO8601DateFormat;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
-import org.joda.time.Duration;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
 import org.joda.time.Period;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
 
 import demo.security.MD5Util;
 import junit.framework.Assert;
@@ -69,6 +82,91 @@ public class PracticeDate extends TestBase {
 		TimeZone timeZone = Calendar.getInstance().getTimeZone();
 		System.out.println(timeZone.getDisplayName(false, TimeZone.SHORT)); 
 	}
+	
+    /**
+     * https://nkcoder.github.io/2016/01/31/java-8-date-time-api/
+     */
+    @Test
+    public void jdk8Date() {
+        // Instant表示某一个时间点的时间戳，可以类比于java.uti.Date
+        Instant begin = Instant.now();
+        begin.plus(5, ChronoUnit.SECONDS);
+        begin.minusMillis(50);
+        begin.isBefore(Instant.now());
+        begin.toEpochMilli();
+        log.info("begin: {}", begin);
+        
+        // Duration表示Instant之间的时间差，可以用来统计任务的执行时间，也支持各种运算操作
+        // do some work
+        Instant end = Instant.now();
+        Duration elapsed = Duration.between(begin, end);
+        elapsed.toMillis();
+        elapsed.dividedBy(10).minus(Duration.ofMillis(10)).isNegative();
+        elapsed.isZero();
+        elapsed.plusHours(3);
+        
+        LocalDate now = LocalDate.now();
+        LocalDate today = LocalDate.of(2016, 1, 31);
+        LocalDate today2 = LocalDate.of(2016, Month.JANUARY, 31);   // JANUARY = 1, ..., DECEMBER = 12
+        
+        today2.getDayOfWeek().getValue();   // Monday = 1, ..., Sunday = 7
+        LocalDate dayOfYear = Year.now().atDay(220);
+        YearMonth april = Year.of(2016).atMonth(Month.APRIL);
+        
+//        注意，有些操作得到的日期可能是不存在的，比如2016-01-31增加1个月后为2016-02-31，该日期是不存在的，返回值为该月的最后一天，即2016-02-29:
+        LocalDate nextMonth = LocalDate.of(2016, 1, 31).plusMonths(1);  // 2016-02-29
+        
+//        Period用来表示两个LocalDate之间的时间差，支持各种运算操作：
+        LocalDate fiveDaysLater = LocalDate.now().plusDays(5);
+        java.time.Period period = LocalDate.now().until(fiveDaysLater).plusMonths(2);
+        period.isNegative();
+        
+//        TemporalAdjusters用于表示某个月第一天、下个周一等日期：
+        LocalDate.now().with(TemporalAdjusters.firstDayOfMonth());
+        LocalDate.now().with(TemporalAdjusters.lastInMonth(DayOfWeek.SUNDAY));
+        LocalDate.now().with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+        
+        //LocalTime表示时间，没有日期，与时区(TimeZone)无关：
+        LocalTime.now().isBefore(LocalTime.of(16, 2, 1));
+        LocalTime.now().plusHours(2).getHour();
+        
+        //LocalDateTime表示日期和时间，适用于时区固定不变的场合(LocalDateTime使用系统默认的时区)，
+        //如果需要根据时区调整日期和时间，应该使用ZonedDateTime:
+        LocalDateTime.now().plusDays(3).minusHours(5).isAfter(LocalDateTime.of(2016, 1, 30, 10, 20, 30));
+        
+        //ZonedDateTime表示带时区的日期和时间，支持的操作与LocalDateTime非常类似：
+        Set<String> zones = ZoneId.getAvailableZoneIds();
+        ZonedDateTime.now(ZoneId.of("Asia/Shanghai")).plusMonths(1).minusHours(3)
+               .isBefore(ZonedDateTime.now());
+        
+        // ZonedDateTime与LocalDateTime、Instant之间可以相互转换：
+        ZonedDateTime nowOfShanghai = LocalDateTime.now().atZone(ZoneId.of("Asia/Shanghai"));
+        ZonedDateTime.now(ZoneId.of("UTC")).toLocalDate();
+        ZonedDateTime nowOfShanghai2 = Instant.now().atZone(ZoneId.of("Asia/Shanghai"));
+        ZonedDateTime.of(LocalDate.now(), LocalTime.now(), ZoneId.of("UTC")).toInstant();
+        
+        // Formatting 与 Parsing
+        // 要格式化或者解析日期时，需要使用到DateTimeFormatter，用来定义日期或时间的格式：
+     // 2016-01-31T15:39:31.481
+        DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(LocalDateTime.now());
+        // Jan 31, 2016 3:50:04 PM
+        DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).format(LocalDateTime.now());
+        // Sun 2016-01-31 15:50:04
+        DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
+        LocalDateTime.parse("2016-01-31 15:51:00-0400", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssxx"));
+        LocalDate.parse("2016-01-31");
+        // 日期和时间格式化的常见格式：
+//           年       yy: 16      yyyy: 2016
+//           月       M: 1        MM: 01
+//           日       d: 3        dd: 03
+//           周       e: 3        E:  Web
+//           时       H: 9        HH: 09
+//           钟       mm: 02
+//           秒       ss: 00
+//           纳秒      nnnnnn:000000
+//           时区偏移    x: -04     xx:-0400
+        
+    }
 
 	@Test
 	public void date() throws ParseException {
@@ -95,6 +193,7 @@ public class PracticeDate extends TestBase {
 	}
 	
 	
+	@Test
 	public void testDate() throws ParseException {
 		// 20060102150405
 		DateTime dt = new DateTime(2006, 1, 2, 15, 4, 5);
@@ -104,8 +203,11 @@ public class PracticeDate extends TestBase {
 		log.info("system default format: date = {}", date);
 		date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.CHINA).parse(
 				"2006-01-02 15:04:05");
-		log.info("getDateInstance with locale: date = {}", date);
+		log.info("getDateInstance with locale CHINA: date = {}", date);
 		Assert.assertEquals(date.toString(), "Mon Jan 02 00:00:00 CST 2006");
+        date = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US).parse(
+                "Mon Jan 02 15:04:05 CST 2006");
+        log.info("getDateInstance with locale US : date = {}", date);
 		
 		date = new SimpleDateFormat(dateFormat).parse("2006-01-02 15:04:05");
 		log.info("SimpleDateFormat: date = {}", date);
@@ -138,7 +240,7 @@ public class PracticeDate extends TestBase {
 		DateFormat dfISO_8601Z = new SimpleDateFormat(dateFormat_ISO_8601Z);
 		Assert.assertEquals(dfISO_8601Z.format(dt.toDate()), "2006-01-02T15:04:05+0800");
 
-		DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+		org.joda.time.format.DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
 		log.info("ISODateTimeFormat = {}", fmt.print(dt));
 		Assert.assertEquals(fmt.print(dt), "2006-01-02T15:04:05.000+08:00");
 
@@ -182,7 +284,7 @@ public class PracticeDate extends TestBase {
 	public void testDateBetween() {
 		final String dateStart = "01/14/2012 09:29:58";
 		final String dateStop = "01/15/2012 10:31:48";
-		final DateTimeFormatter format = DateTimeFormat.forPattern(dateFormatUs);
+		final org.joda.time.format.DateTimeFormatter format = DateTimeFormat.forPattern(dateFormatUs);
 		final DateTime dt1 = format.parseDateTime(dateStart);
 		final DateTime dt2 = format.parseDateTime(dateStop);
 
@@ -215,7 +317,7 @@ public class PracticeDate extends TestBase {
 		log.info("now[{}]", now);
 
 		DateTime plusPeriod = dt.plus(Period.days(1));
-		DateTime plusDuration = dt.plus(new Duration(24L * 60L * 60L * 1000L));
+		DateTime plusDuration = dt.plus(new org.joda.time.Duration(24L * 60L * 60L * 1000L));
 		DateTime onedayLater = dt.plusDays(1);
 		Assert.assertEquals(onedayLater, plusDuration);
 		Assert.assertEquals(onedayLater, plusPeriod);
@@ -240,7 +342,7 @@ public class PracticeDate extends TestBase {
 		log.info("today = {}", today);
 
 		dt = new DateTime();
-		DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
+		org.joda.time.format.DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
 		log.info("ISODateTimeFormat = {}", fmt.print(dt));
 		
 		DateTime daysAgo = today.minusDays(35);
