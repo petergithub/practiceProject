@@ -5,7 +5,10 @@
 
 PROJECT_NAME=$1
 DEPLOY_DIR=`pwd`
-LOGS_DIR=log
+
+PRGDIR=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname $S)
+
+LOGS_DIR=$PRGDIR/log
 if [ $# -lt 1 ]; then
     echo "ERROR: Required one parameter! Usage: dump.sh PID or dump.sh ProjectName"
     exit 1
@@ -15,7 +18,7 @@ if [ -z "$SERVER_NAME" ]; then
     SERVER_NAME=`hostname`
 fi
 
-PIDS=`ps  --no-heading -C java -f --width 1000 | grep "$PROJECT_NAME" |awk '{print $2}'`
+PIDS=`ps --no-heading -C java -f --width 1000 | grep "$PROJECT_NAME" |awk '{print $2}'`
 
 echo -e "PIDS="$PIDS
 if [ -z "$PIDS" ]; then
@@ -36,7 +39,7 @@ if [ ! -d $DATE_DIR ]; then
     mkdir $DATE_DIR
 fi
 
-echo -e "Dumping the $SERVER_NAME ...\c"
+echo -e "Dumping the $SERVER_NAME to $DATE_DIR ...\c"
 for PID in $PIDS ; do
     jstack $PID > $DATE_DIR/jstack-$PID.dump 2>&1
     echo -e ".\c"
