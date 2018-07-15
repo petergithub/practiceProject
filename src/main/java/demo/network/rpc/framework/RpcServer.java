@@ -49,7 +49,7 @@ import java.net.Socket;
  * }
  * </pre>
  *
- * 该类实现的是一个简单的PpcServer，在此基础上可以进行以下的扩展
+ * 该类实现的是一个简单的RpcServer，在此基础上可以进行以下的扩展
  * 线程池处理调用请求、通信层不使用BIO使用NIO甚至是NIO框架（Netty,Mina等）
  * 使用序列化框架比如protostuff、避免反射调用损耗性能使用动态代理生成代理类、增加 注册中心可以使用zk来完成......
  *
