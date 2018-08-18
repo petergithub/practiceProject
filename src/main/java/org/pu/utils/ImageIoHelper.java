@@ -25,7 +25,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.media.imageio.plugins.tiff.TIFFImageWriteParam;
+//import com.sun.media.imageio.plugins.tiff.TIFFImageWriteParam;
 
 public class ImageIoHelper {
 	private static final String TIF = ".tif";
@@ -74,8 +74,8 @@ public class ImageIoHelper {
 			tifImage = File.createTempFile(TEMP_IMAGE_FILE, TIF);
 			tifImage.deleteOnExit();
 			// Set up the writeParam
-			TIFFImageWriteParam tiffWriteParam = new TIFFImageWriteParam(Locale.US);
-			tiffWriteParam.setCompressionMode(ImageWriteParam.MODE_DISABLED);
+//			TIFFImageWriteParam tiffWriteParam = new TIFFImageWriteParam(Locale.US);
+//			tiffWriteParam.setCompressionMode(ImageWriteParam.MODE_DISABLED);
 
 			IIOImage iioImage = new IIOImage(bi, null, metadata);
 			ios = ImageIO.createImageOutputStream(tifImage);
@@ -84,7 +84,7 @@ public class ImageIoHelper {
 			Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("tiff");
 			writer = writers.next();
 			writer.setOutput(ios);
-			writer.write(null, iioImage, tiffWriteParam);
+//			writer.write(null, iioImage, tiffWriteParam);
 		} catch (IOException e) {
 			log.error("IOException in ImageIOHelper.createTempTifImage()", e);
 		} finally {
