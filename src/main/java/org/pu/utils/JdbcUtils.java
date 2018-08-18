@@ -221,4 +221,15 @@ public class JdbcUtils {
 		displayDbProperties(conn);
 		close(conn);
 	}
+
+	@Test
+	public void testGetMb4() throws SQLException {
+		String mysqlDriver = "com.mysql.jdbc.Driver";
+		String url = "jdbc:mysql://localhost:3306/mb4test2?&useUnicode=true&character_set_server=utf8mb4";
+		String userName = "root";
+		String password = "root";
+		Connection conn = getConnection(url, userName, password, mysqlDriver);
+		displayDbProperties(conn);
+		close(conn);
+	}
 }
