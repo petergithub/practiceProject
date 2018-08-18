@@ -1,23 +1,5 @@
 package doing;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
-
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -43,6 +25,21 @@ import org.pu.utils.IoUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.Assert;
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -59,7 +56,10 @@ import okhttp3.Response;
  */
 
 public class PracticeHttp extends TestBase {
-	private static final Logger log = LoggerFactory.getLogger(PracticeHttp.class);
+
+    private static final Logger log = LoggerFactory.getLogger(PracticeHttp.class);
+
+    private static final String UTF_8 = "UTF-8";
 
 	private final String USER_AGENT = "Mozilla/5.0";
 	OkHttpClient client = new OkHttpClient.Builder().build();	
@@ -303,25 +303,44 @@ public class PracticeHttp extends TestBase {
 			System.out.println("Encoding string is: " + result);
 		}
 	}
+    
+    public void testEncode() {
+        String code = System.getProperty("sun.io.unicode.encoding");
+        log.info("code = {}", code);
+    }
+
+    @Test
+    public void testEncodeDecodeTwice() throws UnsupportedEncodingException {
+        String src = "DEMO测%啊\\试";
+        String encode = URLEncoder.encode(URLEncoder.encode(src, UTF_8), UTF_8);
+        
+        encode = "os=android&method=crm%2FuploadMessage" ;
+
+//        String code = URLDecoder.decode(URLDecoder.decode(encode, UTF_8), UTF_8);
+        String code = URLDecoder.decode(encode, UTF_8);
+        log.info("code = {}", code);
+        code = URLDecoder.decode(code, UTF_8);
+        log.info("code = {}", code);
+    }
 
 	@Test
-	public void testEncodeDecode() throws UnsupportedEncodingException, URIException {
+	public void testEncodeDecode() throws UnsupportedEncodingException {
 		String src = "DEMO测试";
 		String target = "DEMO%E6%B5%8B%E8%AF%95";
 
-		Assert.assertEquals(target, URLEncoder.encode(src, "UTF-8"));
-		Assert.assertEquals(src, URLDecoder.decode(target, "UTF-8"));
+		Assert.assertEquals(target, URLEncoder.encode(src, UTF_8));
+		Assert.assertEquals(src, URLDecoder.decode(target, UTF_8));
 
-		Assert.assertEquals(target, URIUtil.encode(src, new BitSet()));
-		Assert.assertEquals(src, URIUtil.decode(target));
-		Assert.assertEquals("测试账号123", URIUtil.decode("%E6%B5%8B%E8%AF%95%E8%B4%A6%E5%8F%B7123"));
+//		Assert.assertEquals(target, URIUtil.encode(src, new BitSet()));
+//		Assert.assertEquals(src, URIUtil.decode(target));
+//		Assert.assertEquals("测试账号123", URIUtil.decode("%E6%B5%8B%E8%AF%95%E8%B4%A6%E5%8F%B7123"));
 	}
 
 	public void testUrl() throws Exception {
 		String str = "queryStatisticalRecord?condition={condition:{startDate:2015-09-21 00:00,endDate:2015-10-21 00:00}}";
 		// encodeURL =
 		// queryStatisticalRecord%3Fcondition%3D%7Bcondition%3A%7BstartDate%3A2015-09-21+00%3A00%2CendDate%3A2015-10-21+00%3A00%7D%7D
-		String encodeURL = URLEncoder.encode(str, "UTF-8");
+		String encodeURL = URLEncoder.encode(str, UTF_8);
 		log.info("encodeURL = {}", encodeURL);
 		URL url = new URL("http", "testtclpay.tclclouds.com", "/settlement/" + encodeURL);
 		// URL url = new URL("http", "testtclpay.tclclouds.com",
