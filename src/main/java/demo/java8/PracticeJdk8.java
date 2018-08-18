@@ -18,7 +18,12 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -38,6 +43,15 @@ import junit.framework.Assert;
 public class PracticeJdk8 extends TestBase {
     private static final Logger log = LoggerFactory.getLogger(PracticeJdk8.class);
 
+    @Test
+    public void testSet() {
+        Set<String> strSet1 = Stream.of("A", "B", "C", "D")
+                .collect(Collectors.toCollection(HashSet::new));
+//        Using Java 8 (Unmodifiable Sets)
+//        Using Collections.unmodifiableSet - We can use Collections.unmodifiableSet as:
+        Set<String> strSet4 = Collections.unmodifiableSet(strSet1);
+    }
+    
     @Test
     public void testDate() {
         // Clock可以替换System.currentTimeMillis()与TimeZone.getDefault()。
