@@ -1,6 +1,35 @@
 package doing;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.pu.test.base.TestBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.CityResponse;
@@ -10,26 +39,7 @@ import com.maxmind.geoip2.record.Location;
 import com.maxmind.geoip2.record.Postal;
 import com.maxmind.geoip2.record.Subdivision;
 
-import org.junit.Test;
-import org.pu.test.base.TestBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import bean.User;
-import junit.framework.Assert;
 
 /**
  * @author Shang Pu
@@ -37,6 +47,129 @@ import junit.framework.Assert;
 public class Practice extends TestBase {
 	private final static Logger log = LoggerFactory.getLogger(Practice.class);
 
+    @Test
+    public void doublePrecise() {
+        double weight= 50.3;
+        double target = 50.2999992;
+        double change = -1.2;
+        
+        double percent = (weight - (target - change))/change;
+        log.info("percent: {}", percent);
+    }
+    
+	@Test
+	public void base64() {
+        final String text = "Base64 finally in Java 8!";
+         
+        final String encoded = Base64
+            .getEncoder()
+            .encodeToString( text.getBytes( StandardCharsets.UTF_8 ) );
+        System.out.println( encoded );
+         
+        final String decoded = new String( 
+            Base64.getDecoder().decode( encoded ),
+            StandardCharsets.UTF_8 );
+        System.out.println( decoded );
+    }
+	
+	@Test
+	public void sortMapByValue() {
+	    Map<String, Integer> map = ImmutableMap.of("a", 1, "b", 2, "c", 3);
+	    log.info("map: {}", map);
+	    Map<String, Integer> sortedMap = sortMapByValue1(map);
+	    log.info("sortedMap: {}", sortedMap);
+
+        map = new HashMap<String, Integer>();
+        map.put("b", 30);
+        map.put("a", 10);
+        map.put("c", 50);
+        
+        log.info("map: {}", map);
+        sortedMap = sortMapByValue2(map);
+        log.info("sortedMap: {}", sortedMap);
+        
+        log.info("combineMap: {}", combineParamsTogether(map));
+	}
+	
+
+    private String combineParamsTogether(Map<String, Integer> map) {
+        Set<String> names = map.keySet();
+        // remove parameter sign
+
+        StringBuilder result = new StringBuilder();
+
+        // 使用TreeMap,默认按照字母排序
+        TreeMap<String, String> parameter = new TreeMap<>();
+
+        if (parameter.size() > 0) {
+            List<String> comboMap = new ArrayList<String>();
+            for (Entry<String, String> entry : parameter.entrySet()) {
+                String comboResult = entry.getKey() + entry.getValue();
+                comboMap.add(comboResult);
+            }
+            Joiner joiner = Joiner.on("&");
+            result.append(joiner.join(comboMap));
+        }
+        return result.toString();
+    }
+	
+
+    private static Map<String, Integer> sortMapByValue1(Map<String, Integer> map) {
+        List<Map.Entry<String, Integer>> mapList = new ArrayList<Map.Entry<String, Integer>>(
+                map.entrySet());
+        Collections.sort(mapList, new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1,
+                               Map.Entry<String, Integer> o2) {
+                int flag = o2.getValue() - o1.getValue();
+                if (flag == 0){
+                    flag = o1.getKey().compareTo(o2.getKey());
+                }
+                return flag;
+            }
+        });
+        Map<String, Integer> result = new LinkedHashMap<String, Integer>();
+        /*for(Map.Entry<String, Integer> entry:mapList){
+            result.put(entry.getKey(), entry.getValue());
+        }*/
+//        for (int i = 0; i < mapList.size(); i++) {
+//            Map.Entry<String, Integer> entry = mapList.get(i);
+//            if (i > 0) { // 只取一位
+//                break;
+//            }
+//            result.put(entry.getKey(), entry.getValue());
+//        }
+        return result;
+    }
+    
+    
+    public TreeMap<String, Integer> sortMapByValue2(Map<String, Integer> map){
+        Comparator<String> comparator = new ValueComparator(map);
+        //TreeMap is a map sorted by its keys. 
+        //The comparator is used to sort the TreeMap by keys. 
+        TreeMap<String, Integer> result = new TreeMap<String, Integer>(comparator);
+        result.putAll(map);
+        return result;
+    }
+    
+ // a comparator that compares Strings
+    class ValueComparator implements Comparator<String>{
+     
+        Map<String, Integer> map = new HashMap<String, Integer>();
+     
+        public ValueComparator(Map<String, Integer> map){
+            this.map.putAll(map);
+        }
+     
+        @Override
+        public int compare(String s1, String s2) {
+            if(map.get(s1) >= map.get(s2)){
+                return -1;
+            }else{
+                return 1;
+            }   
+        }
+    }
 	@Test
 	public void maxMemory() {
 	    long MaxDirectMemorySize = Runtime.getRuntime().maxMemory();
@@ -306,7 +439,7 @@ public class Practice extends TestBase {
 		Assert.assertEquals(60, minutes);
 	}
 
-	public static void main(String[] args) {
+	public static void main2(String[] args) {
 	    long MaxDirectMemorySize = Runtime.getRuntime().maxMemory();
 	    System.out.println("MaxDirectMemorySize: " + MaxDirectMemorySize);
 		// print where java class is loaded from
