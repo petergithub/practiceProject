@@ -1,8 +1,11 @@
 package doing;
 
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Assert;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.pu.utils.Constants;
@@ -12,10 +15,11 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
 
 /**
  * @version Date: Jan 14, 2014 6:45:48 PM
@@ -24,16 +28,35 @@ import junit.framework.Assert;
 public class PracticeString extends TestBase {
 	private static final Logger log = LoggerFactory.getLogger(PracticeString.class);
 
+    @Test
+    public void compare() {
+        String appver = "3.5.5";
+        boolean result = appver.compareTo("3.5.7") > 0;
+		assertFalse(result);
+    }
+    
+    @Test
+    public void testFormat() {
+        String reply = String.format("体重%1$s千克, 体脂率%2$s%%", 11,
+                1.12);
+        assertEquals(reply, "体重11千克, 体脂率1.12%");
+        
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(118 + 1900, 3, 14);
+        String s1 = String.format("Duke's Birthday: %1$tm %1$te,%1$tY", calendar.getTime());
+        assertEquals(s1, "Duke's Birthday: 04 14,2018");
+    }
+	
 	public void testSubstring0() {
-		String ip = "193.126.233.67, 193.126.233.67";
-		// 多次反向代理后会有多个IP值，第一个为真实IP。
-		int index = ip.indexOf(',');
-		if (index != -1) {
-			String ip0 = ip.substring(0, index);
-			log.info("ip0[{}]", ip0);
-		} else {
-			log.info("ip[{}]", ip);
-		}
+	    String ip = "193.126.233.67, 193.126.233.67";
+	    // 多次反向代理后会有多个IP值，第一个为真实IP。
+	    int index = ip.indexOf(',');
+	    if (index != -1) {
+	        String ip0 = ip.substring(0, index);
+	        log.info("ip0[{}]", ip0);
+	    } else {
+	        log.info("ip[{}]", ip);
+	    }
 	}
 
 	public static String getIpAddr(HttpServletRequest request) {
