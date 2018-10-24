@@ -10,6 +10,7 @@ import org.joda.time.Period;
 import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
+import org.junit.Assert;
 import org.junit.Test;
 import org.pu.test.base.TestBase;
 import org.slf4j.Logger;
@@ -40,7 +41,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import demo.security.MD5Util;
-import junit.framework.Assert;
 
 /**
  * Refer to java.text.SimpleDateFormat
@@ -82,8 +82,69 @@ public class PracticeDate extends TestBase {
 		TimeZone timeZone = Calendar.getInstance().getTimeZone();
 		System.out.println(timeZone.getDisplayName(false, TimeZone.SHORT)); 
 	}
+    
+    /**
+     * Date对象表示特定的日期和时间，而LocalDate(Java8)对象只包含没有任何时间信息的日期
+     */
+    @Test
+    public void jdk8LocalDate() {
+        LocalDate now = LocalDate.now();
+        LocalDate sevenDaysBefore = now.minusDays(7L);
+        
+        boolean isAfter = now.isAfter(sevenDaysBefore);
+        Assert.assertTrue(isAfter);
+        
+        // 日期差 返回1年2个月3天  P-1Y-2M-3D 里的 3
+        java.time.Period period = java.time.Period.between(LocalDate.of(2018, 8, 15), LocalDate.of(2017, 6, 12));
+        long duration = period.get(ChronoUnit.DAYS);
+        Assert.assertEquals(-3, duration);
+        log.info("period: {} duration: {}", period, duration);
+        
+        // 日期差 计算总天数 465
+        long durationDays = ChronoUnit.DAYS.between(LocalDate.of(2018, 8, 15), LocalDate.of(2017, 6, 12));
+        Assert.assertEquals(-429, durationDays);
+        log.info("now: {} sevenDaysBefore: {} duration: {} durationDays: {}", now, sevenDaysBefore, duration, durationDays);
+
+//      Date 转 LocalDate
+//        1）将java.util.Date转换为ZonedDateTime。
+//        2）使用它的toLocalDate（）方法从ZonedDateTime获取LocalDate。
+        LocalDate localDate = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        
+        // LocalDate转Date
+//      1）使用ZonedDateTime将LocalDate转换为Instant。
+//      2）使用from（）方法从Instant对象获取Date的实例
+        Date date = Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        
+        // 计算一年前或一年后的日期
+        LocalDate previousYear = LocalDate.now().minus(1, ChronoUnit.YEARS);
+        LocalDate nextYear = LocalDate.now().plus(1, ChronoUnit.YEARS);
+    }
+    
+    @Test
+    public void jdk8LocalDateTime() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime sevenDaysBefore = now.minusDays(7L);
+        long duration = java.time.Duration.between(LocalDateTime.now(), LocalDateTime.of(2018, 9, 13, 18, 20, 30)).toDays();
+        log.info("now: {} sevenDaysBefore: {} duration: {}", now, sevenDaysBefore, duration);
+        
+
+        //Date转换为LocalDateTime
+        LocalDateTime localDateTime = new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        
+        //LocalDateTime转Date
+        Date date = Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
+    }
 	
     /**
+     * 
+     * Instant：瞬时实例。 
+     * LocalDate：本地日期，不包含具体时间 例如：2014-01-14 可以用来记录生日、纪念日、加盟日等。
+     * LocalTime：本地时间，不包含日期。 
+     * LocalDateTime：组合了日期和时间，但不包含时差和时区信息。
+     * ZonedDateTime：最完整的日期时间，包含时区和相对UTC或格林威治的时差。
+     * http://www.importnew.com/15637.html
+     * http://www.importnew.com/26129.html
+     * 
      * https://nkcoder.github.io/2016/01/31/java-8-date-time-api/
      */
     @Test
@@ -155,6 +216,11 @@ public class PracticeDate extends TestBase {
         DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
         LocalDateTime.parse("2016-01-31 15:51:00-0400", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssxx"));
         LocalDate.parse("2016-01-31");
+
+        //Date和Instant互相转换
+        Date date = Date.from(Instant.now());
+        Instant instant = date.toInstant();
+        
         // 日期和时间格式化的常见格式：
 //           年       yy: 16      yyyy: 2016
 //           月       M: 1        MM: 01
