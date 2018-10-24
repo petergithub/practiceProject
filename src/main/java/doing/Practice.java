@@ -609,15 +609,40 @@ public class Practice extends TestBase {
 		log.info(" = {}", Arrays.asList(strings));
 	}
 
+	@Test
 	public void execommand() throws IOException {
 		String cmd = "D:\\sp\\work\\script\\testBat.bat";
 		cmd = "cmd /C start cmd /K bash --login -i";
 		cmd = "explorer /select, /e,D:\\sudoers.txt";
-		Runtime.getRuntime().exec(cmd);
-		Runtime.getRuntime().exec(cmd, null, new File("D:\\sudoers.txt"));
-		String result = org.pu.utils.Utils.exeCmd(cmd, "gbk");
-		log.info("result = {}", result);
+		
+		cmd = "open -a Finder /Users/pu/sp/Nustore\\ Files/Dropbox/base/";
+		log.info("cmd {}", cmd);
+		
+		Runtime.getRuntime().exec(cmd, null, null);
+//		Runtime.getRuntime().exec(cmd, null, new File("D:\\sudoers.txt"));
+//		String result = org.pu.utils.Utils.exeCmd(cmd, "gbk");
+//		log.info("result = {}", result);
 	}
+	
+	@Test
+	public void runtimeExec() throws IOException {
+	 // note no leading forward slash
+	    String fileRelationPath = "Users/pu/sp/Nustore Files/Dropbox/base/";
+	    File workingDir = new File("/");
+	    String[] cmd = new String[]{"open", "-R", fileRelationPath};
+
+//	    Runtime.getRuntime().exec(cmd, null, workingDir);
+	    
+	 // Note leading forward slash:
+	    File file = new File("/Users/pu/sp/Nustore Files/Dropbox/base/") ;
+	    workingDir = file.getParentFile();
+	    String filename = file.getName();
+
+	    cmd = new String[] {"open", "-R", filename} ;
+	    Runtime.getRuntime().exec(cmd, null, workingDir);
+	    
+	}
+	
 
 	public void testInteger() {
 		int num = 6553800;

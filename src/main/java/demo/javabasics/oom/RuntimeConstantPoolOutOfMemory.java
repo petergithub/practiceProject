@@ -1,8 +1,7 @@
 package demo.javabasics.oom;
 
+import org.junit.Assert;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 /**
  * 深入理解Java虚拟机: JVM高级特性与最佳实践
