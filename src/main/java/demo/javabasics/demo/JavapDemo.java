@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo;
+package demo.javabasics.demo;
 
 public class JavapDemo {
 	public static void main(String[] args) {

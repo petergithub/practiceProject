@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo.awt;
+package demo.javabasics.demo.awt;
 
 import java.awt.Button;
 import java.awt.Label;

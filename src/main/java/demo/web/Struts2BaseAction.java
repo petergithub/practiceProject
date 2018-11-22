@@ -1,4 +1,4 @@
-﻿package demo.web;
+package demo.web;
 
 import org.apache.struts2.ServletActionContext;
 

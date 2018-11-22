@@ -1,4 +1,4 @@
-﻿package doing.concurrency.producer.consumer;
+package doing.concurrency.producer.consumer;
 
 public class Producer extends Thread {
 	private String name;

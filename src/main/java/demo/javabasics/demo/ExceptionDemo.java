@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo;
+package demo.javabasics.demo;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -1,4 +1,4 @@
-﻿首先要定义四个变量：
+首先要定义四个变量：
 int pageSize:每页显示多少条记录
 int pageNow:希望显示第几页
 int pageCount:一共有多少页

@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo.awt.listener;
+package demo.javabasics.demo.awt.listener;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;

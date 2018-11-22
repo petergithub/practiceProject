@@ -1,4 +1,4 @@
-﻿package demo.frame.hibernate;
+package demo.frame.hibernate;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,4 +1,4 @@
-﻿package demo.network;
+package demo.network;
 
 import java.awt.Button;
 import java.awt.Frame;

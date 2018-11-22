@@ -1,4 +1,4 @@
-﻿package doing.concurrency.producer.consumer;
+package doing.concurrency.producer.consumer;
 
 import org.apache.log4j.Logger;
 

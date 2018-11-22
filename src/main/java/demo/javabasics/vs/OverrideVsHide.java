@@ -1,4 +1,4 @@
-﻿package demo.javabasics.vs;
+package demo.javabasics.vs;
 
 import static org.junit.Assert.assertEquals;
 

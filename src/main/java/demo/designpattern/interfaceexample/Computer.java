@@ -1,4 +1,4 @@
-﻿package demo.designpattern.interfaceexample;
+package demo.designpattern.interfaceexample;
 
 class Computer {
 	public static void main(String[] args) {

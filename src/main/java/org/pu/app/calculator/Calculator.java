@@ -1,4 +1,4 @@
-﻿package org.pu.app.calculator;
+package org.pu.app.calculator;
 
 import java.awt.Button;
 import java.awt.Color;

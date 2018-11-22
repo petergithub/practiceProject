@@ -1,4 +1,4 @@
-﻿package org.pu.app.book.trainticket.util;
+package org.pu.app.book.trainticket.util;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

@@ -1,4 +1,4 @@
-﻿package doing.search;
+package doing.search;
 
 import java.awt.Button;
 import java.awt.Graphics;

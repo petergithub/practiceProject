@@ -1,4 +1,4 @@
-﻿package demo.designpattern.behavioral.observer;
+package demo.designpattern.behavioral.observer;
 
 import java.util.Observable;
 

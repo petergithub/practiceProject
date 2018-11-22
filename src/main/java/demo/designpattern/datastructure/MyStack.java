@@ -1,4 +1,4 @@
-﻿package demo.designpattern.datastructure;
+package demo.designpattern.datastructure;
 
 import java.util.LinkedList;
 

@@ -1,4 +1,4 @@
-﻿package demo.web.common;
+package demo.web.common;
 
 import java.io.IOException;
 

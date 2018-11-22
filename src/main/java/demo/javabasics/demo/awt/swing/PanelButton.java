@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo.awt.swing;
+package demo.javabasics.demo.awt.swing;
 
 import java.awt.BorderLayout;
 import java.awt.Button;

@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo;
+package demo.javabasics.demo;
 
 /**
  * 程序流程为: 在主函数中，首先执行new MyBase()，在这个过程中， 子类会首先调用父类的构造函数；在父类的构造函数Base()中执行

@@ -1,4 +1,4 @@
-﻿package demo.javabasics.demo.awt.swing;
+package demo.javabasics.demo.awt.swing;
 
 import java.awt.Button;
 import java.awt.Color;
