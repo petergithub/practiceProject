@@ -255,7 +255,8 @@ public class PracticeDate extends TestBase {
 	@Test
 	public void parseLongToDate() throws ParseException {
 		Date date = new Date(1464593775057l);
-		log.info("date[{}]", date);
+		log.info("date[{}]", date); //Mon May 30 15:36:15 CST 2016
+		Assert.assertTrue(date.before(new Date()));
 	}
 	
 	
