@@ -1,12 +1,17 @@
+#!/usr/bin/env bash
+
 #kill之前先dump
 #每次线上环境一出问题,大家就慌了,通常最直接的办法回滚重启,
 #以减少故障时间,这样现场就被破坏了,要想事后查问题就麻烦了,
 #有些问题必须在线上的大压力下才会发生,线下测试环境很难重现,
-#不太可能让开发或Appops在重启前,先手工将出错现场所有数据备份一下,
+#不太可能在重启前,先手工将出错现场所有数据备份一下,
 #所以最好在kill脚本之前调用dump,进行自动备份,这样就不会有人为疏忽。
+#
+# dump path: SCRIPT_HOME/log/$DATE
 
-JAVA_HOME=/usr/java
-DEPLOY_HOME=`dirname $0`
+
+#JAVA_HOME=/usr/java
+SCRIPT_HOME=`dirname $0`
 
 PROJECT_NAME=$1
 DEPLOY_DIR=`pwd`
@@ -20,7 +25,9 @@ if [ -z "$SERVER_NAME" ]; then
     SERVER_NAME=`hostname`
 fi
 
-PIDS=`ps  --no-heading -C java -f --width 1000 | grep "$PROJECT_NAME" |awk '{print $2}'`
+PS_CONTENT=`ps --no-heading -C java -f --width 1000 | grep "$PROJECT_NAME"`
+echo $PS_CONTENT
+PIDS=`echo $PS_CONTENT | tee | awk '{print $2}'`
 
 echo -e "PIDS="$PIDS
 if [ -z "$PIDS" ]; then
@@ -28,20 +35,13 @@ if [ -z "$PIDS" ]; then
     exit 1
 fi
 
-if [ ! -d $LOGS_DIR ]; then
-    mkdir $LOGS_DIR
-fi
-DUMP_DIR=$LOGS_DIR/dump
-if [ ! -d $DUMP_DIR ]; then
-    mkdir $DUMP_DIR
-fi
 DUMP_DATE=`date +%Y%m%d%H%M%S`
-DATE_DIR=$DUMP_DIR/$DUMP_DATE
+DATE_DIR=$SCRIPT_HOME/$LOGS_DIR/dump/$DUMP_DATE
 if [ ! -d $DATE_DIR ]; then
-    mkdir $DATE_DIR
+    mkdir -p $DATE_DIR
 fi
 
-echo -e "Dumping the $SERVER_NAME ...\c"
+echo -e "Dumping the pid $PIDS on host $SERVER_NAME to $DATE_DIR ...\c"
 for PID in $PIDS ; do
     jstack $PID > $DATE_DIR/jstack-$PID.dump 2>&1
     echo -e ".\c"
