@@ -1,21 +1,16 @@
 #!/usr/bin/env bash
 
-#kill之前先dump
-#每次线上环境一出问题,大家就慌了,通常最直接的办法回滚重启,
-#以减少故障时间,这样现场就被破坏了,要想事后查问题就麻烦了,
-#有些问题必须在线上的大压力下才会发生,线下测试环境很难重现,
-#不太可能在重启前,先手工将出错现场所有数据备份一下,
-#所以最好在kill脚本之前调用dump,进行自动备份,这样就不会有人为疏忽。
+# Dump useful info for analysis later: jstack, jinfo, jstat, jmap, lsof, netstat, iostat, mpstat, vmstat, free, sar, uptime
+# dump.sh PID or dump.sh ProjectName
 #
 # dump path: SCRIPT_HOME/log/$DATE
 # get the script: wget --no-check-certificate -O dump.sh https://raw.githubusercontent.com/petergithub/practiceProject/master/scripts/shell/dump.sh
 
+PRGDIR=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname $S)
 
-#JAVA_HOME=/usr/java
-SCRIPT_HOME=`dirname $0`
-
+LOGS_DIR=$PRGDIR/log
 if [ $# -lt 1 ]; then
-    echo "ERROR: Required one parameter! Usage: dump.sh PID/ProjectName"
+    echo "ERROR: Required one parameter! Usage: dump.sh PID or dump.sh ProjectName"
     exit 1
 fi
 PROJECT_NAME=$1
