@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo clear cache
 cd logs/Documentum
 rm -rf datacache

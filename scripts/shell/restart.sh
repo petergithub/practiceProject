@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 shutdown() {
 	echo "restart tomcat"
 	echo "shutdown"

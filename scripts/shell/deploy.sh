@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # deploy class.zip and projectName.zip
 
 LOG=log.deploy.log

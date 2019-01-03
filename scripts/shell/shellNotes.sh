@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 #upload file to remote server
 pscp -i %putty%/putty.ppk C:\Workspace\clonevdoc\* username@hostname:peter/clonevdoc/

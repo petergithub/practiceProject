@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 # scp-speed-test.sh
 # Author: Alec Jacobson alecjacobsonATgmailDOTcom
 # http://www.alecjacobson.com/weblog/?p=635
