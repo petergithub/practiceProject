@@ -6,17 +6,14 @@
 # dump path: SCRIPT_HOME/log/$DATE
 # get the script: wget --no-check-certificate -O dump.sh https://raw.githubusercontent.com/petergithub/practiceProject/master/scripts/shell/dump.sh
 
-PRGDIR=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname $S)
-
-LOGS_DIR=$PRGDIR/log
 if [ $# -lt 1 ]; then
     echo "ERROR: Required one parameter! Usage: dump.sh PID or dump.sh ProjectName"
     exit 1
 fi
 PROJECT_NAME=$1
 
-DEPLOY_DIR=`pwd`
-LOGS_DIR=log
+PRGDIR=$(S=$(readlink "$0"); [ -z "$S" ] && S=$0; dirname $S)
+LOGS_DIR=$PRGDIR/log
 
 if [ -z "$SERVER_NAME" ]; then
     SERVER_NAME=`hostname`
@@ -28,12 +25,12 @@ PIDS=`echo $PS_CONTENT | tee | awk '{print $2}'`
 
 echo -e "PIDS="$PIDS
 if [ -z "$PIDS" ]; then
-    echo "ERROR: The $PIDS does not started!"
+    echo "ERROR: The $PROJECT_NAME does not started!"
     exit 1
 fi
 
 DUMP_DATE=`date +%Y%m%d%H%M%S`
-DATE_DIR=$SCRIPT_HOME/$LOGS_DIR/dump/$DUMP_DATE
+DATE_DIR=$LOGS_DIR/dump/$DUMP_DATE
 if [ ! -d $DATE_DIR ]; then
     mkdir -p $DATE_DIR
 fi
