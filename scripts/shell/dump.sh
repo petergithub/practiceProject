@@ -8,18 +8,20 @@
 #所以最好在kill脚本之前调用dump,进行自动备份,这样就不会有人为疏忽。
 #
 # dump path: SCRIPT_HOME/log/$DATE
+# get the script: wget --no-check-certificate -O dump.sh https://raw.githubusercontent.com/petergithub/practiceProject/master/scripts/shell/dump.sh
 
 
 #JAVA_HOME=/usr/java
 SCRIPT_HOME=`dirname $0`
 
-PROJECT_NAME=$1
-DEPLOY_DIR=`pwd`
-LOGS_DIR=log
 if [ $# -lt 1 ]; then
     echo "ERROR: Required one parameter! Usage: dump.sh PID/ProjectName"
     exit 1
 fi
+PROJECT_NAME=$1
+
+DEPLOY_DIR=`pwd`
+LOGS_DIR=log
 
 if [ -z "$SERVER_NAME" ]; then
     SERVER_NAME=`hostname`
@@ -41,7 +43,7 @@ if [ ! -d $DATE_DIR ]; then
     mkdir -p $DATE_DIR
 fi
 
-echo -e "Dumping the pid $PIDS on host $SERVER_NAME to $DATE_DIR ...\c"
+echo -e "Dumping the pid $PIDS for project $PROJECT_NAME on host $SERVER_NAME to $DATE_DIR ...\c"
 for PID in $PIDS ; do
     jstack $PID > $DATE_DIR/jstack-$PID.dump 2>&1
     echo -e ".\c"
