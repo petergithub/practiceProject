@@ -537,7 +537,12 @@
 				in the war -->
 			<scope>provided</scope>
 		</dependency>
-		<!-- Container provided end -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.8</version>
+        </dependency>
+        <!-- Container provided end -->
 	</dependencies>
 
 	<build>
