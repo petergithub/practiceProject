@@ -1,13 +1,9 @@
 package doing;
 
+import demo.security.MD5Util;
 import org.apache.log4j.helpers.ISO8601DateFormat;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
-import org.joda.time.Hours;
-import org.joda.time.Minutes;
+import org.joda.time.*;
 import org.joda.time.Period;
-import org.joda.time.Seconds;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Assert;
@@ -19,28 +15,18 @@ import org.slf4j.LoggerFactory;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
+import java.time.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Month;
-import java.time.Year;
 import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TimeZone;
-
-import demo.security.MD5Util;
+import java.util.*;
 
 /**
  * Refer to java.text.SimpleDateFormat
@@ -82,6 +68,7 @@ public class PracticeDate extends TestBase {
 		TimeZone timeZone = Calendar.getInstance().getTimeZone();
 		System.out.println(timeZone.getDisplayName(false, TimeZone.SHORT)); 
 	}
+
     
     /**
      * Date对象表示特定的日期和时间，而LocalDate(Java8)对象只包含没有任何时间信息的日期
@@ -257,6 +244,9 @@ public class PracticeDate extends TestBase {
 		Date date = new Date(1464593775057l);
 		log.info("date[{}]", date); //Mon May 30 15:36:15 CST 2016
 		Assert.assertTrue(date.before(new Date()));
+
+		long timestamp = date.getTime();
+		log.info("timestamp: {}", timestamp);
 	}
 	
 	

@@ -27,18 +27,9 @@
 
 package org.pu.app.book.trainticket.util;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.Header;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.ProtocolException;
-import org.apache.http.annotation.Immutable;
+import org.apache.http.*;
 import org.apache.http.client.CircularRedirectException;
 import org.apache.http.client.RedirectHandler;
 import org.apache.http.client.methods.HttpGet;
@@ -50,13 +41,15 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 /**
  * Default implementation of {@link RedirectHandler}.
  * @author bincode
  * @email	5235852@qq.com
  */
 @SuppressWarnings("deprecation")
-@Immutable
 public class DefaultRedirectHandler implements RedirectHandler {
 
     private final Log log = LogFactory.getLog(getClass());
@@ -67,6 +60,7 @@ public class DefaultRedirectHandler implements RedirectHandler {
         super();
     }
     
+    @Override
     public boolean isRedirectRequested(
             final HttpResponse response,
             final HttpContext context) {

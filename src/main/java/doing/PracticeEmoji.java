@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,14 +38,14 @@ public class PracticeEmoji extends TestBase {
         Assert.assertEquals(emojiContent, emojiRecovery(filterContent));
         
         byte[] bytes = new byte[] { (byte) 0xf0, (byte) 0x9f, (byte) 0x98, (byte) 0x81 };
-        Assert.assertEquals(SMILE, new String(bytes, "UTF-8"));
+        Assert.assertEquals(SMILE, new String(bytes, StandardCharsets.UTF_8.name()));
     }
 
     @Test
     public void emojiConvert() throws UnsupportedEncodingException {
         final String MAPLE_LEAF = "🍁"; // \uD83C\uDF41 U+1F341 \xF0\x9F\x8D\x81
         byte[] bytes = new byte[] { (byte) 0xf0, (byte) 0x9f, (byte) 0x8d, (byte) 0x81 };
-        Assert.assertEquals(MAPLE_LEAF, new String(bytes, "UTF-8"));
+        Assert.assertEquals(MAPLE_LEAF, new String(bytes, StandardCharsets.UTF_8.name()));
         Assert.assertEquals(MAPLE_LEAF, "\uD83C\uDF41");
         Assert.assertEquals(MAPLE_LEAF, new StringBuilder().appendCodePoint(0x1F341).toString());
         log.info("bytes: {}", MAPLE_LEAF.getBytes()); // [-16, -97, -115, -127]
@@ -60,7 +61,7 @@ public class PracticeEmoji extends TestBase {
 
         byte[] bytes2 = new byte[] { 0x6c, 0x69, 'b', '/', 0x62, 0x2f, 0x6d, 0x69, 'n', 'd', '/', 'm', 0x61, 'x', 0x2e,
                 0x70, 'h', 0x70 };
-        String str2 = new String(bytes2, "UTF-8");
+        String str2 = new String(bytes2, StandardCharsets.UTF_8.name());
         log.info("str2: {}", str2);
     }
 
@@ -79,7 +80,7 @@ public class PracticeEmoji extends TestBase {
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             try {
-                matcher.appendReplacement(sb, "[[EMOJI:" + URLEncoder.encode(matcher.group(1), "UTF-8") + "]]");
+                matcher.appendReplacement(sb, "[[EMOJI:" + URLEncoder.encode(matcher.group(1), StandardCharsets.UTF_8.name()) + "]]");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
@@ -98,7 +99,7 @@ public class PracticeEmoji extends TestBase {
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             try {
-                matcher.appendReplacement(sb, URLDecoder.decode(matcher.group(1), "UTF-8"));
+                matcher.appendReplacement(sb, URLDecoder.decode(matcher.group(1), StandardCharsets.UTF_8.name()));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

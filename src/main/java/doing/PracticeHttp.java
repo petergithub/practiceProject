@@ -59,7 +59,7 @@ public class PracticeHttp extends TestBase {
 
     private static final Logger log = LoggerFactory.getLogger(PracticeHttp.class);
 
-    private static final String UTF_8 = "UTF-8";
+    private static final String UTF_8 = StandardCharsets.UTF_8.name();
 
 	private final String USER_AGENT = "Mozilla/5.0";
 	OkHttpClient client = new OkHttpClient.Builder().build();	
