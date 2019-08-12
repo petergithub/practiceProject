@@ -219,3 +219,7 @@ gradle-app.setting
 /src/main/main.iml
 
 !/lib/*.jar
+
+__pycache__
+*.pyc
+
