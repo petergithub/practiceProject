@@ -29,6 +29,28 @@ import java.util.concurrent.TimeUnit;
 public class Practice extends TestBase {
 	private final static Logger log = LoggerFactory.getLogger(Practice.class);
 
+
+	@Test
+	public void longLength() {
+		Long timestamp = System.currentTimeMillis();
+		Assert.assertTrue(timestamp.toString().length() == 13);
+
+		Long timestamp10 = timestamp / 1000;
+		Assert.assertTrue(timestamp10.toString().length() == 10);
+		Assert.assertTrue(timestamp2TenDigits(timestamp).toString().length() == 10);
+		Assert.assertTrue(timestamp2TenDigits(timestamp10).toString().length() == 10);
+	}
+
+	private Long timestamp2TenDigits(Long lastReportTime) {
+		int TIMESTAMP_WITH_MILLIS = 13;
+		int MILLS_TO_SECOND = 1000;
+
+		if (lastReportTime.toString().length() == TIMESTAMP_WITH_MILLIS) {
+			lastReportTime = lastReportTime / MILLS_TO_SECOND;
+		}
+		return lastReportTime;
+	}
+
     @Test
     public void doublePrecise() {
         double weight= 50.3;
