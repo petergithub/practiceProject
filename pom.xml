@@ -257,7 +257,7 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
-			<version>1.0.3.RELEASE</version>
+			<version>[1.11.22,)</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -548,6 +548,7 @@
 			<artifactId>jython-standalone</artifactId>
 			<version>2.7.0</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>
