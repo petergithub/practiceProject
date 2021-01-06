@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.pu.utils.StringUtils;
 import org.python.core.*;
 import org.python.util.PythonInterpreter;
+import org.springframework.util.StopWatch;
 
 import java.io.*;
 
@@ -108,7 +109,37 @@ public class PracticePythonTest {
         Assert.assertEquals(42, pyobj.__tojava__(Integer.class));
     }
 
+
     @Test
+    public void jythonDinner() {
+        StopWatch clock = new StopWatch("timer");
+        clock.start("initJpython");
+
+        PythonInterpreter python = new PythonInterpreter();
+        PySystemState sys = Py.getSystemState();
+        //依赖 model_1.py 所以需要导入
+        sys.path.add(pythonScriptPath); // import dependency module
+        String projectDir = "/Users/pu/Documents/workspace/code.picooc/python/Daily_Record/";
+        sys.path.add(projectDir); // import dependency module
+        clock.stop();
+
+        clock.start("tets1");
+        python.execfile(projectDir + "Dinner_record_model.py");
+        PyFunction func = (PyFunction) python.get("test", PyFunction.class);
+        PyObject pyobj = func.__call__();
+        log.debug(pyobj.toString());
+        clock.stop();
+
+        clock.start("tets1");
+        python.execfile(projectDir + "Dinner_record_model.py");
+        pyobj = func.__call__();
+        log.debug(pyobj.toString());
+        clock.stop();
+
+        log.info("Time consume {}", clock.prettyPrint());
+    }
+
+        @Test
     public void runtimeMultipleThread() throws IOException, InterruptedException {
         final Process process = Runtime.getRuntime().exec(command);
         printMessage(process.getInputStream());
